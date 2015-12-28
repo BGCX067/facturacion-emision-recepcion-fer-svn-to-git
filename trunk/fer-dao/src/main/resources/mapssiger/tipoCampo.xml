@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.campo.TipoCampoDAO">
+    <select id="consultar" resultMap="ctTipoCampo">
+         SELECT * FROM CTTIPOSCAMPOS 
+                       ORDER BY LLTIPOCAMPO
+    </select>
+    <!-- Sección resultMaps -->
+     <resultMap type="ctTipoCampo"      id="ctTipoCampo">
+        <result column="LLTIPOCAMPO"    property="id"/>
+        <result column="DSTIPOCAMPO"    property="nombre"/>
+    </resultMap>
+    <!-- fin de sección resultMaps -->
+</mapper>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.administracion.OficinasDAO">
+	<resultMap type="oficinas" id="listaOficinas">
+		<result column="dsoficina" 			property="nombre" />
+		<result column="lloficina" 			property="id" />
+		<result column="dsdomicilio" 		property="domicilio" />
+		<result column="crtelefono" 		property="telefono" />
+		<result column="fcalta" 			property="fcAlta"/>
+		<result column="fcmodificacion" 	property="fcModificacion"/>
+		<result column="boactivo" 			property="activo"/>
+		<result column="dsnombreresp" 		property="nombreResponsable" />
+		<result column="dscorreodirofi" 	property="correoDirectorOficina" />
+		<result column="dscorreorespofi" 	property="correoResponsableOficina" />
+		<result column="dsextencion" 		property="extension" />
+		<result column="fcinioperacion" 	property="fcInicioOperacion"/>
+		<result column="dspaginaweb" 		property="paginaWeb" />
+		<result column="boacervo" 			property="acervo"/>
+		<result column="boincidencias" 		property="incidencias"/>
+		<result column="dsmunicipio" 		property="ctMunicipio.nombre" />
+		<result column="llmunicipio"		property="ctMunicipio.id.idMunicipio"/>
+		<association property="ctEstado" 		column="LLESTADO" 		javaType="ctEstados" 		resultMap="ctEstadosMap"/>
+		<association property="ctUsoHorario" 	column="llusohorario" 	javaType="ctHusoHorario" 	resultMap="ctHusoHorarioMap" />
+	</resultMap>
+	
+	<resultMap type="ctEstados" id="ctEstadosMap">
+		<id property="id" column="LLESTADO"/>
+		<result property="nombre" column="DSESTADO"/>
+	</resultMap>
+	
+	<resultMap type="ctHusoHorario" id="ctHusoHorarioMap">
+		<id property="id" column="LLUSOHORARIO"/>
+		<result property="nombre" column="DSNOMBRE"/>
+	</resultMap>
+	
+	<resultMap type="ctMunicipio" id="ctMunicipioMap">
+		<id property="id" column="LLMUNICIPIO"/>
+		<result property="nombre" column="DSMUNICIPIO"/>
+	</resultMap>
+	
+	<resultMap type="oficinas" id="oficina">
+		<result column="lloficina" property="id" javaType="Long" jdbcType="NUMERIC"/>
+		<result column="dsoficina" property="nombre" javaType="String" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="busquedaOficinaPorId" parameterType="java.lang.Long" resultMap="oficina">
+		SELECT LLOFICINA, DSOFICINA FROM CTOFICINAS
+		WHERE LLOFICINA = #{id}	
+	</select>
+	
+	<select id="busquedaOficinas" parameterType="java.lang.Long" resultMap="listaOficinas">
+		SELECT *
+		FROM CTOFICINAS
+		WHERE CTOFICINAS.LLOFICINA = #{id}
+	</select>
+	
+	<select id="busquedaOficinasPorNombre" parameterType="java.lang.String" resultMap="listaOficinas">
+		SELECT ofi.*, 
+		    esta.*,
+		    uso.*,
+		    mun.*
+		FROM CTOFICINAS ofi
+			join ctestados esta on esta.llestado = ofi.llestado
+		    join ctusohorario uso on uso.llusohorario = ofi.llusohorario
+		    join ctmunicipios mun on mun.llestado = ofi.llestado and mun.llmunicipio = ofi.llmunicipio
+		WHERE DSOFICINA LIKE '%' || #{nombre} || '%'
+	</select>
+	
+	<select id="consultaEstado" parameterType="java.lang.Integer" resultType="ctEstados">
+		SELECT * 
+		FROM CTESTADOS
+		WHERE LLESTADO = #{LLESTADO}
+	</select>
+	
+	<select id="consultaUsoHorario" parameterType="java.lang.Integer" resultType="ctHusoHorario">
+		SELECT *
+		FROM CTUSOHORARIO
+		WHERE LLUSOHORARIO = #{LLUSOHORARIO}
+	</select>
+	
+	<insert id="crearOficina" parameterType="oficinas" keyColumn="LLOFICINA" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO CTOFICINAS (LLOFICINA, DSOFICINA, DSDOMICILIO, LLESTADO, LLMUNICIPIO, CRTELEFONO, LLUSOHORARIO,
+		FCALTA, FCMODIFICACION, BOACTIVO, DSNOMBRERESP, DSCORREODIROFI, DSCORREORESPOFI, DSEXTENCION, FCINIOPERACION,
+		DSPAGINAWEB, BOACERVO, BOINCIDENCIAS)
+		VALUES (
+			#{id},
+			#{nombre},
+			#{domicilio},
+			#{ctEstado.id},
+			#{ctMunicipio.id.idMunicipio},
+			#{telefono},
+			#{ctUsoHorario.id},
+			#{fcAlta},
+			#{fcModificacion},
+			#{activo},
+			#{nombreResponsable},
+			#{correoDirectorOficina},
+			#{correoResponsableOficina},
+			#{extension},
+			#{fcInicioOperacion},
+			#{paginaWeb},
+			#{acervo},
+			#{incidencias}
+		)
+	</insert>
+	
+	<update id="actualizaOficina" parameterType="oficinas">
+		UPDATE CTOFICINAS SET
+	    DSOFICINA = #{nombre},
+	    DSDOMICILIO= #{domicilio},
+	    LLESTADO= #{ctEstado.id},
+	    LLMUNICIPIO= #{ctMunicipio.id.idMunicipio},
+	    CRTELEFONO= #{telefono},
+	    LLUSOHORARIO= #{ctUsoHorario.id},
+	    DSCORREODIROFI= #{correoDirectorOficina},
+	    DSCORREORESPOFI= #{correoResponsableOficina},
+	    DSEXTENCION=#{extension},
+	    FCINIOPERACION=#{fcInicioOperacion},
+	    DSPAGINAWEB=#{paginaWeb},
+	    BOACTIVO= #{activo},
+	    BOACERVO= #{acervo},
+	    BOINCIDENCIAS = #{incidencias}
+	    WHERE LLOFICINA = #{id}
+	</update>
+	
+</mapper>

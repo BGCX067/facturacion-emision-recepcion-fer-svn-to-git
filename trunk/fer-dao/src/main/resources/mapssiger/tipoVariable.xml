@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.tipovariable.TipoVariableDAO">
+    <!-- selects -->
+    <select id="consultar" resultMap="ctTipoVariable">
+       SELECT * FROM CTTIPOVARIABLE
+    </select>
+    <!-- Fin  selects -->
+   
+    <resultMap type="ctTipoVariable" id="ctTipoVariable">
+      <id column="LLTIPOVARIABLE"  property="id"/>
+      <result column="DSNOMBRE" property="nombre"/>   
+    </resultMap>
+    <!-- fin  resultMaps -->
+</mapper>

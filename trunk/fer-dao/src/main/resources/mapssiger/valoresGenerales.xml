@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.administracion.ValorGeneralDAO">
+
+	<resultMap  id="valorGeneralMap" type="valoregeneral">
+	
+		<result property="diasSolicitudVentanilla" column="NOLIMITESOLVENTAN"/>
+		<result property="diasAdvertenciaSolicitudVentanilla" column="NODIASADVSOLVENTAN"/>
+		<result property="diasSolicitudWeb" column="NOLIMITESOLWEBORD"/>
+		<result property="diasAdvertenciaSolicitudWeb" column="NODIASADVWEBORD"/>
+		<result property="diasCertificacion" column="NOLIMITECERTIFICACION"/>
+		<result property="diasAdvertenciasCertificacion" column="NODIASADVCERTIFICAC"/>
+		<result property="diasRechazoSubsanable" column="NOLIMITACLARECHSUBS"/>
+		
+		<result property="boletaIngInscr" column="BLINGRESOINSC"/>
+		<result property="boletaIngrConIns" column="BLINGRESOCONT"/>
+		<result property="boletaIngrCertif" column="BLBOLINGRESOCERT"/>
+		<result property="boletaIngrContCertif" column="BLBOLCERTCONT"/>
+		<result property="boletaInscripcion" column="BLINSCRIPCION"/>
+		<result property="boletaRechazo" column="BLRECHAZO"/>
+		<result property="certfExisInexisGrava" column="BLCERTEXIST"/>
+		<result property="certfInscripcion" column="BLCERTINSC"/>
+		<result property="certfInscrHistRegs" column="BLCERTINSCHIST"/>
+		<result property="certiNoInscrOficRegs" column="BLCERTNOINSC"/>
+		<result property="certCopCertificada" column="BLCERTCOPIACERT"/>
+		
+		<result property="nomBoletaInscripcion" column="DSINSCRIPCION"/>
+		<result property="nomBoletaIngInscr" column="DSINGRESOINSC"/>
+		<result property="nomBoletaIngrConIns" column="DSINGRESOCONT"/>
+		<result property="nomBoletaIngrCertif" column="DSBOLINGRESOCERT"/>
+		<result property="nomBoletaIngrContCertif" column="DSBOLCERTCONT"/>
+		<result property="nomBoletaRechazo" column="DSRECHAZO"/>
+		<result property="nomCertfExisInexisGrava" column="DSCERTEXIST"/>
+		<result property="nomCertfInscripcion" column="DSCERTINSC"/>
+		<result property="nomCertfInscrHistRegs" column="DSCERTINSCHIST"/>
+		<result property="nomCertiNoInscrOficRegs" column="DSCERTNOINSC"/>
+		<result property="nomCertCopCertificada" column="DSCERTCOPIACERT"/>
+		
+		<result property="enviarMail" column="BOENVIARMAIL"/>
+		<result property="entornoCapacitacion" column="BOENTORNOCAPACIT" />
+		
+	</resultMap>
+	
+	<update id="insertar" parameterType="valoregeneral">
+		UPDATE RUCONFIGNACIONAL
+		SET NOLIMITESOLVENTAN=#{diasSolicitudVentanilla}, NODIASADVSOLVENTAN=#{diasAdvertenciaSolicitudVentanilla}, 
+			NOLIMITESOLWEBORD=#{diasSolicitudWeb}, NODIASADVWEBORD=#{diasAdvertenciaSolicitudWeb},
+			NOLIMITECERTIFICACION=#{diasCertificacion}, NODIASADVCERTIFICAC=#{diasAdvertenciasCertificacion},
+			NOLIMITACLARECHSUBS=#{diasRechazoSubsanable},
+			
+			
+			BLINGRESOINSC=#{boletaIngInscr}, BLINGRESOCONT=#{boletaIngrConIns}, BLBOLINGRESOCERT=#{boletaIngrCertif},
+			BLBOLCERTCONT=#{boletaIngrContCertif}, BLINSCRIPCION=#{boletaInscripcion},
+			BLRECHAZO=#{boletaRechazo}, BLCERTEXIST=#{certfExisInexisGrava}, BLCERTINSC=#{certfInscripcion},
+			BLCERTINSCHIST=#{certfInscrHistRegs}, BLCERTNOINSC=#{certiNoInscrOficRegs},
+			BLCERTCOPIACERT=#{certCopCertificada}, 
+			
+			DSINSCRIPCION=#{nomBoletaInscripcion},
+			DSINGRESOINSC=#{nomBoletaIngInscr}, DSINGRESOCONT=#{nomBoletaIngrConIns},
+			DSBOLINGRESOCERT=#{nomBoletaIngrCertif}, DSBOLCERTCONT=#{nomBoletaIngrContCertif},
+			DSRECHAZO=#{nomBoletaRechazo}, DSCERTEXIST=#{nomCertfExisInexisGrava},
+			DSCERTINSC=#{nomCertfInscripcion}, DSCERTINSCHIST=#{nomCertfInscrHistRegs},
+			DSCERTNOINSC=#{nomCertiNoInscrOficRegs}, DSCERTCOPIACERT=#{nomCertCopCertificada}
+	</update>
+	
+	<select id="consultar"  resultMap="valorGeneralMap">
+		SELECT NOLIMITESOLVENTAN, NODIASADVSOLVENTAN,  NOLIMITESOLWEBORD, NODIASADVWEBORD, 
+			   NOLIMITECERTIFICACION, NODIASADVCERTIFICAC,NOLIMITACLARECHSUBS,
+			   
+			   BLINGRESOINSC, BLINGRESOCONT, BLINSCRIPCION, BLRECHAZO, BLCERTEXIST, 
+			   BLCERTINSC, BLCERTINSCHIST,  BLCERTNOINSC, BLCERTCOPIACERT,
+			   BLINSCRIPCION, BLBOLINGRESOCERT, BLBOLCERTCONT,
+			   
+			   DSINSCRIPCION, DSINGRESOINSC,
+			   DSINGRESOCONT, DSRECHAZO, DSCERTEXIST, DSCERTINSC, DSCERTINSCHIST,
+			   DSCERTNOINSC, DSCERTCOPIACERT, DSBOLINGRESOCERT, DSBOLCERTCONT,
+			   
+			   BOENVIARMAIL, BOENTORNOCAPACIT
+			   
+		from RUCONFIGNACIONAL
+	</select>
+	
+    <select id="consultarDiasAdvertencia"  resultMap="valorGeneralMap">
+        SELECT nodiasadvsolventan, nodiasadvwebord, nodiasadvcertificac
+        FROM RUCONFIGNACIONAL      
+    </select>	
+	
+</mapper>

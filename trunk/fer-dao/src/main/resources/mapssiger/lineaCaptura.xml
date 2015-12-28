@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.lineacaptura.LineaCapturaDAO">
+	
+	<resultMap id="listaLineaCaptura" type="lineaCaptura">
+		<result property="id" column="LLLINEACAPTURA"/>
+		<result property="idLocalidadPago" column="LLLOCALIDADPAGO"/>
+        <result property="idPago" column="LLPAGO"/>
+        <result property="crLinea" column="CRLINEA"/>
+        <result property="fechaPago" column="FCPAGO"/>
+        <result property="importe" column="NOIMPORTE"/>
+        <result property="concepto" column="DSCONCEPTO"/>
+        <result property="estatus" column="LLTIPOMOVIMIENTO"/>
+        <result property="fechaLimitePago" column="FCLIMITEPAGO"/>
+    </resultMap>
+
+	<select id="consultar" resultMap="listaLineaCaptura">
+		SELECT * FROM MVLINEACAPTURA
+	</select>
+	
+	<select id="consultarPorPago" resultMap="listaLineaCaptura" parameterType="lineaCaptura">
+		SELECT *
+		FROM MVLINEACAPTURA WHERE LLPAGO = #{idPago} 
+	</select>	
+	
+	<select id="consultarPorId" resultType="lineaCaptura" parameterType="lineaCaptura">
+		SELECT *
+		FROM MVLINEACAPTURA WHERE LLLINEACAPTURA = #{id} 
+	</select>
+	
+	<select id="consultarUltimoMovLinea" resultType="java.lang.Long" parameterType="map">
+	   SELECT LLTIPOMOVIMIENTO FROM (
+        SELECT * FROM MVLINEACAPTURA
+        JOIN DTLOCALIDADPAGO ON MVLINEACAPTURA.LLLOCALIDADPAGO = DTLOCALIDADPAGO.LLLOCALIDADPAGO
+        JOIN CTESTADOS ON DTLOCALIDADPAGO.LLESTADO=CTESTADOS.LLESTADO
+        WHERE CRLINEA= #{lineaCaptura} AND DTLOCALIDADPAGO.LLESTADO=#{idEstado} ORDER BY FCPAGO DESC
+       )
+       WHERE ROWNUM = 1
+    </select>
+	
+	<insert id="crear" parameterType="lineaCaptura">
+		<selectKey keyProperty="id" resultType="java.lang.Long" order="BEFORE"> 
+			SELECT MVLINEACAPTURA_SEQ.nextVal from dual
+		</selectKey>
+  		INSERT INTO MVLINEACAPTURA (LLLINEACAPTURA, LLLOCALIDADPAGO, LLPAGO, CRLINEA, FCPAGO, NOIMPORTE, DSCONCEPTO, LLTIPOMOVIMIENTO, FCLIMITEPAGO)
+  		VALUES (#{id},#{idLocalidadPago},#{idPago},#{crLinea},#{fechaPago},#{importe},#{concepto},#{estatus}, #{fechaLimitePago})
+	</insert>
+	
+	<update id="actualizar" parameterType="lineaCaptura">
+		UPDATE MVLINEACAPTURA SET 
+			CRLINEA = #{crLinea}, 
+			FCPAGO = #{fechaPago}, 
+			NOIMPORTE = #{importe}, 
+			DSCONCEPTO = #{concepto},
+			LLTIPOMOVIMIENTO = #{estatus},
+			FCLIMITEPAGO = #{fechaLimitePago}
+			WHERE LLLINEACAPTURA = #{id}
+	</update>
+	
+	<delete id="eliminar" >
+		DELETE FROM MVLINEACAPTURA WHERE LLLINEACAPTURA = #{idLineaCaptura}
+	</delete>
+	
+	<select id="consultarPagoDerechos" resultType="java.lang.Double" parameterType="java.lang.Long">
+		SELECT NOMONTO FROM MVPAGOS WHERE LLPAGO = #{idPago}
+	</select>
+</mapper>

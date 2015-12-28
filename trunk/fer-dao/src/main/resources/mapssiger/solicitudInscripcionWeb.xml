@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.solicitud.SolicitudInscripcionWebDAO">
+	
+	<resultMap type="caratula" id="cartulaMap">
+	<id property="llcaratula" column="llcaratula"/>
+	<result property="dsdensocial" column="dsdensocial"/>
+	<result property="crfme" column="crfme"/>
+	</resultMap>
+	
+	<select id="listaCaratulasFedatario" resultMap="cartulaMap">
+		select mvcara.* from mvcaratulas mvcara
+	</select>
+	
+	<insert id="guardarDtDocumentos" parameterType="documento">
+		insert into DTDOCUMENTOS 
+		VALUES(DTDOCUMENTOS_SEQ.NEXTVAL,#{folio},#{mvsolicitud.id},#{tipoDocumento.lltipodocumento})
+	</insert>
+	
+	<!-- talvez falta agregar el acmpo llcomfeda en l insercion mv solicitud -->
+	<insert id="guardarSolicitud" parameterType="mvsolicitud">
+		insert INTO mvsolicitudes(LLSOLICITUD,LLPAGO,LLUSUARIO,FCINGRESO,
+                          CRSOLICITANTE,LLTIPOSOLICITUD,LLESTATUS,LLETAPA,LLOFICINA,
+                          LLGRUPOTRABAJO,LLESTATUSBANDEJA)
+                  	values(mvsolicitudes_seq.nextval,#{mvpagos.id},#{usuario.id},sysdate,
+                          	#{solicitante},#{tipoSolicitud.id},#{estatus.id},#{etapa.id},#{oficina.id},
+                         	#{llgrupoTrabajo},#{estatus.id})
+	</insert>	
+	
+	
+	<select id="obtenerIdGrupoTrabajoUsuario" resultType="java.lang.Long">
+	select grupotra.LLGRUPOTRABAJO from CTGRUPOSTRABAJO grupotra
+              join USUARIO_GRUPOTRABAJO usu_grupotra on grupotra.LLGRUPOTRABAJO=usu_grupotra.LLGRUPOTRABAJO
+              join CTUSUARIOS ctusu on usu_grupotra.LLUSUARIO=ctusu.LLUSUARIO
+              where ctusu.LLUSUARIO=#{idusuario}
+	
+	</select>
+	
+</mapper>

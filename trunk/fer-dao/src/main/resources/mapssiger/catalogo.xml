@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.catalogo.CatalogoDAO">
+        <!-- Selects -->
+        <select id="consultarActivos" resultMap="catalogo">
+            SELECT * FROM CTCATALOGOS WHERE BOACTIVO = 1 ORDER BY LLCATALOGO
+        </select>
+        <!-- Fin selects -->        
+        <!-- Inserts -->
+        <insert id="crearElementoCatalogo" parameterType="elemento">
+            INSERT INTO ELEMENTOS_CATALOGOS(LLELEMENTO,LLCATALOGO,BOMULTIPLE) 
+                   VALUES(#{id},#{catalogoElemento.ctCatalogo.id},#{catalogoElemento.multiple})
+        </insert>
+        <!-- Fin inserts -->
+        <!-- Sección deletes -->
+	    <delete id="eliminarElementoCatalogo">
+	        DELETE ELEMENTOS_CATALOGOS WHERE LLELEMENTO = #{value}
+	    </delete>
+	    <!-- Fin sección deletes -->
+
+        <!-- Sección updates -->
+        <update id="modificar"  parameterType="elemento">
+            UPDATE ELEMENTOS_CATALOGOS SET LLCATALOGO = #{catalogoElemento.ctCatalogo.id}, BOMULTIPLE = #{catalogoElemento.multiple}
+                    WHERE LLELEMENTO = #{id}
+        </update>
+        <!-- Fin de sección updates -->
+        
+        <!-- Sección resultMap -->
+        <resultMap id="catalogo"    type="catalogo">
+            <result property="id"               column="LLCATALOGO"/>
+            <result property="nombre"           column="DSNOMBRE"/>
+            <result property="descripcion"      column="DSCATALOGO"/>
+            <result property="activo"           column="BOACTIVO"/>
+        </resultMap>       
+        <!-- Fin sección resultMap -->
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.tipodocumento.TipoDocumentoDAO">
+    <resultMap type="tipoDocumento" id="listaTipoDocumento">
+        <result property="lltipodocumento" column="lltipodocumento"/>
+        <result property="dstipodocumento" column="dstipodocumento"/>
+        <result property="noorden" column="noorden"/>
+        <result property="fcmodificacion" column="fcmodificacion"/>
+        <result property="boactivo" column="boactivo"/>
+        <result property="dsclave"  column="dsclave"/>
+    </resultMap>
+    <select id="obtenerTipoDocumentos" resultMap="listaTipoDocumento">
+        SELECT * FROM CTTIPODOCUMENTO
+    </select>
+    
+    <select id="buscarTipoDocumentos" parameterType="tipoDocumento" resultMap="listaTipoDocumento">
+        SELECT LLTIPODOCUMENTO, DSTIPODOCUMENTO, NOORDEN, FCMODIFICACION, BOACTIVO FROM CTTIPODOCUMENTO 
+        where  DSTIPODOCUMENTO LIKE '%' || #{dstipodocumento} || '%'
+		  
+    </select>
+    
+    <select id="consultarPorClaveNombre" parameterType="tipoDocumento" resultMap="listaTipoDocumento">
+    	SELECT LLTIPODOCUMENTO, DSCLAVE, DSTIPODOCUMENTO 
+    	FROM CTTIPODOCUMENTO
+		WHERE UPPER(DSCLAVE) LIKE UPPER( '%' || #{texto} || '%' )
+		OR UPPER(DSTIPODOCUMENTO) LIKE UPPER( '%' || #{texto} || '%' )
+    </select>
+    
+    <insert id="agregarTipoDocumento"  parameterType="giro">
+        INSERT INTO  CTTIPODOCUMENTO (LLTIPODOCUMENTO, DSTIPODOCUMENTO, NOORDEN, BOACTIVO)
+        VALUES (cttipodocumento_lltipodocument.nextval, #{dstipodocumento}, #{noorden}, #{boactivo})
+    </insert>
+    
+    <update id="actualizaTipoDocumento" parameterType="giro"> 
+	  UPDATE CTTIPODOCUMENTO
+	    SET
+	     DSTIPODOCUMENTO = #{dstipodocumento},  
+	   NOORDEN = #{noorden},  
+	   FCMODIFICACION = #{fcmodificacion},
+	    BOACTIVO = #{boactivo}
+	    where LLTIPODOCUMENTO = #{lltipodocumento} 
+	 </update>
+	 
+</mapper>

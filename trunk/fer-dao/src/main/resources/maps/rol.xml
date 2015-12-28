@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.beltsoft.jim.fer.dao.RolDAO">
+
+	<insert id="crear" parameterType="rol" useGeneratedKeys="true" keyColumn="LLROL" keyProperty="id">
+        INSERT INTO CTROLES (LLROL,DSROL, BOOFICINA, BOFEDATARIO, BOFIRMA, FCMODIFICACION, BOACTIVO)
+        VALUES (CTROLES_LLROL_SEQ.NEXTVAL, #{nombre}, #{disOficina}, #{disFedatario}, #{disFirma},  #{fechaModRol}, #{estatus})
+	</insert>
+
+	<update id="modificar" parameterType="rol">
+		UPDATE CTROLES SET
+		DSROL = #{nombre},
+		BOOFICINA = #{disOficina},
+		BOFEDATARIO = #{disFedatario},
+		BOFIRMA = #{disFirma},
+		FCMODIFICACION = #{fechaModRol},
+		BOACTIVO = #{estatus}
+		WHERE LLROL = #{id}
+	</update>
+
+	<delete id="eliminarFuncionalidadesPorRol" parameterType="java.util.Map">
+	    DELETE FROM ROL_FUNCIONALIDAD WHERE LLFUNCIONALIDAD IN 
+	    <foreach item="item" collection="funcionalidadesDelete" open="(" close=")" separator=",">
+	    #{item.id, jdbcType=NUMERIC}
+        </foreach>
+	     AND LLROL = #{rol.id, jdbcType=NUMERIC}
+	</delete>
+
+	<insert id="insertarFuncionalidadesPorRol" parameterType="java.util.Map">
+        INSERT ALL
+	    <foreach item="item" collection="funcionalidadInsert" >
+	    INTO ROL_FUNCIONALIDAD (LLFUNCIONALIDAD, LLROL) VALUES (#{item.id, jdbcType=NUMERIC},#{rol.id, jdbcType=NUMERIC})
+        </foreach> 
+        SELECT * FROM dual
+	</insert>
+
+	<delete id="eliminarUsuariosPorRol" parameterType="java.util.Map">
+		DELETE FROM USUARIO_ROL WHERE LLUSUARIO IN
+	    <foreach item="item" collection="usuariosDelete" open="(" close=")" separator=",">
+	    #{item.id, jdbcType=NUMERIC}
+        </foreach>
+	     AND LLROL = #{rol.id, jdbcType=NUMERIC}
+	</delete>
+
+	<insert id="insertarUsuariosPorRol" parameterType="java.util.Map">
+        INSERT ALL
+	    <foreach item="item" collection="usuariosInsert" >
+	    INTO USUARIO_ROL (LLUSUARIO, LLROL) VALUES (#{item.id, jdbcType=NUMERIC},#{rol.id, jdbcType=NUMERIC})
+        </foreach> 
+        SELECT * FROM dual
+	</insert>
+
+	<select id="consultarFuncionalidadPorRol" resultMap="funcionalidadMap">
+		SELECT CTFUNCIONALIDADES.LLFUNCIONALIDAD, CTFUNCIONALIDADES.DSFUNCIONALIDAD
+		FROM CTFUNCIONALIDADES
+		JOIN ROL_FUNCIONALIDAD
+		ON CTFUNCIONALIDADES.LLFUNCIONALIDAD = ROL_FUNCIONALIDAD.LLFUNCIONALIDAD AND
+		ROL_FUNCIONALIDAD.LLROL = #{id}
+	</select>
+
+	<select id="consultarUsuariosPorRol" resultMap="usuarioMap">
+		SELECT 
+		CTUSUARIOS.LLUSUARIO, 
+		CTUSUARIOS.DSNOMBRE,
+		CTUSUARIOS.DSAPELLIDOPATERNO,
+		CTUSUARIOS.DSAPELLIDOMATERNO
+		FROM CTUSUARIOS
+		JOIN USUARIO_ROL
+		ON CTUSUARIOS.LLUSUARIO = USUARIO_ROL.LLUSUARIO AND
+		USUARIO_ROL.LLROL = #{id}
+	</select>
+
+	<select id="consultarFuncionalidadDisponiblesPorRol" resultMap="funcionalidadMap">
+		SELECT CTFUNCIONALIDADES.LLFUNCIONALIDAD, CTFUNCIONALIDADES.DSFUNCIONALIDAD
+		FROM CTFUNCIONALIDADES LEFT JOIN
+		(SELECT CTFUNCIONALIDADES.LLFUNCIONALIDAD, CTFUNCIONALIDADES.DSFUNCIONALIDAD
+		FROM CTFUNCIONALIDADES JOIN ROL_FUNCIONALIDAD
+		ON CTFUNCIONALIDADES.LLFUNCIONALIDAD = ROL_FUNCIONALIDAD.LLFUNCIONALIDAD
+		AND ROL_FUNCIONALIDAD.LLROL = #{id}) TEMP_FUNCIONALIDADES
+		ON CTFUNCIONALIDADES.LLFUNCIONALIDAD = TEMP_FUNCIONALIDADES.LLFUNCIONALIDAD
+		WHERE TEMP_FUNCIONALIDADES.LLFUNCIONALIDAD IS NULL
+	</select>
+
+	<select id="consultarUsuariosDisponiblesPorRol" resultMap="usuarioMap">
+		SELECT CTUSUARIOS.LLUSUARIO,
+		CTUSUARIOS.DSNOMBRE,
+		CTUSUARIOS.DSAPELLIDOPATERNO,
+		CTUSUARIOS.DSAPELLIDOMATERNO
+		FROM CTUSUARIOS LEFT JOIN
+		(SELECT CTUSUARIOS.LLUSUARIO, CTUSUARIOS.DSNOMBRE
+		FROM CTUSUARIOS JOIN USUARIO_ROL
+		ON CTUSUARIOS.LLUSUARIO = USUARIO_ROL.LLUSUARIO
+		AND USUARIO_ROL.LLROL = #{id}) TEMP_USUARIOS
+		ON CTUSUARIOS.LLUSUARIO = TEMP_USUARIOS.LLUSUARIO
+		WHERE TEMP_USUARIOS.LLUSUARIO IS NULL
+	</select>
+
+	<select id="consultarSiExisteNombreRol" resultType="java.lang.Boolean" parameterType="rol">
+		SELECT COUNT(DSROL)
+		FROM CTROLES
+		WHERE DSROL = #{nombre}
+	</select>
+
+	<select id="consultarPorNombre" resultMap="rolMap">
+		SELECT *
+		FROM CTROLES
+		WHERE DSROL LIKE '%' || #{nombre} || '%'
+	</select>
+
+	<select id="consultarTodosRoles" resultMap="rolTodos">
+		SELECT
+		LLROL, DSROL
+		FROM CTROLES
+	</select>
+
+	<select id="consultarUsuarioRoles" resultMap="rolTodos" parameterType="usuario">
+		Select usuario_rol.llrol, usuario_rol.llusuario, ctusuarios.dsnombre, ctroles.dsrol from usuario_rol
+		inner join ctroles on usuario_rol.llrol = ctroles.llrol
+		inner join ctusuarios on usuario_rol.llusuario = ctusuarios.llusuario
+		WHERE ctusuarios.llusuario = #{id}
+	</select>
+
+	<select id="consultarRolesOficina" resultMap="rolTodos">
+		SELECT
+		LLROL, DSROL
+		FROM CTROLES
+		WHERE BOOFICINA = 1
+	</select>
+
+	<select id="consultarRolesFedatario" resultMap="rolTodos">
+		SELECT
+		LLROL, DSROL
+		FROM CTROLES
+		WHERE BOFEDATARIO = 1
+	</select>
+	
+	<select id="consultarRolesGenerales" resultMap="rolTodos">
+		SELECT
+		LLROL, DSROL
+		FROM CTROLES
+		WHERE BOOFICINA = 0 AND
+		BOFEDATARIO = 0 
+	</select>
+
+	<select id="consultarRoles" resultMap="rolTodos" parameterType="usuario">
+		SELECT
+		CTROLES.DSROL
+		FROM CTROLES
+		INNER JOIN USUARIO_ROL ON CTROLES.LLROL = USUARIO_ROL.LLROL
+		WHERE USUARIO_ROL.LLUSUARIO = #{id}
+	</select>
+
+	<select id="consultarPorUsuario" resultMap="rolMap" parameterType="usuario">
+	   SELECT r.*, f.*
+                FROM  USUARIO_ROL           ur
+                    JOIN CTROLES            r   ON r.LLROL = ur.LLROL
+                    JOIN ROL_FUNCIONALIDAD  rf  ON  rf.LLROL            = ur.LLROL
+                    JOIN CTFUNCIONALIDADES  f   ON  f.LLFUNCIONALIDAD   = rf.LLFUNCIONALIDAD
+                WHERE ur.LLUSUARIO = #{id}
+	</select>
+
+	<resultMap type="rol" id="rolMap">
+		<id column="LLROL" property="id" javaType="Integer" jdbcType="NUMERIC" />
+		<result column="DSROL" property="nombre" javaType="String" jdbcType="VARCHAR" />
+		<result column="BOOFICINA" property="disOficina" javaType="Boolean" jdbcType="CHAR" />
+		<result column="BOFEDATARIO" property="disFedatario" javaType="Boolean" jdbcType="CHAR" />
+		<result column="BOFIRMA" property="disFirma" javaType="Boolean" jdbcType="CHAR" />
+		<result column="FCMODIFICACION" property="fechaModRol" javaType="Date" jdbcType="DATE" />
+		<result column="BOACTIVO" property="estatus" javaType="Boolean" jdbcType="CHAR" />
+		
+		<collection property="funcionalidades" column="LLFUNCIONALIDAD" ofType="funcionalidad" javaType="ArrayList" resultMap="funcionalidadMap"/>
+	</resultMap>
+
+	<resultMap type="rol" id="rolTodos">
+		<id column="LLROL" property="id" javaType="Integer" jdbcType="NUMERIC" />
+		<result column="DSROL" property="nombre" javaType="String" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap type="funcionalidad" id="funcionalidadMap">
+		<id column="LLFUNCIONALIDAD" property="id" javaType="Integer" jdbcType="NUMERIC" />
+		<result column="DSFUNCIONALIDAD" property="nombre" javaType="String" jdbcType="VARCHAR" />
+		<result column="DSCODIGO" property="codigo" javaType="String" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap type="usuario" id="usuarioMap">
+		<id column="LLUSUARIO" property="id" javaType="Integer" jdbcType="NUMERIC" />
+		<result column="DSNOMBRE" property="nombre" javaType="String" jdbcType="VARCHAR" />
+		<result column="DSAPELLIDOPATERNO" property="apellidoPaterno" javaType="String"	jdbcType="VARCHAR"/>
+		<result column="DSAPELLIDOMATERNO" property="apellidoMaterno" javaType="String"	jdbcType="VARCHAR"/>
+	</resultMap>
+
+</mapper>

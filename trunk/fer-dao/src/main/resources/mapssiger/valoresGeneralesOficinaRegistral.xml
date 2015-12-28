@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.administracion.ValorGeneralOficinaRegistralDAO">
+
+    <resultMap type='valorgeneraloficinaregistral' id='ValGralOficRegResult'> 
+        <id property='idConfigOficina' column='llconfigoficina'/> 
+        <result property='numSalarioMinimo' column='nosalariominimo'/> 
+        <result property='escudo' column='blescudo'/> 
+        <result property='fechaModificacion' column='fcmodificacion'/> 
+        <result property='activoInactivo' column='boactivo'/> 
+        <association property='oficina' resultMap='OficinaResult'/>
+    </resultMap> 
+	
+    <resultMap type='oficina' id='OficinaResult'> 
+        <id property='id' column='LLOFICINA'/> 
+        <result property='nombreOficina' column='DSOFICINA'/>     
+    </resultMap> 
+	
+    <select id='getValGralOficRegById' parameterType='int' resultMap='ValGralOficRegResult'> 
+        SELECT 
+        CONFIG.LLCONFIGOFICINA, CONFIG.NOSALARIOMINIMO,
+        OFIC.LLOFICINA, OFIC.DSOFICINA
+        FROM CTCONFIGOFICINA CONFIG LEFT OUTER JOIN CTOFICINAS OFIC ON CONFIG.LLOFICINA = OFIC.LLOFICINA 
+        WHERE CONFIG.LLCONFIGOFICINA = #{configId} 
+    </select> 
+
+    <select id='getAllValsGralesOficReg' resultMap='ValGralOficRegResult'> 
+        SELECT
+        CONFIG.LLCONFIGOFICINA, CONFIG.NOSALARIOMINIMO,
+        OFIC.LLOFICINA, OFIC.DSOFICINA
+        FROM CTCONFIGOFICINA CONFIG LEFT OUTER JOIN CTOFICINAS OFIC ON CONFIG.LLOFICINA = OFIC.LLOFICINA
+    </select> 
+    
+    <select id="consultarLngtdLineaOficReg" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT CONFIG.NOLONGLINEACAPT
+        FROM CTCONFIGOFICINA CONFIG LEFT OUTER JOIN CTOFICINAS OFIC ON CONFIG.LLOFICINA = OFIC.LLOFICINA 
+        WHERE CONFIG.LLOFICINA = #{idOficina} AND CONFIG.BOACTIVO=1
+    </select>
+
+    <insert id="insertarValGralOficReg" >
+        INSERT INTO CTCONFIGOFICINA(
+                    LLCONFIGOFICINA, 
+                    LLOFICINA,
+                    NOSALARIOMINIMO,
+                    NOLONGLINEACAPT,
+                    BLESCUDO,
+                    FCMODIFICACION,
+                    BOACTIVO
+        ) VALUES (
+                    ctconfigoficina_SEQ.nextval,
+                    #{oficina.id},
+                    #{numSalarioMinimo},
+                    #{longitudLineaCapt},
+                    #{escudo},
+                    sysdate,
+                    #{activoInactivo}
+        )
+    </insert>
+        
+    <update id="deshabilitaRegistro" parameterType="int"> 
+        UPDATE CTCONFIGOFICINA
+        SET
+        FCMODIFICACION = sysdate,
+        BOACTIVO = '0'
+        WHERE LLCONFIGOFICINA = #{configId} 
+    </update>
+        
+</mapper>

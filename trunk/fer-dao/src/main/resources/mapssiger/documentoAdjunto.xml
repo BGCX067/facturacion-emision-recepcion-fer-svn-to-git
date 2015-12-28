@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.documentos.DocumentosAdjuntosDAO">
+
+    <!-- Query que obtiene los documentos adjuntos de la solicitud. -->
+    <select id="consultarDocumentosAdjuntosPorSolicitud" resultMap="documentosAdjuntosMap">
+		SELECT
+			docadj.lldocadjunto, docadj.dsnomdocorigen, docadj.documento, docadj.dsmimetype  
+		FROM mvdocadjuntos docadj
+		<where>
+        	<if test="idSolicitud != null">
+            	AND docadj.llsolicitud = #{idSolicitud}
+			</if>
+		</where>
+    </select>
+    
+    <resultMap id="documentosAdjuntosMap" type="docAdjunto">
+		<id     property="id"           column="lldocadjunto"/>
+		<result property="nomDocOrigen" column="dsnomdocorigen"/>
+		<result property="documento"    column="documento"/>
+		<result property="mimeType"     column="dsmimetype"/>
+	</resultMap>
+	
+	<insert id="insertarDocumentoAdjunto" >
+        INSERT INTO mvdocadjuntos(
+			lldocadjunto, 
+            documento,
+            llsolicitud,
+            dscadoriginal,
+            dsnomdocorigen,
+            dsmimetype
+        ) VALUES (
+            MVDOCADJUNTOS_SEQ.nextval,
+            #{documento},
+            #{solicitud.id},
+            #{descOriginal},
+            #{nomDocOrigen},
+            #{mimeType}
+        )
+    </insert>
+    	  
+</mapper>

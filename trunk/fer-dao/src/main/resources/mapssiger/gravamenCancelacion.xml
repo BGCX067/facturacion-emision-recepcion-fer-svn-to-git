@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.gravamencancelacion.GravamenCancelacionDAO">
+
+    <select id="consultarActosGravamenPorFme" parameterType="java.lang.Long" resultMap="actoGravamenMap" >
+        SELECT S.DSNCI,
+               CFPRE.DSFRMPRECLAVE,
+               FRA.LLMVFRMACTO,
+               CA.DSACTOCORTA, FRA.FCINGRESO,
+               FRA.FCINSCRIPCION, FRA.NOMONTO,
+               SFP.LLSOLFRMPRE,   
+               CA.LLACTO          
+        FROM MVSOLICITUDES S
+        JOIN SOLICITUD_CARATULAFME SCF ON SCF.LLSOLICITUD =  S.LLSOLICITUD
+        JOIN MVCARATULAS C ON C.LLCARATULA = SCF.LLCARATULA
+        JOIN MVSOLFRMPRE SFP ON S.LLSOLICITUD = SFP.LLSOLICITUD
+        JOIN MVFRMACTO FRA ON SFP.LLSOLFRMPRE = FRA.LLSOLFRMPRE
+        JOIN FORMAS_ACTOS FA ON FRA.LLFORMAACTO = FA.LLFORMAACTO
+        JOIN CTACTOS CA ON FA.LLACTO = CA.LLACTO
+        JOIN CFDEFFRMPRE DEFFPRE ON DEFFPRE.LLDEFFRMPRE = SFP.LLDEFFRMPRE
+        JOIN CTFRMPRE CFPRE ON CFPRE.LLCTFRMPRE = DEFFPRE.LLCATFRMPRE       
+        WHERE CA.LLTIPOACTO = 1  --Solo gravamenes
+        AND BOPRINCIPAL = 1    
+        AND FCINSCRIPCION IS NOT NULL --Solo actos inscritos
+        AND C.LLCARATULA = #{idFme}
+    </select>
+    
+    <select id="consultarActosCancSinGravPorFme" parameterType="java.lang.Long" resultMap="actoGravamenMap" >   
+        SELECT S.DSNCI,
+               CFPRE.DSFRMPRECLAVE,
+               FRA.LLMVFRMACTO,
+               CA.DSACTOCORTA, FRA.FCINGRESO,
+               FRA.FCINSCRIPCION, FRA.NOMONTO,
+               SFP.LLSOLFRMPRE,
+               CA.LLACTO, CTA.DSACTO, CTA.LLTIPOACTO                      
+        FROM MVSOLICITUDES S
+        JOIN SOLICITUD_CARATULAFME SCF ON SCF.LLSOLICITUD =  S.LLSOLICITUD
+        JOIN MVCARATULAS C ON C.LLCARATULA = SCF.LLCARATULA
+        JOIN MVSOLFRMPRE SFP ON S.LLSOLICITUD = SFP.LLSOLICITUD
+        JOIN MVFRMACTO FRA ON SFP.LLSOLFRMPRE = FRA.LLSOLFRMPRE
+        JOIN FORMAS_ACTOS FA ON FRA.LLFORMAACTO = FA.LLFORMAACTO
+        JOIN CTACTOS CA ON FA.LLACTO = CA.LLACTO
+        JOIN CFDEFFRMPRE DEFFPRE ON DEFFPRE.LLDEFFRMPRE = SFP.LLDEFFRMPRE
+        JOIN CTFRMPRE CFPRE ON CFPRE.LLCTFRMPRE = DEFFPRE.LLCATFRMPRE  
+        JOIN CTTIPOACTO CTA ON CA.LLTIPOACTO = CTA.LLTIPOACTO     
+        WHERE CA.LLTIPOACTO = 2  --Solo cancelaciones
+        AND BOPRINCIPAL = 1    
+        AND (FRA.FCINSCRIPCION IS NOT NULL OR FRA.LLESTDOACTO = 1) --Solo actos inscritos. Con que cumpla cualquiera de las 2, lo considero inscrito
+        AND C.LLCARATULA = #{idFme}
+        AND FRA.LLMVFRMACTO NOT IN
+          (SELECT AA1.LLACTO
+          FROM DTASOCIAACTOS AA1
+         
+          JOIN DTASOCIAACTOS AA2 ON AA1.LLASOACTO = AA2.LLASOACTO
+         
+          JOIN MVFRMACTO FRA1 ON AA1.LLACTO = FRA1.LLMVFRMACTO
+          JOIN FORMAS_ACTOS  FA1 ON FRA1.LLFORMAACTO = FA1.LLFORMAACTO
+          JOIN CTACTOS CA1 ON FA1.LLACTO = CA1.LLACTO
+          JOIN CTTIPOACTO CTA1 ON CA1.LLTIPOACTO = CTA1.LLTIPOACTO
+         
+          JOIN MVFRMACTO FRA2 ON AA2.LLACTOAFECTA = FRA2.LLMVFRMACTO
+          JOIN FORMAS_ACTOS  FA2 ON FRA2.LLFORMAACTO = FA2.LLFORMAACTO
+          JOIN CTACTOS CA2 ON FA2.LLACTO = CA2.LLACTO
+          JOIN CTTIPOACTO CTA2 ON CA2.LLTIPOACTO = CTA2.LLTIPOACTO
+          LEFT JOIN GRAVAMEN_CANCELACION GR_CA ON (CA2.LLACTO = GR_CA.LLACTOGRAVAMEN AND
+          GR_CA.LLACTOCANCELACION = CA1.LLACTO)         
+          WHERE CA2.LLTIPOACTO = 1
+          AND CA1.LLTIPOACTO = 2
+          AND FRA1.FCINSCRIPCION IS NOT NULL
+          AND FRA2.FCINSCRIPCION IS NOT NULL)
+      AND FRA.LLMVFRMACTO NOT IN
+          (SELECT AA1.LLACTOAFECTA
+          FROM DTASOCIAACTOS AA1
+          JOIN DTASOCIAACTOS AA2 ON AA1.LLASOACTO = AA2.LLASOACTO
+ 
+          JOIN MVFRMACTO FRA1 ON AA1.LLACTOAFECTA = FRA1.LLMVFRMACTO
+          JOIN FORMAS_ACTOS  FA1 ON FRA1.LLFORMAACTO = FA1.LLFORMAACTO
+          JOIN CTACTOS CA1 ON FA1.LLACTO = CA1.LLACTO
+          JOIN CTTIPOACTO CTA1 ON CA1.LLTIPOACTO = CTA1.LLTIPOACTO
+         
+          JOIN MVFRMACTO FRA2 ON AA2.LLACTO = FRA2.LLMVFRMACTO
+          JOIN FORMAS_ACTOS  FA2 ON FRA2.LLFORMAACTO = FA2.LLFORMAACTO
+          JOIN CTACTOS CA2 ON FA2.LLACTO = CA2.LLACTO
+          JOIN CTTIPOACTO CTA2 ON CA2.LLTIPOACTO = CTA2.LLTIPOACTO
+         
+          LEFT JOIN GRAVAMEN_CANCELACION GR_CA ON (CA2.LLACTO = GR_CA.LLACTOGRAVAMEN AND
+          GR_CA.LLACTOCANCELACION = CA1.LLACTO)
+          WHERE CA2.LLTIPOACTO =1
+          AND CA1.LLTIPOACTO = 2
+          AND (FRA1.FCINSCRIPCION IS NOT NULL OR FRA1.LLESTDOACTO = 1)
+          AND (FRA2.FCINSCRIPCION IS NOT NULL OR FRA2.LLESTDOACTO = 1))
+    </select>
+   
+    <select id="consultarGravamenesConCancelacion" parameterType="java.lang.Long" resultType="map">
+       SELECT S1.DSNCI nci, S2.DSNCI nciA,
+               CFPRE1.DSFRMPRECLAVE ctForma, CFPRE2.DSFRMPRECLAVE ctFormaA,
+               formaActo.LLMVFRMACTO idMvFrmActo, formaActoAfectado.LLMVFRMACTO idMvFrmActoA,
+               CA1.DSACTOCORTA ctActo, CA2.DSACTOCORTA ctActoA,
+               formaActo.FCINGRESO fcIngreso, formaActoAfectado.FCINGRESO fcIngresoA,
+               formaActo.FCINSCRIPCION fcInscripcion, formaActoAfectado.FCINSCRIPCION fcInscripcionA,
+               SFP1.LLSOLFRMPRE idSolFrmPre, SFP2.LLSOLFRMPRE idSolFrmPreA,
+               CA1.LLACTO idCtActo, CA2.LLACTO idCtActoA, TA.DSASOCIACION descAsociacion  
+              
+        FROM MVCARATULAS C
+       
+        JOIN SOLICITUD_CARATULAFME SCF1 ON SCF1.LLCARATULA =  C.LLCARATULA
+        JOIN SOLICITUD_CARATULAFME SCF2 ON SCF2.LLCARATULA =  C.LLCARATULA
+       
+        JOIN MVSOLICITUDES S1 ON S1.LLSOLICITUD = SCF1.LLSOLICITUD
+        JOIN MVSOLICITUDES S2 ON S2.LLSOLICITUD = SCF2.LLSOLICITUD
+       
+        JOIN MVSOLFRMPRE SFP1 ON S1.LLSOLICITUD = SFP1.LLSOLICITUD
+        JOIN MVSOLFRMPRE SFP2 ON S2.LLSOLICITUD = SFP2.LLSOLICITUD
+       
+        JOIN MVFRMACTO formaActo ON SFP1.LLSOLFRMPRE = formaActo.LLSOLFRMPRE
+        JOIN MVFRMACTO formaActoAfectado ON SFP2.LLSOLFRMPRE = formaActoAfectado.LLSOLFRMPRE
+       
+        JOIN FORMAS_ACTOS FA1 ON formaActo.LLFORMAACTO = FA1.LLFORMAACTO
+        JOIN FORMAS_ACTOS FA2 ON formaActoAfectado.LLFORMAACTO = FA2.LLFORMAACTO
+       
+        JOIN CTACTOS CA1 ON FA1.LLACTO = CA1.LLACTO
+        JOIN CTACTOS CA2 ON FA2.LLACTO = CA2.LLACTO
+       
+        JOIN GRAVAMEN_CANCELACION GC ON (GC.LLACTOCANCELACION = CA1.LLACTO AND GC.LLACTOGRAVAMEN = CA2.LLACTO) --Que los tipos de los actos tengan una relación de gravámen-cancelación
+       
+        JOIN CFDEFFRMPRE DEFFPRE1 ON DEFFPRE1.LLDEFFRMPRE = SFP1.LLDEFFRMPRE
+        JOIN CFDEFFRMPRE DEFFPRE2 ON DEFFPRE2.LLDEFFRMPRE = SFP2.LLDEFFRMPRE
+       
+        JOIN CTFRMPRE CFPRE1 ON CFPRE1.LLCTFRMPRE = DEFFPRE1.LLCATFRMPRE       
+        JOIN CTFRMPRE CFPRE2 ON CFPRE2.LLCTFRMPRE = DEFFPRE2.LLCATFRMPRE    
+       
+        JOIN DTASOCIAACTOS AA ON ((AA.LLACTO = formaActo.LLMVFRMACTO AND AA.LLACTOAFECTA = formaActoAfectado.LLMVFRMACTO) OR (AA.LLACTO = formaActoAfectado.LLMVFRMACTO AND AA.LLACTOAFECTA = formaActo.LLMVFRMACTO)) --Que estén relacionadas en dtasociaactos
+        JOIN CTTIPOASOCIACION TA ON AA.LLASOCIACION = TA.LLASOCIACION
+       
+        WHERE C.LLCARATULA = 5             
+        AND ((formaActo.FCINSCRIPCION IS NOT NULL OR formaActo.LLESTDOACTO = 1) AND (formaActoAfectado.FCINSCRIPCION IS NOT NULL OR formaActoAfectado.LLESTDOACTO = 1))--Solo actos inscritos. Con que cumpla cualquiera de las 2, lo considero inscrito     
+        AND (CA1.LLTIPOACTO = 2 AND  CA2.LLTIPOACTO = 1)      
+    </select>
+    
+    <select id="consultarMontoUltimaModific" parameterType= "java.lang.Long" resultType="java.lang.Double">
+        SELECT NOMONTO                                                      -- En este select consulto el monto de la última modificación ...
+            FROM                                                            -- ... al acto de gravámen recibido como parámetro
+                (SELECT A2M.NOMONTO                                         -- Monto del acto de modificación 
+                FROM MVFRMACTO A1G                                          -- Acto 1, de gravámen
+                JOIN DTASOCIAACTOS AA ON A1G.LLMVFRMACTO = AA.LLACTOAFECTA  -- Busco el acto de gravámen en la tabla de asociación
+                JOIN MVFRMACTO A2M ON A2M.LLMVFRMACTO = AA.LLACTO           -- Acto 2, de modificación
+                JOIN FORMAS_ACTOS FA ON  A2M.LLFORMAACTO = FA.LLFORMAACTO   -- A partir de aqui, busco que el acto 2 sea de modificación
+                JOIN CTACTOS CA ON FA.LLACTO = CA.LLACTO
+                JOIN CTTIPOACTO CTA ON CA.LLTIPOACTO = CTA.LLTIPOACTO
+                WHERE AA.LLACTOAFECTA = #{idActoGravamen}                   --Parámetro (id del mvfrmacto de gravámen)
+                AND CTA.LLTIPOACTO = 4                                      --Solo actos de modificación
+                ORDER BY A2M.FCINSCRIPCION DESC)
+            WHERE ROWNUM = 1
+    </select>
+    
+    <select id="obtenerMontoCancelaciones" parameterType= "java.lang.Long" resultType="java.lang.Double">
+        SELECT SUM(A2C.NOMONTO)                                        -- En este select consulto el monto de la suma de todas las cancelaciones ...
+                                                                        -- ... del acto de gravámen recibido como parámetro
+        FROM MVFRMACTO A1G                                              -- Acto 1, de gravámen                                            
+        JOIN DTASOCIAACTOS AA ON A1G.LLMVFRMACTO = AA.LLACTOAFECTA      -- Busco el acto de gravámen en la tabla de asociación
+        JOIN MVFRMACTO A2C ON A2C.LLMVFRMACTO = AA.LLACTO               --Acto 2, de cancelación
+        JOIN FORMAS_ACTOS FA ON A2C.LLFORMAACTO = FA.LLFORMAACTO        --A partir de aqui, busco que el acto 2 sea de cancelación
+        JOIN CTACTOS CA ON FA.LLACTO = CA.LLACTO
+        JOIN CTTIPOACTO CTA ON CA.LLTIPOACTO = CTA.LLTIPOACTO
+        WHERE AA.LLACTOAFECTA = #{idActoGravamen}                       --Parámetro (id del mvfrmacto de gravámen)
+        AND (CTA.LLTIPOACTO = 2 OR CTA.LLTIPOACTO = 3)                  --Solo actos de cancelación     
+    </select>
+    
+    <select id="consultarMontoActualGravamen" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT SUM (NOMONTO) FROM (
+            SELECT NOMONTO                                                  -- En este select consulto el monto de la última modificación ...
+            FROM                                                            -- ... al acto de gravámen recibido como parámetro
+                (SELECT A2M.NOMONTO                                         -- Monto del acto de modificación 
+                FROM MVFRMACTO A1G                                          -- Acto 1, de gravámen
+                JOIN DTASOCIAACTOS AA ON A1G.LLMVFRMACTO = AA.LLACTOAFECTA  -- Busco el acto de gravámen en la tabla de asociación
+                JOIN MVFRMACTO A2M ON A2M.LLMVFRMACTO = AA.LLACTO           -- Acto 2, de modificación
+                JOIN FORMAS_ACTOS FA ON  A2M.LLFORMAACTO = FA.LLFORMAACTO   -- A partir de aqui, busco que el acto 2 sea de modificación
+                JOIN CTACTOS CA ON FA.LLACTO = CA.LLACTO
+                JOIN CTTIPOACTO CTA ON CA.LLTIPOACTO = CTA.LLTIPOACTO
+                WHERE AA.LLACTOAFECTA = #{idActoGravamen}                   --Parámetro (id del mvfrmacto de gravámen)
+                AND CTA.LLTIPOACTO = 4                                      --Solo actos de modificación
+                ORDER BY A2M.FCINSCRIPCION DESC)
+            WHERE ROWNUM = 1                                                --Solo obtengo la última modificación
+
+            UNION ALL
+            
+            SELECT -SUM(A2C.NOMONTO)                                        -- En este select consulto el monto de la suma de todas las cancelaciones ...
+                                                                            -- ... del acto de gravámen recibido como parámetro
+            FROM MVFRMACTO A1G                                              -- Acto 1, de gravámen                                            
+            JOIN DTASOCIAACTOS AA ON A1G.LLMVFRMACTO = AA.LLACTOAFECTA      -- Busco el acto de gravámen en la tabla de asociación
+            JOIN MVFRMACTO A2C ON A2C.LLMVFRMACTO = AA.LLACTO               --Acto 2, de cancelación
+            JOIN FORMAS_ACTOS FA ON A2C.LLFORMAACTO = FA.LLFORMAACTO        --A partir de aqui, busco que el acto 2 sea de cancelación
+            JOIN CTACTOS CA ON FA.LLACTO = CA.LLACTO
+            JOIN CTTIPOACTO CTA ON CA.LLTIPOACTO = CTA.LLTIPOACTO
+            WHERE AA.LLACTOAFECTA = #{idActoGravamen}                       --Parámetro (id del mvfrmacto de gravámen)
+            AND (CTA.LLTIPOACTO = 2 OR CTA.LLTIPOACTO = 3)                  --Solo actos de cancelación
+        ) 
+    </select>
+   
+    <resultMap type="formaacto" id="actoGravamenMap">
+       <id property="id" column="LLMVFRMACTO"/>
+       <result property="fcIngreso" column="FCINGRESO"/>
+       <result property="fcInscripcion" column="FCINSCRIPCION"/>
+       <result property="monto" column="NOMONTO"/>            
+       <association property='solicitudFormaPrecodificada' resultMap='solFrmPreMap'/>
+       <association property='formasActos' resultMap='formasActosMap'/>
+    </resultMap>
+    
+    <resultMap type="formaacto" id="actoGravamenMap2">
+       <id property="id" column="LLMVFRMACTO"/>
+       <result property="fcIngreso" column="FCINGRESO"/>
+       <result property="fcInscripcion" column="FCINSCRIPCION"/>  
+       <result property="monto" column="NOMONTO"/>     
+       <association property='solicitudFormaPrecodificada' resultMap='solFrmPreMap'/>
+       <association property='formasActos' resultMap='formasActosMap'/>
+    </resultMap>
+
+    <resultMap type="solfrmpre" id="solFrmPreMap">        
+        <id property="id" column="LLSOLFRMPRE"/>  
+        <association property="cfDefFormaPrecodificada" resultMap="defFrmPreMap" />
+        <association property="solicitud" resultMap="solicitudMap" />                      
+    </resultMap>
+   
+    <resultMap type="deffrmpre" id="defFrmPreMap">
+        <id property="id" column="LLDEFFRMPRE" />      
+        <association property="ctFormaPrecodificada" resultMap="formaPreCodificadaMap" />
+    </resultMap>   
+   
+    <resultMap type="ctformaprecod" id="formaPreCodificadaMap">
+        <id property="id" column="LLCTFRMPRE"/>
+        <result property="descripcionForma" column="DSFRMPRECOD"/>
+        <result property="claveForma" column="DSFRMPRECLAVE"/>
+    </resultMap>
+   
+    <resultMap type="mvsolicitud" id="solicitudMap">
+        <id property="id" column="LLSOLICITUD"/>
+        <result property="nci" column="DSNCI"/>
+    </resultMap>
+   
+    <resultMap type="formasactos" id="formasActosMap">
+        <id property="id" column="LLFORMAACTO"/>
+        <association property="acto" javaType="ctActo" column="LLACTO" resultMap="catActoMap"/>
+    </resultMap>
+   
+    <resultMap type="ctActo" id="catActoMap">
+        <id property="id" column="LLACTO"/>
+        <result property="nombre" column="DSACTO"/>
+        <result property="nombreCorto" column="DSACTOCORTA"/>
+        <association property="tipo" javaType="tipoActo" column="LLTIPOACTO" resultMap="catTipoActoMap"/>
+    </resultMap>
+    
+    <resultMap type="tipoActo" id="catTipoActoMap">
+        <id property="id" column="LLTIPOACTO"/>
+        <result property="descripcion" column="DSACTO"/>
+    </resultMap>        
+   
+    <resultMap type="asociaActos" id="asociaActosMap">
+        <id property="id" column="LLASOACTO"/>
+        <association property="formaActo" javaType="mvformaacto" column="LLACTO" resultMap="actoGravamenMap"/>        
+        <association property="formaActoAfectado" javaType="mvformaacto" column="LLACTOAFECTA" resultMap="actoGravamenMap2"/>        
+        <association property="tipoAsociacion" javaType="ctTipoAsociacion" column="LLASOCIACION"  resultMap="tipoAsociacionMap" />
+    </resultMap>    
+    
+    <resultMap type="ctTipoAsociacion" id="tipoAsociacionMap">
+        <id property="id" column="LLASOCIACION"/>        
+        <result property="descAsociacion" column="DSASOCIACION"/>        
+    </resultMap>
+
+</mapper>

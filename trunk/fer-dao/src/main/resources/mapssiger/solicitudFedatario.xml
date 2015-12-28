@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.solicitud.SolicitudFedatarioDAO">
+
+	<resultMap type="solicitudFedatarioVO" id="SolicitudFedatarioMap">
+		<id property="idSolicitud" column="idSolicitud"/>
+		<result property="fme" column="fme"/>
+		<association property="fedatario" column="idFedatario" javaType="Fedatario" select="consultaFedatario" />
+		<association property="tipoSolicitud" column="idTipoSolicitud" javaType="TipoSolicitud" select="consultaTipoSolicitud" />										
+		<association property="estatus" column="idEstatus" javaType="Estatus" select="consultaEstatus" />	
+ 		<association property="formaPrecodificada" column="idfrmpre" javaType="FormaPreCodificada" select="consultaFrmPre" />
+	</resultMap>
+	
+	<resultMap type="mvsolicitud" id="mvSolicitudMap">
+     	<id property="id" column="LLSOLICITUD"/> 
+     	<result property="fechaIngreso" column="FCINGRESO"/>
+    	<result property="nci" column="DSNCI"/>
+    	<result property="solicitante" column="CRSOLICITANTE"/>
+    	<association property="mvpagos" javaType="pago" column="LLPAGO" resultMap="pagoMap" />
+    	<association property="fedatario" javaType="fedatario" column="LLFEDATARIO" resultMap="fedatarioMap" />
+    	<association property="tipoSolicitud" javaType="tipoSolicitud" column="LLTIPOSOLICITUD" resultMap="tipoSolicitudMap" />
+    	<association property="estatus" javaType="ctestatus" column="LLESTATUS" resultMap="estatusMap" />  
+    	<association property="etapa" javaType="etapa" column="LLETAPA" resultMap="etapaMap" />  
+    	<association property="mvcertificacion" javaType="certificacion" column="LLCERTIFICACION" resultMap="certificacionMap" />
+    	<association property="oficina" javaType="oficinas" column="LLOFICINA" resultMap="oficinaMap"></association>    	 	 	 	
+    	<collection property="solFrmPre" javaType="ArrayList" ofType="solfrmpre" column="LLSOLFRMPRE" resultMap="solfrmpreMap" />
+        <collection property="solicitudCaratulafmes" javaType="ArrayList" ofType="solicitudcaratulafme" column="LLSOLICITUD" resultMap="solicitudcaratulafmeMap" />
+        <collection property="dtDocumento" javaType="ArrayList" ofType="documento" column="LLDOCUMENTO" resultMap="documentoMap" />
+        <collection property="enboletases" javaType="ArrayList" ofType="boleta" column="LLBOLETA" resultMap="boletaMap" />
+        <!-- <collection property="mvcertificacioneses" javaType="ArrayList" ofType="certificacion" column="LLCERTIFICACION" resultMap="certificacionMap" /> -->                
+    </resultMap>
+    
+     <resultMap type="fedatario" id="fedatarioMap">
+    	<id property="id" column="LLFEDATARIO"/>
+    	<result property="numero" column="CRNUMERO"/>
+    	<result property="nombre" column="DSNOMBRE"/>
+    	<result property="apellidoPaterno" column="DSAPELLIDOPATERNO"/>
+    	<result property="apellidoMaterno" column="DSAPELLIDOMATERNO"/>
+    </resultMap>
+    
+    <resultMap type="tipoSolicitud" id="tipoSolicitudMap">
+    	<id property="id" column="LLTIPOSOLICITUD"/>
+    	<result property="nombre" column="DSTIPOSOLICITUD"/>
+    	<result property="activo" column="BOACTIVO"/>
+    </resultMap>
+
+	<resultMap type="ctestatus" id="estatusMap">
+    	<id property="id" column="LLESTATUS"/>
+    	<result property="nombre" column="DSESTATUS"/>
+    	<result property="activo" column="BOACTIVO"/>
+    </resultMap>
+    
+    <resultMap type="etapa" id="etapaMap">
+    	<id property="id" column="LLETAPA"/>
+    	<result property="nombre" column="DSETAPA"/>
+    	<result property="etapa" column="LLETAPA"/>
+    </resultMap>
+    
+    <resultMap type="pago" id="pagoMap">
+    	<id property="id" column="LLPAGO"/>
+    	<result property="descripcionPago" column="DSPAGO"/>
+    	<result property="monto" column="NOMONTO"/>
+    </resultMap>
+    
+    <resultMap type="solfrmpre" id="solfrmpreMap">
+    	<id property="id" column="LLSOLFRMPRE"/>
+    	<association property="cfDefFormaPrecodificada" javaType="deffrmpre" column="LLDEFFRMPRE" resultMap="deffrmpreMap" />
+    	<collection property="mvFormasActos" javaType="ArrayList" ofType="mvformaacto" column="LLSOLFRMPRE" resultMap="mvformaactoMap" />
+    </resultMap>
+    
+    <resultMap type="deffrmpre" id="deffrmpreMap">
+    	<id property="id" column="LLDEFFRMPRE" />		
+		<association property="formaPrecodificada" javaType="formaPreCodificada" column="LLCATFRMPRE" resultMap="formaPreCodificadaMap" />
+    </resultMap>
+    
+    <resultMap type="formaPreCodificada" id="formaPreCodificadaMap">
+    	<id property="pkFormaPreCodificada" column="LLCTFRMPRE"/>
+    	<result property="titulo" column="DSFRMPRECOD"/>
+    	<result property="clave" column="DSFRMPRECLAVE"/>
+    </resultMap>
+    
+   <resultMap type="solicitudcaratulafme" id="solicitudcaratulafmeMap">
+       <association property="mvSolicitud" javaType="mvsolicitud" column="LLSOLICITUD" resultMap="solicitudMap"/>
+       <association property="caratula" javaType="caratula" column="LLCARATULA" resultMap="caratulaMap"/>
+   </resultMap>
+   
+   <resultMap type="caratula" id="caratulaMap">
+        <id property="llcaratula" column="LLCARATULA"/>
+    	<result property="crfme" column="CRFME"/>
+    	<result property="dsdensocial" column="DSDENSOCIAL"/>
+   </resultMap>
+   
+    <resultMap type="mvsolicitud" id="solicitudMap">
+        <id property="id" column="LLSOLICITUD"/>
+    	<result property="nci" column="DSNCI"/>
+   </resultMap>
+   
+   <resultMap type="documento" id="documentoMap">
+    	<id property="id" column="LLDOCUMENTO"/>
+    	<result property="folio" column="NOFOLIO"/>
+    </resultMap>
+   
+    <resultMap type="mvformaacto" id="mvformaactoMap">
+    	<id property="id" column="LLMVFRMACTO"/>
+    	<result property="fcIngreso" column="FCINGRESO"/>
+    	<result property="fcInscripcion" column="FCINSCRIPCION"/>
+    	<result property="aceptado" column="BOACEPTADO"/>
+    	<association property="estado" javaType="estadoActo" column="llestdoacto" resultMap="estdoActoMap" />
+       	<association property="formaActo" javaType="formasactos" column="LLFORMAACTO" resultMap="formasactosMap" />    	
+    </resultMap>
+    
+    <resultMap type="formasactos" id="formasactosMap">
+    	<association property="acto" javaType="ctacto" column="LLACTO" resultMap="actoMap" />
+    </resultMap>
+    
+    <resultMap type="ctacto" id="actoMap">
+    	<id property="id" column="LLACTO"/>
+    	<result property="nombre" column="DSACTO"/>
+    	<result property="nombreCorto" column="DSACTOCORTA"/>
+    	<result property="fcModificacion" column="FCMODIFICACION"/>
+    	<result property="activo" column="BOACTIVO"/>    	
+    </resultMap>  
+    
+    <resultMap type="boleta" id="boletaMap">
+    	<id property="id" column="LLBOLETA"/>
+    	<association property="ctTipoBoleta" javaType="cttipoboleta" column="LLTIPOBOLETA" resultMap="tipoboletaMap"/>
+	</resultMap>
+    
+    <resultMap type="cttipoboleta" id="tipoboletaMap">
+    	<id property="id" column="LLTIPOBOLETA"/>
+    	<result property="nombre" column="DSTIPOBOLETA"/>
+    </resultMap>
+    
+    <resultMap type="certificacion" id="certificacionMap">
+    	<id property="id" column="LLCERTIFICACION"/>
+    	<result property="noCopias" column="NOCOPIAS"/>
+    	<association property="ctTipoCertificado" javaType="ctTipoCertificado" column="LLTIPOCERTIFICA" resultMap="tipocertificadoMap"/>
+	</resultMap>
+	
+	<resultMap type="cttipocertificado" id="tipocertificadoMap">
+    	<id property="id" column="LLTIPOCERTIFICA"/>
+    	<result property="nombre" column="DSTIPOCERTIFICA"/>
+    </resultMap>
+    
+    <resultMap type="docAdjunto" id="docAdjuntoMap">
+    	<result property="id"      column="LLDOCADJUNTO"/>
+    	<result property="nomdocorigen"  column="dsnomdocorigen"/>
+    </resultMap>
+    
+    <resultMap type="estadoActo" id="estdoActoMap">
+    	<id property="id"       column="LLESTDOACTO"/>
+    	<result  property="nombre"   column="DSESTADOACTO"/>
+    </resultMap>
+    
+    <resultMap type="oficinas" id="oficinaMap">
+    	<id property="id" column="LLOFICINA"/>
+    	<result property="nombre" column="DSOFICINA"/>
+    </resultMap>
+   
+   <update id="actualizarSolicitudSalidaSinRegistro" parameterType="mvsolicitud">
+    	 update mvsolicitudes
+	    	 set lletapa = 4 
+	    	 where LLSOLICITUD = #{id}
+    </update>
+    
+    <select id="consultaBoletaSolicitud" resultMap="boletaMap" >
+    	select cttipoboletas.dstipoboleta, enboletas.xmlboleta, enboletas.llboleta 
+		  from enboletas 
+		  join cttipoboletas on enboletas.lltipoboleta = cttipoboletas.lltipoboleta
+		  where enboletas.llsolicitud = #{id}
+    </select>
+    
+    <select id="consultaArchivosAdjuntosDeUnaSolicitud" resultMap="docAdjuntoMap">
+    	select * from mvdocadjuntos where llsolicitud = #{id}
+    </select>
+    
+	<select id="consultaMvSolicitudesEtapaFedatario" resultMap="mvSolicitudMap">
+
+		SELECT 
+		       mvsol.*,
+		       ctfed.*,
+		       cttiposol.*,
+		       ctet.*	  
+		                   
+		FROM
+		       mvsolicitudes mvsol 
+		       JOIN dtcompfeda dtcomfed on mvsol.llcompfeda = dtcomfed.llcompfeda 
+			   JOIN ctfedatarios ctfed on dtcomfed.llfedpublico = ctfed.llfedatario
+			   JOIN ctetapas ctet on mvsol.lletapa = ctet.lletapa 
+			   JOIN cttiposolicitudes cttiposol on mvsol.lltiposolicitud = cttiposol.lltiposolicitud 
+		 
+		WHERE 
+			<if test="idFedatario != null and idFedatario != 0">
+			   dtcomfed.llfedpublico = #{idFedatario}
+			</if>  
+			<if test="idEtapa != null and idEtapa != 0">
+			   AND mvsol.lletapa = #{idEtapa}
+			</if>     
+	</select>
+	
+	<select id="consultaMvSolicitudesCaratFormasPrecod" resultMap="mvSolicitudMap">
+	
+	 select 
+	       mvsol.*,
+	       ctfed.*,
+	       mvfrmpre.*,
+	       frmpre.*,
+	       ctes.*,
+	       mvcarat.*,
+	       cttiposol.*,
+	       ctet.*       
+	          
+	       
+	from
+	       mvsolicitudes mvsol 
+	       JOIN dtcompfeda dtcomfed on mvsol.llcompfeda = dtcomfed.llcompfeda 
+		   JOIN ctfedatarios ctfed on dtcomfed.llfedpublico = ctfed.llfedatario
+	       join cttiposolicitudes cttiposol on mvsol.lltiposolicitud = cttiposol.lltiposolicitud
+	       join mvsolfrmpre mvfrmpre on mvsol.llsolicitud = mvfrmpre.llsolicitud
+	       join cfdeffrmpre dffrmpre on mvfrmpre.lldeffrmpre = dffrmpre.lldeffrmpre
+	       join ctfrmpre frmpre on dffrmpre.llcatfrmpre = frmpre.llctfrmpre
+	       join ctestatus ctes on mvsol.llestatus = ctes.llestatus
+	       join solicitud_caratulafme solicaratfme on mvsol.llsolicitud = solicaratfme.llsolicitud
+	       join mvcaratulas mvcarat on mvcarat.llcaratula = solicaratfme.llcaratula
+	       join ctetapas ctet on mvsol.lletapa = ctet.lletapa  
+	       WHERE 
+       	<if test="idFedatario != null and idFedatario != 0">
+			   dtcomfed.llfedpublico = #{idFedatario}
+			</if>  
+			<if test="idEtapa != null and idEtapa != 0">
+			   AND mvsol.lletapa = #{idEtapa}
+				   <if test="idEtapa==4">
+				   AND mvsol.lltiposolicitud=3
+				   </if>
+			</if>     
+			
+	
+	</select>
+	
+	<select id="consultaMvSolicitudesCaratFormasPrecodBol" resultMap="mvSolicitudMap">
+		select 
+	       mvsol.*,
+	       ctfed.*,
+	       mvfrmpre.*,
+	       frmpre.*,
+	       ctes.*,
+	       mvcarat.*,
+	       cttiposol.*,
+	       ctet.*,
+	       enbol.*,
+	       cttipob.*
+		from
+	       mvsolicitudes mvsol 
+	       JOIN dtcompfeda dtcomfed on mvsol.llcompfeda = dtcomfed.llcompfeda 
+		   JOIN ctfedatarios ctfed on dtcomfed.llfedpublico = ctfed.llfedatario
+	       join cttiposolicitudes cttiposol on mvsol.lltiposolicitud = cttiposol.lltiposolicitud
+	       join mvsolfrmpre mvfrmpre on mvsol.llsolicitud = mvfrmpre.llsolicitud
+	       join cfdeffrmpre dffrmpre on mvfrmpre.lldeffrmpre = dffrmpre.lldeffrmpre
+	       join ctfrmpre frmpre on dffrmpre.llcatfrmpre = frmpre.llctfrmpre
+	       join ctestatus ctes on mvsol.llestatus = ctes.llestatus
+	       join solicitud_caratulafme solicaratfme on mvsol.llsolicitud = solicaratfme.llsolicitud
+	       join mvcaratulas mvcarat on mvcarat.llcaratula = solicaratfme.llcaratula  
+	       join ctetapas ctet on mvsol.lletapa = ctet.lletapa
+	       join enboletas enbol on mvsol.llsolicitud = enbol.llsolicitud
+		   join cttipoboletas cttipob on enbol.lltipoboleta = cttipob.lltipoboleta
+		WHERE 
+       	<if test="idFedatario != null and idFedatario != 0">
+			   dtcomfed.llfedpublico = #{idFedatario}
+			</if>  
+			<if test="idEtapa != null and idEtapa != 0">
+			   AND mvsol.lletapa = #{idEtapa}
+			</if>   
+	
+	</select>
+	
+	
+	<select id="consultaMvSolicitudPorFedatario" parameterType="Fedatario" resultMap="mvSolicitudMap">
+		SELECT 
+		       mvsol.*,
+		       ctfed.*,
+		       cttiposol.*,
+		       ctes.*
+		                   
+		FROM
+		       mvsolicitudes mvsol 
+		       JOIN dtcompfeda dtcomfed on mvsol.llcompfeda = dtcomfed.llcompfeda 
+			   JOIN ctfedatarios ctfed on dtcomfed.llfedpublico = ctfed.llfedatario
+		       JOIN cttiposolicitudes cttiposol on mvsol.lltiposolicitud = cttiposol.lltiposolicitud
+		       JOIN ctestatus ctes on mvsol.llestatus = ctes.llestatus
+		 
+		WHERE 
+			   <if test="id != null and id != 0">
+			   dtcomfed.llfedpublico = #{id}
+			   </if>
+			   AND mvsol.llestatus = 2
+	</select>
+
+	<select id="consultaDetalleSolicitud" parameterType="mvsolicitud" resultMap="mvSolicitudMap">
+
+select 
+       mvsol.*,
+       ctfed.*,
+       cttiposol.*,
+       mvfrmpre.*,
+       frmpre.*,
+       ctes.*,
+       mvcarat.*,       
+       ctacto.*,
+       frma.*,
+	   afrm.*,
+       edoActo.*,
+	   mvpag.*,
+	   ctet.*,
+	   dtdoc.*,
+	   mvcert.*,
+       cttipocert.*	   
+       
+	   from
+       mvsolicitudes mvsol 
+       JOIN dtcompfeda dtcomfed on mvsol.llcompfeda = dtcomfed.llcompfeda 
+	   JOIN ctfedatarios ctfed on dtcomfed.llfedpublico = ctfed.llfedatario
+       join mvpagos mvpag on mvsol.llpago = mvpag.llpago
+       join dtdocumentos dtdoc on mvsol.llsolicitud = dtdoc.llsolicitud
+       join cttiposolicitudes cttiposol on mvsol.lltiposolicitud = cttiposol.lltiposolicitud
+       join mvsolfrmpre mvfrmpre on mvsol.llsolicitud = mvfrmpre.llsolicitud
+       join cfdeffrmpre dffrmpre on mvfrmpre.lldeffrmpre = dffrmpre.lldeffrmpre
+       join ctfrmpre frmpre on dffrmpre.llcatfrmpre = frmpre.llctfrmpre
+       join mvfrmacto frma ON mvfrmpre.llsolfrmpre = frma.llsolfrmpre
+       join ctestadosacto edoActo ON edoActo.llestdoacto = frma.llestdoacto  
+	   join formas_actos afrm ON frma.llformaacto = afrm.llformaacto 
+	   join ctactos ctacto ON afrm.llacto = ctacto.llacto 
+       join ctestatus ctes on mvsol.llestatus = ctes.llestatus
+       join solicitud_caratulafme solicaratfme on mvsol.llsolicitud = solicaratfme.llsolicitud
+       join mvcaratulas mvcarat on mvcarat.llcaratula = solicaratfme.llcaratula
+       join ctetapas ctet on mvsol.lletapa = ctet.lletapa
+       join mvcertificaciones mvcert on mvsol.llsolicitud = mvcert.llsolicitud
+       join cttipocertifica cttipocert on mvcert.lltipocertifica = cttipocert.lltipocertifica 
+    where  
+    	<if test="id != null and id != 0">
+	    mvsol.llsolicitud = #{id}
+	    </if>
+    </select>
+
+    <select id="consultaSolicitudPorFedatario" parameterType="Fedatario" resultMap="SolicitudFedatarioMap">
+
+select 
+       mvsol.llsolicitud as idSolicitud,
+       mvsol.lltiposolicitud as idTipoSolicitud,
+       mvsol.llestatus as idEstatus,
+       mvsol.llfedatario as idFedatario,
+       mvfrmpre.llsolfrmpre as idsolfrmpre,
+       frmpre.llcatfrmpre as idfrmpre,
+       frmpre.lldeffrmpre as iddeffrmpre,
+       frmpre.llcatfrmpre as idfrmpre,
+       frmpre.fcmodificacion as fechamodificacion,
+       frmpre.dsinstruccion as instruccion,
+       frmpre.fcinicio as fechaInicio,
+       frmpre.fcfin as fechafin,
+       mvcarat.crfme as fme
+	   from
+       mvsolicitudes mvsol
+       join mvsolfrmpre mvfrmpre on mvsol.llsolicitud = mvfrmpre.llsolicitud
+       join cfdeffrmpre frmpre on mvfrmpre.lldeffrmpre = frmpre.lldeffrmpre 
+       join solicitud_caratulafme solicaratfme on mvsol.llsolicitud = solicaratfme.llsolicitud
+       join mvcaratulas mvcarat on mvcarat.llcaratula = solicaratfme.llcaratula  
+    where  
+    	<if test="id != null and id != 0">
+	    mvsol.llfedatario = #{id}
+	    </if>
+	    
+    </select>
+    
+    <select id="consultaFrmPre" parameterType="java.lang.Integer" resultType="formaPreCodificada">
+		SELECT frmpre.llctfrmpre as pkFormaPreCodificada,
+				frmpre.dsfrmprecod as titulo,
+				frmpre.dsfrmpreclave as clave
+		FROM ctfrmpre frmpre
+		WHERE frmpre.llctfrmpre = #{idfrmpre}
+	</select>
+	
+	<select id="consultaFedatario" parameterType="java.lang.Integer" resultType="fedatario">
+		SELECT ctfed.llfedatario as id,
+				ctfed.crnumero as numero,
+				ctfed.dsnombre as nombre,
+				ctfed.dsapellidopaterno as apellidoPaterno,
+				ctfed.dsapellidomaterno as apellidoMaterno,
+				ctfed.dspais as pais
+		FROM ctfedatarios ctfed 
+		WHERE llfedatario = #{idFedatario}
+	</select>
+	
+	
+	
+	<delete id="eliminarMvsolicitud" >
+		UPDATE MVSOLICITUDES SET LLESTATUS = (SELECT LLESTATUS FROM CTESTATUS WHERE DSESTATUS = 'Eliminada')  WHERE LLSOLICITUD = #{idSolicitud}
+	</delete>
+	
+</mapper>

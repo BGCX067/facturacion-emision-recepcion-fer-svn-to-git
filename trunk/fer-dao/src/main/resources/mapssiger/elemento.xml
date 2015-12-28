@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.elemento.ElementoDAO">
+    <!-- Sección selects -->
+    <select id="consultarElementosDeVersionDeFP" resultMap="elemento">
+          SELECT el.*, tipoel.*, c.*, ctipo.*, secel.*, comp.* FROM FORMAS_ELEMENTOS formel
+                  JOIN CFELEMENTOS el                   ON el.LLELEMENTO          = formel.LLELEMENTO
+                  JOIN CTTIPOELEMENTOS tipoel           ON tipoel.LLTIPOELEMENTO  = el.LLTIPOELEMENTO
+                  LEFT JOIN CFCAMPOS c ON c.llelemento = el.llelemento
+                  LEFT JOIN CTTIPOSCAMPOS ctipo ON ctipo.LLTIPOCAMPO  = c.LLTIPOCAMPO
+                  LEFT JOIN ELEMENTOS_CATALOGOS clcat ON clcat.LLELEMENTO = c.LLELEMENTO
+                  LEFT JOIN CFSECCIONELEM secel ON secel.LLELEMENTOSECCION = el.LLELEMENTO
+                  LEFT JOIN COMP_ELEM cel  ON cel.LLELEMENTO = el.LLELEMENTO
+                  LEFT JOIN CTCOMPONENTES comp  ON comp.LLCOMPONENTE = cel.LLCOMPONENTE               
+             WHERE formel.LLDEFFRMPRE = #{value}
+                   ORDER BY NOPOSICION ASC
+    </select>
+    <select id="consultarColumnasDeTabla" resultMap="cfDefColumna">
+        SELECT * FROM CFDEFCOLUMNAS col
+	              JOIN CFELEMENTOS el ON el.llelemento = col.llelemento
+	              JOIN CFCAMPOS c ON c.llelemento = el.llelemento
+	              JOIN CTTIPOSCAMPOS ctipo ON ctipo.LLTIPOCAMPO  = c.LLTIPOCAMPO
+	              LEFT JOIN ELEMENTOS_CATALOGOS clcat ON clcat.llelemento = c.llelemento
+	             WHERE col.llelementotabla = #{value}
+    </select>
+    <select id="consultarElementosDeSeccion" resultMap="elemento">
+         SELECT el.*, tipoel.*, c.*, ctipo.*, secel.* FROM SECCIONES_ELEMENTOS secionesel
+                  JOIN CFELEMENTOS el                   ON el.LLELEMENTO          = secionesel.LLELEMENTO
+                  JOIN CTTIPOELEMENTOS tipoel           ON tipoel.LLTIPOELEMENTO  = el.LLTIPOELEMENTO
+                  LEFT JOIN CFCAMPOS c ON c.llelemento = el.llelemento
+                  LEFT JOIN CTTIPOSCAMPOS ctipo ON ctipo.LLTIPOCAMPO  = c.LLTIPOCAMPO
+                  LEFT JOIN ELEMENTOS_CATALOGOS clcat ON clcat.LLELEMENTO = c.LLELEMENTO
+                  LEFT JOIN CFSECCIONELEM secel ON secel.LLELEMENTOSECCION = el.LLELEMENTO                               
+             WHERE secionesel.LLELEMENTOSECCION = #{value}
+                   ORDER BY el.NOPOSICION ASC
+    </select>
+    <!-- Sección inserts -->
+    <insert id="crear" parameterType="elemento" keyProperty="id" keyColumn="LLELEMENTO" useGeneratedKeys="true">
+        INSERT INTO CFELEMENTOS ( LLELEMENTO, DSCLAVE, DSNOMBRE, DSTEXTOAYUDA, LLTIPOELEMENTO, BOINSCACTO, NOPOSICION) 
+               VALUES( CFELEMENTOS_SEQ.nextval,#{clave},#{nombre},#{textoAyuda},#{tipoElemento.id},#{inscribeActo},#{posicion})
+    </insert>
+    <!-- se relaciona elemento con la forma precodificada -->
+    <insert id="crearFormaElemento">
+        INSERT INTO FORMAS_ELEMENTOS (llelemento,lldeffrmpre) VALUES (#{idElemento},#{idDefFormaPrecodificada})
+    </insert>
+    
+    <!-- se relaciona elemento con definición de columnas de un elemento tipo tabla -->
+    <insert id="crearColumnaTabla">
+        INSERT INTO CFDEFCOLUMNAS (LLELEMENTO,LLELEMENTOTABLA) VALUES (#{idElemento},#{idElementoTabla})
+    </insert>
+    
+    <!-- Fin sección insert -->
+    <!-- Sección deletes -->
+    <delete id="eliminarElementoActoDeForma">
+        DELETE FRM_ACTO_ELEM WHERE LLELEMENTO = #{value}
+    </delete>
+    <delete id="eliminarElementoDeForma">
+        DELETE FORMAS_ELEMENTOS WHERE LLELEMENTO = #{value}
+    </delete>
+    <delete id="eliminarElemento">
+        DELETE CFELEMENTOS WHERE LLELEMENTO = #{value}
+    </delete>
+    <delete id="eliminarElementoColumna">
+         DELETE CFDEFCOLUMNAS WHERE LLELEMENTO = #{value}
+     </delete>
+    <!-- Fin sección deletes -->
+    
+    <!-- Sección updates -->
+    <update id="modificarPosicionDeElemento" parameterType="elemento">
+        UPDATE CFELEMENTOS SET NOPOSICION = #{posicion} WHERE LLELEMENTO =#{id} 
+    </update>        
+    <update id="modificar" parameterType="elemento">
+         UPDATE CFELEMENTOS SET DSCLAVE = #{clave}, DSNOMBRE = #{nombre}, DSTEXTOAYUDA = #{textoAyuda}, LLTIPOELEMENTO = #{tipoElemento.id}, BOINSCACTO = #{inscribeActo}
+                WHERE LLELEMENTO = #{id}
+    </update>
+    <!-- Fin de sección pudates -->    
+    <!-- Sección resultMaps -->
+    <resultMap type="elemento" id="elemento">
+        <id column="LLELEMENTO" property="id"/>
+        <result column="DSCLAVE"  property="clave"/>
+        <result column="DSNOMBRE"  property="nombre"/>
+        <result column="DSTEXTOAYUDA"  property="textoAyuda"/>
+        <result column="BOINSCACTO"  property="inscribeActo"/>
+        <result column="NOPOSICION"  property="posicion"/>
+        <!-- Asociación con cttipoelemento -->
+        <association property="tipoElemento" javaType="ctTipoElemento" column="LLTIPOELEMENTO" resultMap="ctTipoElemento" />
+        <!-- Asociación con cfcampos -->
+        
+        <!-- Asociación con CfSeccionElemento-->
+        <association property="seccionElemento" javaType="cfSeccionElemento" column="LLELEMENTOSECCION" resultMap="cfSeccionElemento" />
+        
+        <!-- Asociación con ComponenteElemento-->
+        <association property="campo" javaType="campo" column="LLELEMENTO" resultMap="campo" />
+        <!-- Asociación con CfDefColumna -->
+        <!-- Asociación con ctacto -->
+        <association property="componenteElemento" javaType="componenteElemento" column="LLELEMENTO" resultMap="componenteElemento" />
+    </resultMap>  
+    <resultMap type="ctTipoElemento" id="ctTipoElemento">
+        <id column="LLTIPOELEMENTO" property="id"/>
+        <result column="DSTIPOELEMENTO"  property="nombre"/>
+    </resultMap>
+    <resultMap type="campo"      id="campo">
+         <id column="LLELEMENTO"            property="id"/>
+         <result column="NOMAXCARACTERES"   property="noMaxCaracteres"/>
+         <result column="BOACEPTACOMAS"     property="aceptaComas"/>
+         <result column="BOACEPTADEC"       property="aceptaDec"/>
+         <result column="NOMINIMO"          property="noMinimo"/>
+         <result column="NOMAXIMO"          property="noMaximo"/>
+         <result column="DSVERDADERO"       property="verdadero"/>
+         <result column="DSFALSO"           property="falso"/>
+         <result column="DSLEYENDA"         property="leyenda"/>
+         
+         <association property="ctTipoCampo" javaType="ctTipoCampo" column="LLTIPOCAMPO" resultMap="ctTipoCampo" />
+    </resultMap>
+    <resultMap type="cfDefColumna" id="cfDefColumna">
+         <result column="LLELEMENTOTABLA"   property="idElementoTabla"/>
+         <result column="LLELEMENTO"        property="idElemento"/>
+         
+         <association property="cfElemento" javaType="elemento" column="LLELEMENTO" resultMap="elemento" />
+    </resultMap>
+    <resultMap type="componenteElemento"      id="componenteElemento">
+         <id column="LLELEMENTO"      property="idElemento"/>
+         <result column="LLCOMPONENTE"  property="idComponente"/>
+         <association property="ctComponente" javaType="componente" column="LLCOMPONENTE" resultMap="componente" />
+    </resultMap>
+    <resultMap type="componente"      id="componente">
+         <id column="LLCOMPONENTE"      property="id"/>
+         <result column="DSCOMPONENTE"  property="nombre"/>
+    </resultMap>
+    <resultMap type="cfSeccionElemento" id="cfSeccionElemento">
+         <result column="LLELEMENTO"      property="idElemento"/>
+         <result column="BOACTIVABLE"  property="activable"/>
+    </resultMap>
+    <resultMap type="ctTipoCampo" id="ctTipoCampo">
+        <id column="LLTIPOCAMPO"      property="id"/>
+         <result column="DSTIPOCAMPO"  property="nombre"/>
+    </resultMap>
+    <!-- fin de sección resultMaps -->
+</mapper>

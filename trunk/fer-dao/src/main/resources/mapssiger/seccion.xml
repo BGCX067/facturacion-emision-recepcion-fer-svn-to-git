@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.seccion.SeccionDAO">
+    <!-- Sección inserts -->
+    <insert id="crear" parameterType="cfSeccionElemento" >
+        INSERT INTO CFSECCIONELEM (LLELEMENTOSECCION,BOACTIVABLE) VALUES(#{idElemento},#{activable})
+    </insert>
+    <!-- se relaciona elemento con la seccion -->
+    <insert id="crearSeccionElemento" >
+       INSERT INTO SECCIONES_ELEMENTOS(LLELEMENTO, LLELEMENTOSECCION) VALUES (#{idElemento},#{idElementoSeccion})
+    </insert>
+    <!-- Fin sección insert -->
+     <!-- Sección deletes -->
+    <delete id="eliminarElementoDeSeccion">
+       DELETE SECCIONES_ELEMENTOS WHERE LLELEMENTO = #{value}
+    </delete>
+    <delete id="eliminarSeccion">
+       DELETE CFSECCIONELEM WHERE LLELEMENTOSECCION = #{value}
+    </delete>   
+    <!-- Fin sección deletes -->
+    <!-- Sección resultMaps -->
+    <resultMap type="cfSeccionElemento"      id="cfSeccionElemento">
+         <id        column="LLELEMENTOSECCION"  property="idElemento"/>
+         <result    column="BOACTIVABLE"        property="activable"/>
+    </resultMap>
+    <!-- fin de sección resultMaps -->
+</mapper>

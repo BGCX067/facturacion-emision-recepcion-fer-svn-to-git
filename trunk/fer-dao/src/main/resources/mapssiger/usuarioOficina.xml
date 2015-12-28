@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.usuariooficina.UsuarioOficinaDAO">
+
+	<select id="consulta" parameterType="usuario" resultMap="usuarioOficinaMap" >
+		SELECT uo.*
+		FROM usuario_oficina uo
+		WHERE uo.llusuario = #{id}	
+	</select>
+	
+	<resultMap type="usuarioOficina" id="usuarioOficinaMap">
+		<association property="usuario" javaType="usuario" column="llusuario" resultMap="usuario" />
+		<association property="oficina" javaType="oficina" column="lloficina" resultMap="oficina" />
+	</resultMap>
+
+	<resultMap type="usuario" id="usuario">
+		<id property="id" column="llusuario"/>
+	</resultMap>
+	
+	<resultMap type="oficina" id="oficina">
+		<id property="id" column="lloficina"/>
+	</resultMap>
+
+</mapper>

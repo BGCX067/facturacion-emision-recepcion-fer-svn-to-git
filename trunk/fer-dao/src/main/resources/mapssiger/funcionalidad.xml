@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.funcionalidad.FuncionalidadDAO">
+		<!-- Selects -->
+		<select id="consultarPorUsuario" parameterType="usuario" resultMap="funcionalidad">
+			SELECT f.*
+				FROM CTUSUARIOS u
+					JOIN USUARIO_ROL 		ur	ON	ur.LLUSUARIO		= u.LLUSUARIO
+					JOIN ROL_FUNCIONALIDAD	rf	ON	rf.LLROL 			= ur.LLROL
+					JOIN CTFUNCIONALIDADES	f	ON	f.LLFUNCIONALIDAD	= rf.LLFUNCIONALIDAD
+				WHERE u.LLUSUARIO = #{id}
+		</select>
+		<select id="consultar" resultMap="funcionalidadRol">
+			SELECT LLFUNCIONALIDAD, DSFUNCIONALIDAD FROM CTFUNCIONALIDADES
+		</select>
+		<!-- Fin selects -->		
+
+		<!-- Sección resultMap -->
+		<resultMap id="funcionalidad"	type="funcionalidad">
+			<result property="id"  						column="LLFUNCIONALIDAD"/>
+			<result property="nombre"  					column="DSFUNCIONALIDAD"/>
+			<result property="fechaModfuncionalidad"  	column="FCMODIFICACION"/>
+			<result property="estatus"  				column="BOACTIVO"/>
+			<result property="codigo"  				column="DSCODIGO"/>
+		</resultMap>
+		<resultMap id="funcionalidadRol"	type="funcionalidad">
+			<result property="id"  						column="LLFUNCIONALIDAD"	javaType="Integer"	jdbcType="NUMERIC"/>
+			<result property="nombre"  					column="DSFUNCIONALIDAD"	javaType="String"	jdbcType="VARCHAR"/>
+		</resultMap>
+		<!-- Fin sección resultMap -->
+</mapper>

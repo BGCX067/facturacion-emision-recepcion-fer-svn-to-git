@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.municipio.MunicipioDAO">
+
+	<resultMap id="listaMunicipio" type="ctMunicipio">
+		<result property="id" column="LLMUNICIPIO"/>
+		<result property="nombre" column="DSMUNICIPIO"/>
+		<result property="activo" column="BOACTIVO"/>
+		<association property="estado" column="LLESTADO" javaType="estado" resultMap="EstadoMap"/>
+	</resultMap>
+	
+	<resultMap id="listaMunicipios" type="ctMunicipio">
+		<result property="nombre" column="DSMUNICIPIO"/>
+		<result property="activo" column="BOACTIVO"/>
+		<association property="ctEstado" column="LLESTADO" javaType="ctEstados" resultMap="ctEstadoMap"/>
+		<association property="id" column="LLMUNICIPIO" javaType="ctMunicipioId" resultMap="ctMunicipioIdMap"/>
+	</resultMap>
+	
+	<resultMap type="estado" id="EstadoMap">
+		<id property="id" column="LLESTADO"/>
+		<result property="nombre" column="DSNOMBRE"/>
+	</resultMap>
+	
+	<resultMap type="ctMunicipioId" id="ctMunicipioIdMap">
+		<result property="idEstado" column="LLESTADO"/>
+		<result property="idMunicipio" column="LLMUNICIPIO"/>
+	</resultMap>
+	
+	<resultMap type="ctEstados" id="ctEstadoMap">
+		<id property="id" column="LLESTADO"/>
+		<result property="nombre" column="DSNOMBRE"/>
+	</resultMap>
+	
+	<select id="consultar" parameterType="municipio" resultMap="listaMunicipio">
+		SELECT *
+		FROM CTMUNICIPIOS
+	</select>
+	
+	<select id="consultarPorEstado" parameterType="estado" resultMap="listaMunicipio">
+		SELECT * 
+		FROM CTMUNICIPIOS 
+		WHERE LLESTADO = #{id}
+	</select>
+	
+	<select id="consultaPorEstado" parameterType="java.lang.Long" resultMap="listaMunicipios">
+		SELECT * FROM CTMUNICIPIOS
+		WHERE LLESTADO = #{id} 
+	</select>
+</mapper>

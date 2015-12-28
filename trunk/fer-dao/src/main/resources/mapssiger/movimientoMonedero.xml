@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.movmonedero.MovimientoMonederoDAO">				   
+	
+	<select id="consultarUltimoMovimientoDelTramite" resultMap="movimientoMonederoMap" parameterType="java.lang.Long">
+		SELECT * FROM 
+			(
+			 SELECT * FROM MVMONEDERO 
+			 WHERE LLPAGO = #{idPago} 
+			 ORDER BY FCOPERACION DESC
+			)
+		WHERE ROWNUM = 1
+	</select>
+	
+	<select id="consultarMovimientos" resultMap="movimientoMonederoMap">
+	    SELECT M.FCOPERACION, DSCONCEPTO, M.LLTIPOMOVIMIENTO, NOMONTO, NOSALDOACTUAL, NORESERVATOTAL, LLMOVMONEDERO
+	    FROM MVMONEDEROELEC ME JOIN MVMONEDERO M ON ME.LLMONEDEROELEC = M.LLMONEDEROELEC
+	    WHERE LLFEDATARIO = #{idFedatario}
+	    AND LLLOCALIDADPAGO = #{idLocalidad}
+	    AND M.FCOPERACION BETWEEN #{fechaInicio} AND #{fechaFin}
+	    ORDER BY FCOPERACION
+	</select>
+	
+	<insert id="crearMovimiento" parameterType="movimientoMonedero">
+		INSERT INTO MVMONEDERO
+		(LLMOVMONEDERO, LLPAGO, LLMONEDEROELEC, LLTIPOMOVIMIENTO, DSCONCEPTO, FCOPERACION, NOMONTO, NORESERVATOTAL)
+		VALUES (MVMONEDERO_SEQ.nextVal, #{idPago},#{monedero.id},#{tipoMovimiento},#{concepto},#{fechaOperacion},#{monto},#{saldoReservado}) 		
+	</insert>
+		
+	<resultMap type="movimientoMonedero" id="movimientoMonederoMap">
+		<id column="LLMOVMONEDERO" property="id" javaType="Long" jdbcType="NUMERIC" />
+		<result column="LLPAGO" property="idPago" javaType="Long" jdbcType="NUMERIC" />
+		<result column="LLMONEDEROELEC" property="monedero" javaType="Monedero" jdbcType="NUMERIC" />
+		<result column="LLTIPOMOVIMIENTO" property="tipoMovimiento" javaType="Long" jdbcType="NUMERIC" />
+		<result column="DSCONCEPTO" property="concepto" javaType="String" jdbcType="VARCHAR" />
+		<result column="FCOPERACION" property="fechaOperacion" javaType="Date" jdbcType="DATE" />
+		<result column="NOMONTO" property="monto" javaType="Double" jdbcType="NUMERIC" />
+		<result column="NOSALDOACTUAL" property="saldoActual" javaType="Double" jdbcType="NUMERIC"/>		
+		<result column="NORESERVATOTAL" property="saldoReservado" javaType="Double" jdbcType="NUMERIC" />
+		<result column="FCOPERACION" property="fechaOperacion"/>
+	</resultMap>
+	 
+</mapper>

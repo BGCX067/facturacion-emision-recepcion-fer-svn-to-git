@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.pago.DesgloseDAO">
+	
+	<!-- JELL: Este metodo regresa el desglose de los montos por id de solicitud. -->
+    <select id="consultarDesglosePorSolicitud" resultMap="desglosePorSolicitudMap">
+    	SELECT DESGLOSE.*
+		FROM DTDESGLOSE DESGLOSE
+		<where>
+        	<if test="idSolicitud != null">
+            	AND DESGLOSE.LLSOLICITUD = #{idSolicitud}
+			</if>
+		</where>
+		ORDER BY DESGLOSE.LLDESGLOSE
+    </select>
+	
+	<resultMap type="dtDesglose" id="desglosePorSolicitudMap">
+    	<id     property="id"              column="LLDESGLOSE"/>
+    	<result property="tipoDesglose.id" column="LLTIPODESGLOSE"/>
+    	<result property="pagoDerechos.id" column="LLPAGODERECHO"/>
+    	<result property="solicitud.id"    column="LLSOLICITUD"/>
+    	<result property="concepto"        column="DSCONCEPTO"/>
+    	<result property="montoinIcial"    column="NOMONTOINICIAL"/>
+    	<result property="montoFinal"      column="NOMONTOFINAL"/>
+    	<result property="montoAplicado"   column="NOMONTOAPLICADO"/>
+    	<result property="descuento"       column="NODESCUENTO"/>
+	</resultMap>
+    
+</mapper>

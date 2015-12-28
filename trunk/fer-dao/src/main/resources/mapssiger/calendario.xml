@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.calendario.CalendarioDAO">
+	
+	<insert id="insertCalendario" useGeneratedKeys="true" parameterType="ctcalendarios" keyProperty="ctcalendarios.llcalendario" keyColumn="LLCALENDARIO">
+		 <selectKey keyProperty="llcalendario" resultType="java.lang.Integer" order="BEFORE">
+		 	SELECT MAX(LLCALENDARIO)+1 FROM CTCALENDARIOS
+		 </selectKey>
+		 INSERT INTO CTCALENDARIOS 
+		 (LLCALENDARIO,
+		 CRANIO,
+		 FCALTA,
+		 BONACIONAL)
+		 VALUES 
+		 (#{llcalendario},
+		 #{anio},
+		 #{fechaAlta},
+		 #{bonacional})
+	</insert>
+	
+	<select id="getNextVal" resultType="java.lang.Integer">
+		SELECT MAX(LLCALENDARIO) FROM CTCALENDARIOS
+	</select>
+	
+</mapper>

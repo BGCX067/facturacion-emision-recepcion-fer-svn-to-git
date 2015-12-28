@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.estado.EstadoDAO">
+
+	<select id="consultar" resultMap="listaEstados">
+		SELECT * 
+		FROM CTESTADOS
+	</select>
+	
+	<resultMap id="listaEstados" type="estado">
+		<id     property="id"      column="LLESTADO"/>
+		<result property="nombre"  column="DSESTADO"/>
+		<result property="estatus" column="BOACTIVO"/>
+	</resultMap>
+	
+	<select id="consultarEstados" resultMap="estadoResultMap">
+		SELECT * 
+		FROM CTESTADOS
+	</select>
+	
+	<resultMap id="estadoResultMap" type="ctEstados">
+		<id     property="id"     column="LLESTADO"/>
+		<result property="nombre" column="DSESTADO"/>
+		<result property="activo" column="BOACTIVO"/>
+		<collection property="ctMunicipios" javaType="ArrayList" ofType="ctMunicipio" column="LLMUNICIPIO" resultMap="municipiosMap"/>
+	</resultMap>
+
+	<resultMap type="ctMunicipio" id="municipiosMap">
+		<id     property="id"     column="LLMUNICIPIO"/>
+		<result property="nombre" column="DSMUNICIPIO"/>
+	</resultMap>
+	
+</mapper>

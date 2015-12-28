@@ -1,0 +1,797 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.3.2.v20140211-1400 Build &lt;4.3.2.v20140218-1056></property>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[
+importPackage( Packages.java.io );
+ 
+fos = new java.io.FileOutputStream( "c:\\logFile.txt" ); 
+
+printWriter = new java.io.PrintWriter( fos ); 
+
+printWriter.println( "ReportDesign.initialize..." ); ]]></method>
+    <method name="afterFactory"><![CDATA[
+printWriter.close( );]]></method>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <data-sources>
+        <script-data-source name="Data Source" id="12"/>
+    </data-sources>
+    <data-sets>
+        <script-data-set name="FedatariosDataSet" id="13">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">IdFedatario</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">NumFedatario</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Nombre</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">ApPaterno</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">ApMaterno</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Solicitudes</property>
+                    <property name="dataType">javaObject</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">IdFedatario</property>
+                </structure>
+                <structure>
+                    <property name="columnName">NumFedatario</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Nombre</property>
+                </structure>
+                <structure>
+                    <property name="columnName">ApPaterno</property>
+                </structure>
+                <structure>
+                    <property name="columnName">ApMaterno</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Solicitudes</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">IdFedatario</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">NumFedatario</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">Nombre</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">ApPaterno</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">ApMaterno</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">Solicitudes</property>
+                        <property name="dataType">javaObject</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[importPackage(Packages.mx.gob.se.siger2.reports.consulta);
+
+printWriter.println( "OPEN: FEDATARIOS: ENTRE" ); 
+
+var lista = reportContext.getParameterValue("ListaDeSolicitudesParam");
+
+printWriter.println( "OPEN: FEDATARIOS: lista = " + lista); 
+
+// Si los parametros son null, obtengo la lista default para efectos de prueba.
+if(lista != null) {
+	
+	printWriter.println( "OPEN: FEDATARIOS: VALORES OBTENIDOS DE PARAMETROS.."); 
+	iteratorExterno = lista.iterator();
+	
+} else {
+
+	printWriter.println( "OPEN: FEDATARIOS: VALORES OBTENIDOS DEFAULT PARA PRUEBAS.."); 
+	myrows = new BoletinResultadosSolicitudDataSet();
+	iteratorExterno = myrows.getRecords().iterator();
+
+}
+
+indexExterno = 0;
+indexInterno = 0;
+]]></method>
+            <method name="fetch"><![CDATA[
+printWriter.println( "FETCH: FEDATARIOS: ENTRE:.."); 
+
+printWriter.println( "FETCH: FEDATARIOS: ANTES: indexExterno = " + indexExterno); 
+
+if( iteratorExterno.hasNext() ) {
+
+	printWriter.println( "FETCH: FEDATARIOS: hasNext().."); 
+
+	var objExterno = iteratorExterno.next();
+
+	row["IdFedatario"]  = objExterno.getIdFedatario();
+	row["NumFedatario"] = objExterno.getNumFedatario();
+	row["Nombre"]       = objExterno.getNombre();
+	row["ApPaterno"]    = objExterno.getApPaterno();
+	row["ApMaterno"]    = objExterno.getApMaterno();
+	row["Solicitudes"]  = objExterno.getSolicitudes(); // Pasa una lista de Solicitudes.
+
+	indexExterno++;
+	
+	// Inicializo la lista interna.
+	indexInterno = 0;
+	
+	printWriter.println( "FETCH: FEDATARIOS: DESPUES: indexExterno = " + indexExterno); 
+
+	return true;
+
+} else {
+	printWriter.println( "FETCH: FEDATARIOS: FIN DE LA LISTA DE FEDATARIOS.."); 
+	return false;
+}]]></method>
+        </script-data-set>
+        <script-data-set name="SolicitudesDataSet" id="62">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Nci</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Fme</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Fecha</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">FechaConHusoHorario</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Origen</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Status</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">MotivoRechazo</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">Nci</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Fme</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Fecha</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FechaConHusoHorario</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Origen</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Status</property>
+                </structure>
+                <structure>
+                    <property name="columnName">MotivoRechazo</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">ListaSolicitudesParam</property>
+                    <property name="dataType">javaObject</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue" type="javascript">null</expression>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">Nci</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">Fme</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">Fecha</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">FechaConHusoHorario</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">Origen</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">Status</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">MotivoRechazo</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[importPackage(Packages.org.eclipse.birt.spring.example.jell);
+
+printWriter.println( "OPEN: SOLICITUDES: ENTRE..");
+ 
+printWriter.println( "OPEN: SOLICITUDES: inputParams[ListaSolicitudesParam] = " + inputParams["ListaSolicitudesParam"]); 
+
+if( inputParams["ListaSolicitudesParam"] == null ) {
+	indexExterno=1;
+	indexInterno=1;
+}else{
+	indexExterno=0;
+}
+
+printWriter.println( "OPEN: SOLICITUDES: indexExterno = " + indexExterno); ]]></method>
+            <method name="fetch"><![CDATA[printWriter.println( "FETCH: SOLICITUDES: ENTRE..");
+
+printWriter.println( "FETCH: SOLICITUDES: ANTES: indexExterno = " + indexExterno);
+
+if( indexExterno > 0 ) {
+	printWriter.println( "FETCH: SOLICITUDES: RETURN FALSE..");
+	return false;
+}
+
+var objListaSolicitudes = inputParams["ListaSolicitudesParam"];
+
+printWriter.println( "FETCH: SOLICITUDES: objListaSolicitudes = " + objListaSolicitudes);
+
+if(indexInterno == 0) {
+	printWriter.println( "FETCH: SOLICITUDES: INICIALIZO ITERATOR..");
+	iteratorInterno = objListaSolicitudes.iterator();
+}
+
+if( iteratorInterno.hasNext() ) {
+
+	printWriter.println( "FETCH: SOLICITUDES: hasNext().."); 
+
+	printWriter.println( "FETCH: SOLICITUDES: ANTES: indexInterno = " + indexInterno);
+	
+	var objInterno = iteratorInterno.next();
+	
+	printWriter.println( "FETCH: SOLICITUDES: objInterno = " + objInterno); 
+	
+	row["Nci"]                 = objInterno.getNci();
+	row["Fme"]                 = objInterno.getFme();
+	row["Fecha"]               = objInterno.getFechaIngreso();
+	row["FechaConHusoHorario"] = objInterno.getFechaIngresoConHusoHorario();
+	row["Origen"]              = objInterno.getOrigen();
+	row["Status"]              = objInterno.getStatus();
+	row["MotivoRechazo"]       = objInterno.getMotivoRechazo();
+	
+	indexInterno++;
+	//indexExterno++;
+	
+	printWriter.println( "FETCH: SOLICITUDES: DESPUES: indexInterno = " + indexInterno); 
+	//printWriter.println( "FETCH: SOLICITUDES: DESPUES: indexExterno = " + indexExterno); 
+
+	return true;
+	
+} else {
+
+	printWriter.println( "FETCH: SOLICITUDES: TERMINE XXX.."); 
+	
+	indexExterno = 0;
+
+	printWriter.println( "FETCH: SOLICITUDES: DESPUES: indexExterno = " + indexExterno); 
+	
+	return false;	
+
+}
+	
+]]></method>
+        </script-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <page-footer>
+                <text id="3">
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="7">
+            <column id="8"/>
+            <row id="9">
+                <cell id="10">
+                    <label id="11">
+                        <property name="fontSize">14pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">REPORTE DE SOLICITUDES POR FEDATARIOS</text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <table id="15">
+            <property name="dataSet">FedatariosDataSet</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">IdFedatario</property>
+                    <text-property name="displayName">IdFedatario</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["IdFedatario"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">NumFedatario</property>
+                    <text-property name="displayName">NumFedatario</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["NumFedatario"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Nombre</property>
+                    <text-property name="displayName">Nombre</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Nombre"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">ApPaterno</property>
+                    <text-property name="displayName">ApPaterno</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["ApPaterno"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">ApMaterno</property>
+                    <text-property name="displayName">ApMaterno</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["ApMaterno"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Solicitudes</property>
+                    <text-property name="displayName">Solicitudes</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Solicitudes"]</expression>
+                    <property name="dataType">javaObject</property>
+                </structure>
+                <structure>
+                    <property name="name">HeaderFedatario</property>
+                    <expression name="expression" type="javascript">dataSetRow["IdFedatario"] + " - " + dataSetRow["NumFedatario"] + ": " + dataSetRow["Nombre"] + " " + dataSetRow["ApPaterno"] + " " + dataSetRow["ApMaterno"]</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+            </list-property>
+            <column id="22"/>
+            <header>
+                <row id="16">
+                    <cell id="17"/>
+                </row>
+            </header>
+            <detail>
+                <row id="18">
+                    <property name="backgroundColor">#800000</property>
+                    <cell id="19">
+                        <data id="106">
+                            <property name="backgroundColor">#800000</property>
+                            <property name="color">white</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">1px</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">1px</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">1px</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">1px</property>
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">HeaderFedatario</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="26">
+                    <cell id="27">
+                        <table id="28">
+                            <property name="width">7.9375in</property>
+                            <property name="dataSet">SolicitudesDataSet</property>
+                            <list-property name="paramBindings">
+                                <structure>
+                                    <property name="paramName">ListaSolicitudesParam</property>
+                                    <simple-property-list name="expression">
+                                        <value type="javascript">row["Solicitudes"]</value>
+                                    </simple-property-list>
+                                </structure>
+                            </list-property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">Nci</property>
+                                    <text-property name="displayName">Nci</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["Nci"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">Fme</property>
+                                    <text-property name="displayName">Fme</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["Fme"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">Fecha</property>
+                                    <text-property name="displayName">Fecha</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["Fecha"]</expression>
+                                    <property name="dataType">date</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">Origen</property>
+                                    <text-property name="displayName">Origen</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["Origen"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">Status</property>
+                                    <text-property name="displayName">Status</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["Status"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">FechaConHusoHorario</property>
+                                    <text-property name="displayName">FechaConHusoHorario</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["FechaConHusoHorario"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">MotivoRechazo</property>
+                                    <text-property name="displayName">MotivoRechazo</text-property>
+                                    <expression name="expression" type="javascript">"Motivo de rechazo: " + dataSetRow["MotivoRechazo"]</expression>
+                                    <property name="dataType">string</property>
+                                    <property name="allowExport">true</property>
+                                </structure>
+                            </list-property>
+                            <column id="47">
+                                <property name="width">1.7291666666666667in</property>
+                            </column>
+                            <column id="48">
+                                <property name="width">1.6770833333333333in</property>
+                            </column>
+                            <column id="49">
+                                <property name="width">1.75in</property>
+                            </column>
+                            <column id="50">
+                                <property name="width">1.25in</property>
+                            </column>
+                            <column id="51">
+                                <property name="width">1.4166666666666667in</property>
+                            </column>
+                            <header>
+                                <row id="29">
+                                    <property name="backgroundColor">gray</property>
+                                    <cell id="30">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <label id="96">
+                                            <text-property name="text">NCI</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="31">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <label id="98">
+                                            <text-property name="text">FME</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="32">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <label id="100">
+                                            <text-property name="text">Fecha y hora de ingreso</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="33">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <label id="102">
+                                            <text-property name="text">Origen</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="34">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <label id="104">
+                                            <text-property name="text">Estatus</text-property>
+                                        </label>
+                                    </cell>
+                                </row>
+                            </header>
+                            <detail>
+                                <row id="35">
+                                    <property name="backgroundColor">silver</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">1px</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">1px</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">1px</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">1px</property>
+                                    <property name="textAlign">center</property>
+                                    <cell id="36">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <data id="97">
+                                            <property name="resultSetColumn">Nci</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="37">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <data id="99">
+                                            <property name="resultSetColumn">Fme</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="38">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <data id="107">
+                                            <property name="resultSetColumn">FechaConHusoHorario</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="39">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <data id="103">
+                                            <property name="resultSetColumn">Origen</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="40">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <data id="105">
+                                            <property name="resultSetColumn">Status</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                                <row id="121">
+                                    <property name="backgroundColor">silver</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">1px</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">1px</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">1px</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">1px</property>
+                                    <property name="textAlign">center</property>
+                                    <cell id="122">
+                                        <property name="colSpan">5</property>
+                                        <property name="rowSpan">1</property>
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                        <data id="128">
+                                            <property name="textAlign">justify</property>
+                                            <property name="resultSetColumn">MotivoRechazo</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </detail>
+                            <footer>
+                                <row id="41">
+                                    <cell id="42">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                    </cell>
+                                    <cell id="43">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                    </cell>
+                                    <cell id="44">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                    </cell>
+                                    <cell id="45">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                    </cell>
+                                    <cell id="46">
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">1px</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">1px</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">1px</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">1px</property>
+                                    </cell>
+                                </row>
+                            </footer>
+                        </table>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="20">
+                    <cell id="21"/>
+                </row>
+            </footer>
+        </table>
+    </body>
+</report>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+          http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+          version="2.5">    
+	<display-name>Archetype Created Web Application</display-name>
+	 <!-- JSF Servlet is defined to container -->
+           <!-- Spring Context Configuration' s Path definition -->
+      <context-param>
+         <param-name>contextConfigLocation</param-name>
+         <param-value>/WEB-INF/spring/root-context.xml</param-value>
+      </context-param>
+ 
+ <!-- Llave publica y primaria para captcha del dominio  www.economia.gob.mx -->
+<!--  	  <context-param> -->
+<!-- 		<param-name>primefaces.PRIVATE_CAPTCHA_KEY</param-name> -->
+<!-- 		<param-value>6LfP-PUSAAAAAB_zV2a-3z3rLsZCJpc_-3BbJzB2</param-value> -->
+<!-- 		</context-param> -->
+<!-- 		<context-param> -->
+<!-- 		<param-name>primefaces.PUBLIC_CAPTCHA_KEY</param-name> -->
+<!-- 		<param-value>6LfP-PUSAAAAAFCU8dnzIMBlqgeBG0bB_L4TQd1m</param-value> -->
+<!-- 		</context-param> -->
+		
+      <!-- The Bootstrap listener to start up and shut down Spring's root WebApplicationContext. It is registered to Servlet Container -->
+      <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+      </listener>
+      <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+      </listener>
+      <listener>
+        <listener-class>com.beltsoft.jim.fer.util.SessionListener</listener-class>
+      </listener>
+      <!--listener>
+	    <listener-class>jeeobserver.JeeObserverListener</listener-class>
+	  </listener-->
+	   
+      
+      <!-- Project Stage Level -->
+      <context-param>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+      </context-param>
+      <context-param>
+		    <param-name>javax.faces.VALIDATE_EMPTY_FIELDS</param-name>
+		    <param-value>true</param-value>
+		</context-param>
+      
+		<context-param>
+			<param-name>javax.faces.FACELETS_LIBRARIES</param-name>
+			<param-value>/WEB-INF/spring/springsecurity.taglib.xml</param-value>
+		</context-param>
+      
+      <context-param>
+	    <param-name>javax.faces.CONFIG_FILES</param-name>
+	    <param-value>
+	        /WEB-INF/faces/faces-config.xml
+<!-- 	    	/WEB-INF/fedatario-faces-config.xml, -->
+<!-- 	    	/WEB-INF/rol-faces-config.xml, -->
+	    	
+<!-- 	    	/WEB-INF/giro-faces-config.xml, -->
+<!-- 	    	/WEB-INF/tipo-documento-faces-config.xml, -->
+<!-- 	    	/WEB-INF/lineaCaptura-faces-config.xml, -->
+<!-- 	    	/WEB-INF/descuentoOficina-faces-config.xml, -->
+<!-- 	    	/WEB-INF/solicitudProceso-faces-config.xml, -->
+<!-- 	    	/WEB-INF/formasActos-faces-config.xml, -->
+<!-- 	    	/WEB-INF/configuracionVersionFP-faces-config.xml -->
+	    </param-value>
+	  </context-param>
+ 	  
+ 	  <context-param>
+	 	 <param-name>primefaces.THEME</param-name>
+	 	 <param-value>sesiger</param-value>
+	  </context-param>
+ 	
+      <!-- Welcome Page -->
+   	  <welcome-file-list>
+        <welcome-file>xhtml/index.xhtml</welcome-file>
+      </welcome-file-list>
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<filter-class>org.primefaces.webapp.filter.FileUploadFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<servlet-name>Faces Servlet</servlet-name>
+	</filter-mapping>
+	<filter>
+         <filter-name>EncodingFilter</filter-name>
+        <filter-class>com.beltsoft.jim.fer.util.EncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+      <!-- JSF Servlet is defined to container -->
+      <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+      </servlet>
+ 
+      <!-- Mapping with servlet and url for the http requests. -->
+      <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.jsf</url-pattern>
+      </servlet-mapping>
+      <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.faces</url-pattern>
+      </servlet-mapping>
+      <servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>*.xhtml</url-pattern>
+	</servlet-mapping>
+</web-app>

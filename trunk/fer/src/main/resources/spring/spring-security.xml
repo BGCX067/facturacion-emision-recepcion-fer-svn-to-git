@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/security
+						http://www.springframework.org/schema/security/spring-security-3.0.xsd"
+	xmlns:p="http://www.springframework.org/schema/p">
+    <http auto-config="true" use-expressions="true" >
+        <intercept-url pattern="/" access="permitAll"/>
+        <intercept-url pattern="/xhtml/login/login.xhtml" access="permitAll"/>
+<!--         <intercept-url pattern="/xhtml/comun/fedatario/*" access="permitAll"/> -->
+<!--         <intercept-url pattern="/xhtml/comun/oficina/*" access="permitAll"/> -->
+<!--         <intercept-url pattern="/xhtml/autoservicio/usuario/*" access="permitAll"/> -->
+<!--         <intercept-url pattern="/xhtml/administracion/configuracionFP/*" access="permitAll"/> -->
+        <intercept-url  pattern="/javax.faces.resource/**" filters="none"/>
+        
+<!--         <intercept-url pattern="/xhtml/consulta/entregaDocumentacion/*" access="hasRole('CONS_REGI_ENTR')"/> -->
+<!--         <intercept-url pattern="/xhtml/administracion/calendario/*" access="hasAnyRole('CONF_CALE_NACI','CONF_CALE_LOCA')"/> -->
+<!--         <intercept-url pattern="/xhtml/administracion/configValoresGralesNacional/*" access="hasRole('ADMI_SIGER_NACI')"/> -->
+<!--         <intercept-url pattern="/xhtml/administracion/grupos/*" access="hasRole('ADMI_TARE')"/> -->
+<!--         <intercept-url pattern="/xhtml/administracion/roles/*" access="hasRole('ADMI_USUA')"/> -->
+<!--         <intercept-url pattern="/xhtml/administracion/usuarios/*" access="hasRole('ADMI_USUA')"/> -->
+<!--         <intercept-url pattern="/xhtml/catalogos/fedatario/*" access="hasRole('ADMI_FEDA')"/> -->
+<!--         <intercept-url pattern="/xhtml/catalogos/giro/*" access="hasRole('ADMI_CATA')"/> -->
+<!--         <intercept-url pattern="/xhtml/catalogos/oficinas/*" access="hasRole('ADMI_OFIC_REGI')"/> -->
+<!--         <intercept-url pattern="/xhtml/catalogos/tipoDocumento/*" access="hasRole('ADMI_CATA')"/> -->
+<!--         <intercept-url pattern="/xhtml/consulta/entregaDocumentacion/*" access="hasRole('CONS_REGI_ENTR')"/> -->
+<!--         <intercept-url pattern="/xhtml/identificacionUsuario/*" access="isAuthenticated()"/> -->
+<!--         <intercept-url pattern="/xhtml/pagos/lineaCaptura/*" access="hasRole('PAGA_LINE_CAPT')"/> -->
+<!--         <intercept-url pattern="/xhtml/administracion/configuracionFP/*" access="hasRole('CONF_FORM_PREC_ACTO')"/> -->
+      
+        <intercept-url pattern="/**" access="isAuthenticated()"/>
+        <form-login  login-page="/xhtml/login/login.xhtml"/>
+    </http>
+    <beans:bean id="ferAuthenticationProvider"  class="com.beltsoft.jim.fer.seguridad.FerAuthenticationProvider" >    	
+    </beans:bean>
+	<authentication-manager>
+ 		<authentication-provider ref="ferAuthenticationProvider"/>
+	</authentication-manager>
+</beans:beans>

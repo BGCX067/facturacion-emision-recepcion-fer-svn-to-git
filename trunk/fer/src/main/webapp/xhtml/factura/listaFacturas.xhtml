@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"	
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:head />
+	<h:body>
+     	<ui:composition template="#{pageContext.request.contextPath}/xhtml/layout/common/layout.xhtml" >
+     		<ui:define name="content">
+				<h:form id="listaFacturasForm">
+					 <div align="center" style="width:100%">
+						    <p:panelGrid style="margin-top:20px;width:100%">  							   
+							<p:row>  
+							        <p:column> <h:outputLabel value="Fecha"/></p:column>   							  
+							       	<p:column><p:calendar id="fechaInicioId" value="#{facturaMB.fechaInicio}" 
+							       		pattern="dd-MM-yyyy" mask="true" effect="fold" />
+							       	</p:column>
+							        <p:column> <h:outputLabel value="a"/></p:column>
+							        <p:column><p:calendar id="fechaFinId" 
+							        value="#{facturaMB.fechaFin}" pattern="dd-MM-yyyy" mask="true" 
+							        effect="fold" /></p:column>         
+						    </p:row>				        	
+					</p:panelGrid>	
+					</div>
+			        <p:growl id="messages" showDetail="true" />
+					<h:commandButton 
+						 class="boton_principal" 
+						 actionListener="#{facturaMB.buscar}" 
+						 update=":listaFacturasForm:tableFacturas"
+						 value="#{messageSource['boton.buscar']}" icon="ui-icon-search">
+					
+					</h:commandButton>
+					<div style="overflow: auto;">
+						<p:outputPanel id="tableFacturas">				
+							<p:dataTable id="facturatable" var="factura" value="#{facturaMB.facturas}"  >
+							    <p:column headerText="UUID">
+							        <h:outputText value="#{factura.uuid}" />
+							    </p:column>
+							 	<p:column headerText="RFC Emisor">
+							        <h:outputText value="#{factura.rfcEmisor}" />
+							    </p:column>
+							    <p:column headerText="RFC Receptor">
+							        <h:outputText value="#{factura.rfcReceptor}" />
+							    </p:column>
+							    <p:column headerText="Fecha Emisión">
+							        <h:outputText value="#{factura.fechaEmision}" >
+							        	<f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+							        </h:outputText>
+							    </p:column>
+							    <p:column headerText="Fecha Timbrado">
+							        <h:outputText value="#{factura.fechaTimbrado}" >
+							        	<f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+							        </h:outputText>
+							        
+							    </p:column>
+							    <p:column headerText="Estado SAT">
+							        <h:outputText value="#{factura.acuseEstado}" />
+							    </p:column>
+							</p:dataTable>
+						</p:outputPanel>
+					</div>
+				</h:form>				
+			</ui:define>
+     	</ui:composition>
+     </h:body>	
+</html>

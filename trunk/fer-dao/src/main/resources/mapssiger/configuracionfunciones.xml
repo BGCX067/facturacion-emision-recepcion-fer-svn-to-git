@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.funcion.ConfiguracionFuncionesDAO">
+
+	<!-- JELL: Query que obtiene las formas precodificadas y los actos por solicitud filtrados por id de solicitud. -->
+	<select id="obtenerFormaPrecodificaYActosPorNumSolicitud" resultMap="formasPrecodificadasYActosResult" > 
+    	SELECT 
+        SOL.LLSOLICITUD, 
+  		SOL_FROM_PREC.LLSOLFRMPRE, 
+  		ACTO.LLMVFRMACTO, 
+  		DEF_FORMA.LLDEFFRMPRE, DEF_FORMA.LLCATFRMPRE, 
+  		CAT_FORMA.LLCTFRMPRE, CAT_FORMA.DSFRMPRECOD, CAT_FORMA.DSFRMPRECLAVE, 
+  		FOR_ACT.LLFORMAACTO, FOR_ACT.LLDEFFRMPRE, FOR_ACT.LLACTO, 
+  		CAT_ACTOS.LLACTO, CAT_ACTOS.DSACTO, CAT_ACTOS.BOACTIVO, 
+  		EST_ACT.LLESTDOACTO, EST_ACT.DSESTADOACTO, 
+  		FUNC.LLFUNCION, FUNC.DSNOMBRE, FUNC.DSCODIGO,
+  		PARAMFUN.LLPARAMFUNCION, PARAMFUN.DSNOMBRE, PARAMFUN.DSCODIGO, PARAMFUN.LLFUNCION
+        FROM MVSOLICITUDES SOL 
+		LEFT OUTER JOIN MVSOLFRMPRE SOL_FROM_PREC ON SOL.LLSOLICITUD = SOL_FROM_PREC.LLSOLICITUD 
+		LEFT OUTER JOIN MVFRMACTO ACTO ON SOL_FROM_PREC.LLSOLFRMPRE = ACTO.LLSOLFRMPRE 
+		LEFT OUTER JOIN CFDEFFRMPRE DEF_FORMA ON SOL_FROM_PREC.LLDEFFRMPRE = DEF_FORMA.LLDEFFRMPRE 
+		LEFT OUTER JOIN CTFRMPRE CAT_FORMA ON DEF_FORMA.LLCATFRMPRE = CAT_FORMA.LLCTFRMPRE 
+		LEFT OUTER JOIN FORMAS_ACTOS FOR_ACT ON ACTO.LLFORMAACTO = FOR_ACT.LLFORMAACTO 
+		LEFT OUTER JOIN CTACTOS CAT_ACTOS ON FOR_ACT.LLACTO = CAT_ACTOS.LLACTO 
+		LEFT OUTER JOIN CTESTADOSACTO EST_ACT ON ACTO.LLESTDOACTO = EST_ACT.LLESTDOACTO 
+		LEFT OUTER JOIN CTACTOS_CTFUNC ACT_FUN ON CAT_ACTOS.LLACTO = ACT_FUN.LLACTO 
+		LEFT OUTER JOIN CTFUNCIONES FUNC ON ACT_FUN.LLFUNCION = FUNC.LLFUNCION 
+		LEFT OUTER JOIN CFPARAMFUNCION PARAMFUN ON FUNC.LLFUNCION = PARAMFUN.LLFUNCION 
+        <where>
+        	<if test="idSolicitud != null">
+            	AND SOL.LLSOLICITUD = #{idSolicitud}
+			</if>
+		</where>
+		ORDER BY CAT_FORMA.DSFRMPRECLAVE ASC, FOR_ACT.LLACTO ASC, ACT_FUN.LLFUNCION ASC, PARAMFUN.LLPARAMFUNCION ASC
+	</select>
+	
+	<!-- JELL: Mapa que las formas precodificadas y sus actos. -->
+	<resultMap type="mvsolicitud" id="formasPrecodificadasYActosResult">
+		<id          property="id"        column="LLSOLICITUD" />
+		<association property="solFrmPre" resultMap="solFormaPrecodResult"/>
+	</resultMap>
+	
+	<resultMap type="solfrmpre" id="solFormaPrecodResult">
+   		<id          property="id"                      column="LLSOLFRMPRE" />
+		<association property="cfDefFormaPrecodificada" resultMap="defFormaPrecodificadaMap" />
+        <association property="mvFormasActos"           resultMap='formaActoMap'/>
+	</resultMap>
+	
+	<resultMap type="deffrmpre" id="defFormaPrecodificadaMap">
+    	<id          property="id"                 column="LLDEFFRMPRE" />		
+		<association property="formaPrecodificada" resultMap="formaPreCodificadaMap" />
+    </resultMap>
+	
+	 <resultMap type="formaPreCodificada" id="formaPreCodificadaMap">
+    	<id     property="pkFormaPreCodificada" column="LLCTFRMPRE"/>
+    	<result property="titulo"               column="DSFRMPRECOD"/>
+    	<result property="clave"                column="DSFRMPRECLAVE"/>
+    </resultMap>
+    
+    <resultMap type="mvformaacto" id="formaActoMap">
+		<id          property="id"        column="LLMVFRMACTO"  />
+        <association property="estado"    resultMap="estadoActoMap" />
+        <association property="formaActo" resultMap="actosPorFormaMap" />
+	</resultMap>
+	
+	<resultMap type="estadoActo" id="estadoActoMap">
+		<id     column="LLESTDOACTO"  property="id" />
+        <result column="DSESTADOACTO" property="nombre"/>
+	</resultMap>
+	
+    <resultMap type="formasactos" id="actosPorFormaMap">
+    	<association property="acto" resultMap="catActoMap" />
+	</resultMap>
+	
+	<resultMap type="ctacto" id="catActoMap">
+    	<id         property="id"          column="LLACTO" />
+        <result     property="nombre"      column="DSACTO" />
+        <result     property="nombreCorto" column="DSACTOCORTA" />
+        <result     property="activo"      column="BOACTIVO" />
+        <!-- <collection property="funciones"   column="LLFUNCION" javaType="ArrayList" ofType="funcion" resultMap="funcionMap" /> -->
+        <association property="funciones" resultMap="funcionMap" />
+	</resultMap>
+	
+	<resultMap type="funcion" id="funcionMap">
+		<id         property="id"         column="LLFUNCION" />
+		<result     property="nombre"     column="DSNOMBRE" />
+		<!-- <collection property="parametros" column="LLPARAMFUNCION" javaType="ArrayList" ofType="ctParametroFuncion" resultMap="parametroFuncionMap" /> -->
+		<association property="parametros" resultMap="parametroFuncionMap" />
+	</resultMap>
+
+	<resultMap type="ctParametroFuncion" id="parametroFuncionMap">
+        <id     property="id"     column="LLPARAMFUNCION" />
+        <result property="nombre" column="DSNOMBRE" />
+        <result property="codigo" column="DSCODIGO" />
+    </resultMap>
+    
+</mapper>

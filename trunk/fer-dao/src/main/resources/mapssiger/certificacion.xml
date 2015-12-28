@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.solicitud.SolicitudCertificacionDAO">
+
+	<select id="consultarTipoCertificacion" parameterType="java.lang.Long" resultMap="tipoCertificadoMap">
+		SELECT CTTIPOCERTIFICA.LLTIPOCERTIFICA FROM MVCERTIFICACIONES 
+		JOIN CTTIPOCERTIFICA ON MVCERTIFICACIONES.LLTIPOCERTIFICA = CTTIPOCERTIFICA.LLTIPOCERTIFICA
+		WHERE LLSOLICITUD = #{idSolicitud}
+	</select>
+		
+	<select id="consultarSolicitudesACertificar" parameterType="java.lang.Long" resultMap="solCertificacionMap">
+       SELECT S.DSNCI, CA.BOACERVO, CA.CRFME, TC.DSTIPOCERTIFICA, S.FCINGRESO, E.DSESTATUS, S.NOCONTINUIDAD, S.CRSOLICITANTE, 
+       CA.DSDENSOCIAL, S.LLSOLICITUD, CE.NOCOPIAS, CA.DSANTREG, S.LLOFICINA, S.LLTIPOSOLICITUD, CA.LLCARATULA,
+       TC.LLTIPOCERTIFICA, ED.LLESTADO, M.LLMUNICIPIO
+       FROM MVSOLICITUDES S
+       JOIN MVCERTIFICACIONES CE ON S.LLSOLICITUD = CE.LLSOLICITUD
+       JOIN CTTIPOCERTIFICA TC ON CE.LLTIPOCERTIFICA = TC.LLTIPOCERTIFICA
+       JOIN CTESTATUS E ON (S.LLESTATUS = E.LLESTATUS  AND S.LLESTATUS != 10) 
+       JOIN CTOFICINAS O ON S.LLOFICINA = O.LLOFICINA
+       LEFT JOIN CTESTADOS ED ON O.LLESTADO = ED.LLESTADO
+       LEFT JOIN CTMUNICIPIOS M ON O.LLMUNICIPIO = M.LLMUNICIPIO
+       LEFT JOIN SOLICITUD_CARATULAFME SOLCAR ON (S.LLSOLICITUD = SOLCAR.LLSOLICITUD AND SOLCAR.BOPRINCIPAL = 1)
+       LEFT JOIN MVCARATULAS CA ON SOLCAR.LLCARATULA = CA.LLCARATULA
+       WHERE (S.LLTIPOSOLICITUD = 6 OR S.LLTIPOSOLICITUD = 8)    
+       AND S.LLETAPA = 4
+       AND LLUSUARIO = #{idUsuario}
+       ORDER BY FCINGRESO
+    </select>	
+    
+    <select id="consultar" resultMap="tipoCertificaMap">
+		SELECT * FROM CTTIPOCERTIFICA
+	</select>
+	
+	<insert id="insertaCertificacion" parameterType="mvcertificacion">
+	   INSERT INTO MVCERTIFICACIONES (
+		    LLCERTIFICACION,
+		    LLSOLICITUD,
+		    LLTIPOCERTIFICA,
+		    XMLCERTIFICADO,
+		    NOCOPIAS
+		) VALUES (
+		    MVCERTIFICACIONES_SEQ.NEXTVAL,
+		    #{solicitud.id},
+		    #{tipoCertificado.id},
+		    #{certificado},
+		    #{noCopias})
+	</insert>
+	
+	<resultMap id="tipoCertificadoMap" type="ctTipoCertificado">
+        <id property="id" column="LLTIPOCERTIFICA"/>
+        <result property="nombre" column="DSTIPOCERTIFICA"/>
+    </resultMap>  
+    
+    <resultMap id="solCertificacionMap" type="mvsolicitud">
+        <id property="id" column="LLSOLICITUD"/>
+        <result property="fechaIngreso" column="FCINGRESO"/>
+        <result property="nci" column="DSNCI"/>
+        <result property="fechaLimite" column="FCLIMITE"/>
+        <result property="solicitante" column="CRSOLICITANTE"/>
+        <result property="numContinuidad" column="NOCONTINUIDAD"/>
+        <result property="observaciones" column="DSOBSERVACIONES"/>
+        <association property="tipoSolicitud" javaType="tipoSolicitud" column="LLTIPOSOLICITUD">
+            <id property="id" column="LLTIPOSOLICITUD"/>
+        </association>
+        <association property="etapa" javaType="etapa" column="LLETAPA">
+            <id property="id" column="LLETAPA"/>
+        </association>
+        <association property="estatus" javaType="ctestatus" column="LLESTATUS">
+            <id property="id" column="LLESTATUS"/>
+            <id property="nombre" column="DSESTATUS"/>
+        </association>         
+        <association property="oficina" javaType="oficinas" column="LLOFICINA">
+            <id property="id" column="LLOFICINA"/>    
+            <association property="ctMunicipio" column="LLMUNICIPIO" javaType="ctMunicipio" resultMap="municipioMap"/>   
+            <association property="ctEstado" javaType="ctEstados" column="LLESTADO" resultMap="estadoMap"/>  
+        </association>         
+        <association property="mvcertificacion" javaType="certificacion">
+            <id property="id" column="LLCERTIFICACION"/>
+            <result property="noCopias" column="NOCOPIAS"/>
+            <association property="ctTipoCertificado" javaType="ctTipoCertificado" column="LLTIPOCERTIFICA" resultMap="tipoCertificadoMap"/>
+        </association>      
+       <collection property="solicitudCaratulafmes" javaType="java.util.HashSet" ofType="solicitudcaratulafme" column="LLSOLICITUD" resultMap="solicitudCaratulaMap" /> 
+    </resultMap>  
+    
+   <resultMap type="solicitudcaratulafme" id="solicitudCaratulaMap">
+       <association property="mvSolicitud" javaType="mvsolicitud" column="LLSOLICITUD" resultMap="solicitudMap"/>
+       <association property="caratula" javaType="caratula" column="LLCARATULA" resultMap="caratulaMap"/>
+   </resultMap>
+   
+   <resultMap type="caratula" id="caratulaMap">
+        <id property="llcaratula" column="LLCARATULA"/>
+        <result property="crfme" column="CRFME"/>
+        <result property="dsdensocial" column="DSDENSOCIAL"/>
+        <result property="dsantreg" column="DSANTREG"/>
+        <result property="boacervo" column="BOACERVO"/>
+   </resultMap>
+   
+    <resultMap type="mvsolicitud" id="solicitudMap">
+        <id property="id" column="LLSOLICITUD"/>
+        <result property="nci" column="DSNCI"/>
+   </resultMap>
+   
+    <resultMap id="tipoCertificaMap" type="ctTipoCertificado">
+        <id property="id" column="LLTIPOCERTIFICA"/>
+        <result property="nombre" column="DSTIPOCERTIFICA"/>
+   </resultMap>
+    
+   <resultMap type="ctMunicipio" id="municipioMap">
+        <association property="id" column="LLMUNICIPIO" javaType="ctMunicipioId" resultMap="ctMunicipioIdMap"/>
+   </resultMap> 
+    
+   <resultMap type="ctMunicipioId" id="ctMunicipioIdMap">
+        <result property="idEstado" column="LLESTADO"/>
+        <result property="idMunicipio" column="LLMUNICIPIO"/>
+   </resultMap>
+    
+   <resultMap type="ctEstados" id="estadoMap">
+        <id property="id" column="LLESTADO"/>
+   </resultMap>
+    
+</mapper>

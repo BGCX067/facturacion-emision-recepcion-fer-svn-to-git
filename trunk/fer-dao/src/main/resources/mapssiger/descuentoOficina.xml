@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.oficina.DescuentoOficinaDAO">
+
+	<select id="consultaDescuentoOficinaTodos" resultMap="ctCondicionMap">
+		SELECT CTCON.*,
+               CTOFIC.*
+        FROM CTCONDICIONES CTCON JOIN CTOFICINAS CTOFIC
+        ON CTCON.LLOFICINA = CTOFIC.LLOFICINA
+        ORDER BY CTCON.DSCONDICION
+	</select>
+
+	<select id="consultaPorNombre" resultMap="ctCondicionMap" parameterType="ctCondicion">			
+		SELECT CTCON.*,
+		       CTOFIC.*
+		FROM CTCONDICIONES CTCON 
+		JOIN CTOFICINAS CTOFIC ON CTCON.LLOFICINA = CTOFIC.LLOFICINA
+    	WHERE CTCON.DSCONDICION = #{nombre}
+		ORDER BY CTCON.DSCONDICION		
+	</select>
+	
+	<select id="consultaPorIdOficina" resultMap="ctCondicionMap" parameterType="ctCondicion">				
+		SELECT CTCON.*,
+		       CTOFIC.*
+		FROM CTCONDICIONES CTCON 
+		JOIN CTOFICINAS CTOFIC ON CTCON.lloficina = CTOFIC.lloficina
+    	WHERE CTCON.lloficina = #{oficina.id}
+		ORDER BY CTCON.DSCONDICION
+	</select>
+	
+	<select id="consultaPorNombrePorOficina" resultMap="ctCondicionMap" parameterType="ctCondicion">		
+		SELECT CTCON.*,
+		       CTOFIC.*
+		FROM CTCONDICIONES CTCON JOIN CTOFICINAS CTOFIC
+    	ON CTCON.lloficina = CTOFIC.lloficina
+    	WHERE CTCON.lloficina = #{oficina.id}
+    	AND CTCON.DSCONDICION = #{nombre}
+		ORDER BY CTCON.DSCONDICION
+	</select>
+	
+	<update id="actualizaDescuentoOficina" parameterType="ctCondicion">
+		UPDATE CTCONDICIONES SET			
+			DSCONDICION = #{nombre},			
+			FCMODIFICACION = sysdate,
+			BOACTIVO = #{activo},
+			LLOFICINA = #{oficina.id}
+		WHERE LLCONDICION = #{id}		
+	</update>
+	
+	<insert id="agregaDescuentoOficina" parameterType="ctCondicion">
+		<selectKey keyProperty="id" resultType="java.lang.Long" order="BEFORE"> 
+			SELECT CTCONDICIONES_SEQ.nextVal FROM dual
+		</selectKey>
+		INSERT INTO CTCONDICIONES 
+			(LLCONDICION, DSCONDICION, FCMODIFICACION, BOACTIVO, LLOFICINA )
+		VALUES 
+			(#{id},			
+			 #{nombre},			
+			 sysdate,
+			 #{activo},
+			 #{oficina.id})
+	
+	</insert>
+	
+	<resultMap type="ctCondicion" id="ctCondicionMap">
+        <id property="id" column="LLCONDICION"/>
+        <result property="nombre" column="DSCONDICION"/>       
+        <result property="fcModificacion" column="FCMODIFICACION"/>
+        <result property="activo" column="BOACTIVO" />
+        
+        <association property="oficina" javaType="oficinas" column="LLOFICINA" resultMap="oficinaMap" />        
+    </resultMap>
+    
+    <resultMap type="oficinas" id="oficinaMap">
+        <id property="id" column="LLOFICINA"/>
+        <result property="nombre" column="DSOFICINA"/>
+    </resultMap>
+
+</mapper>

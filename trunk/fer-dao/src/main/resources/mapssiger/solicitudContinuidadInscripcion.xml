@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.solicitud.SolicitudContinuidadInscripcionDAO">
+
+	<select id="buscarSolicitudes" resultMap="detalleSolicitudMap">
+		SELECT S.*, SC.*, CA.*, SFP.*, DFP.*, FP.*, FAC.*, FA.* , AC.*, EA.*, MOT_REC.*
+		FROM MVSOLICITUDES
+		S
+		LEFT OUTER JOIN SOLICITUD_CARATULAFME SC
+		ON S.LLSOLICITUD=SC.LLSOLICITUD
+		LEFT OUTER JOIN
+		MVCARATULAS
+		CA
+		ON CA.LLCARATULA=SC.LLCARATULA
+		LEFT OUTER JOIN MVSOLFRMPRE SFP
+		ON S.LLSOLICITUD=
+		SFP.LLSOLICITUD
+		LEFT OUTER JOIN CFDEFFRMPRE DFP
+		ON SFP.LLDEFFRMPRE=DFP.LLDEFFRMPRE
+		LEFT OUTER JOIN
+		CTFRMPRE FP
+		ON
+		DFP.LLCATFRMPRE=FP.LLCTFRMPRE
+		LEFT OUTER JOIN MVFRMACTO FAC
+		ON
+		SFP.LLSOLFRMPRE=FAC.LLSOLFRMPRE
+		LEFT
+		OUTER JOIN FORMAS_ACTOS FA
+		ON FAC.LLFORMAACTO=FA.LLFORMAACTO
+		LEFT OUTER JOIN CTACTOS AC
+		ON
+		FA.LLACTO=AC.LLACTO
+		LEFT OUTER JOIN CTESTADOSACTO EA
+		ON
+		FAC.LLESTDOACTO=EA.LLESTDOACTO
+
+		<!-- Busco el motivo de rechazo mas actual -->
+		LEFT JOIN (SELECT LLMVFRMACTO, MAX(FCMODIFICACION) FEC_MOD_MOT_REC FROM DTMOTIVOSRECHAZO GROUP BY
+		LLMVFRMACTO) REC_MOT_REC
+		ON REC_MOT_REC.LLMVFRMACTO = FAC.LLMVFRMACTO
+		LEFT JOIN DTMOTIVOSRECHAZO
+		MOT_REC
+		ON MOT_REC.LLMVFRMACTO = REC_MOT_REC.LLMVFRMACTO
+		AND MOT_REC.FCMODIFICACION =
+		REC_MOT_REC.FEC_MOD_MOT_REC
+		WHERE
+		(EA.LLESTDOACTO = 2 OR EA.LLESTDOACTO=3)
+		<!-- <if test="idUsuario != null"> -->
+		<!-- AND S.LLUSUARIO=#{idUsuario} -->
+		<!-- </if> -->
+		<if test="nci != null">
+			AND UPPER(S.DSNCI) LIKE UPPER('%' || #{nci} || '%')
+		</if>
+		<if test="fme != null">
+			AND UPPER(CA.CRFME) LIKE UPPER('%' || #{fme} || '%')
+		</if>
+		<if test="drn != null">
+			AND UPPER(CA.DSDENSOCIAL) LIKE UPPER('%' || #{drn} || '%')
+		</if>
+		ORDER BY S.LLSOLICITUD, S.DSNCI
+	</select>
+
+
+	<select id="listaDocumentos" resultMap="documentoMap">
+		SELECT DOC.*, TDOC.*
+		FROM DTDOCUMENTOS DOC
+		JOIN
+		CTTIPODOCUMENTO TDOC
+		ON DOC.LLTIPODOCUMENTO=TDOC.LLTIPODOCUMENTO
+		WHERE DOC.LLSOLICITUD=#{id}
+	</select>
+
+	<select id="listaTiposDocumentos" resultMap="tipoDocumentoMap">
+		SELECT TDOC.*
+		FROM CTTIPODOCUMENTO TDOC
+	</select>
+
+	<select id="listaTiposFedatarios" resultMap="tiposFedatariosMap">
+		SELECT TF.* FROM CTTIPOFEDATARIO TF
+	</select>
+
+	<select id="obtenerFedatarios" resultMap="dtCompFedaMap">
+		SELECT CF.*,
+		FP.LLFEDATARIO AS FP_LLFEDATARIO,
+		FP.DSNOMBRE AS FP_DSNOMBRE, FP.DSAPELLIDOPATERNO AS FP_DSAPELLIDOPATERNO,
+		FP.DSAPELLIDOMATERNO AS
+		FP_DSAPELLIDOMATERNO, FP.CRNUMERO AS FP_CRNUMERO,
+		FAB.LLFEDATARIO AS FAB_LLFEDATARIO, FAB.DSNOMBRE
+		AS FAB_DSNOMBRE, FAB.DSAPELLIDOPATERNO AS FAB_DSAPELLIDOPATERNO,
+		FAB.DSAPELLIDOMATERNO AS
+		FAB_DSAPELLIDOMATERNO, FAB.CRNUMERO AS FAB_CRNUMERO,
+		FSA.LLFEDATARIO AS
+		FSA_LLFEDATARIO,
+		FSA.DSNOMBRE AS FSA_DSNOMBRE, FSA.DSAPELLIDOPATERNO AS FSA_DSAPELLIDOPATERNO,
+		FSA.DSAPELLIDOMATERNO AS FSA_DSAPELLIDOMATERNO, FSA.CRNUMERO AS FSA_CRNUMERO,
+		TF.*
+
+		FROM DTCOMPFEDA
+		CF
+		LEFT OUTER JOIN CTFEDATARIOS FP
+		ON CF.LLFEDPUBLICO=FP.LLFEDATARIO
+		LEFT OUTER JOIN
+		CTFEDATARIOS FAB
+		ON
+		CF.LLACTUANDOBAJO=FAB.LLFEDATARIO
+		LEFT OUTER JOIN CTFEDATARIOS FSA
+		ON
+		CF.LLSUSTITUYENDO=FSA.LLFEDATARIO
+		JOIN MVSOLICITUDES S
+		ON CF.LLCOMPFEDA=S.LLCOMPFEDA
+		JOIN
+		CTTIPOFEDATARIO TF
+		ON CF.LLTIPOFEDATARIO=TF.LLTIPOFEDATARIO
+		WHERE
+		S.LLSOLICITUD=#{id}
+
+	</select>
+
+	<select id="listaFedatarios" resultMap="ctfedatariosMap">
+		SELECT F.*, TF.*
+		FROM CTFEDATARIOS F
+		JOIN
+		CTTIPOFEDATARIO TF
+		ON F.LLTIPOFEDATARIO=TF.LLTIPOFEDATARIO
+	</select>
+
+	<select id="listaTiposAutoridad" resultMap="ctTipoAutoridadMap">
+		SELECT TA.*
+		FROM CTTIPOAUTORIDAD TA
+	</select>
+
+	<select id="listaTiposAclaraciones" resultMap="ctTipoAclaracionMap">
+		SELECT TA.*
+		FROM CTTIPOACLARACION TA
+		WHERE
+		TA.BOACTIVO='1'
+	</select>
+
+	<!-- MODIFICAR -->
+	<select id="oficinaUsuario" resultMap="ctOficinaMap">
+		SELECT O.LLOFICINA, O.DSOFICINA
+		FROM CTOFICINAS O
+		JOIN
+		USUARIO_OFICINA UO
+		ON O.LLOFICINA=UO.LLOFICINA
+		JOIN CTUSUARIOS U
+		ON UO.LLUSUARIO=U.LLUSUARIO
+		WHERE
+		U.LLUSUARIO=#{id}
+	</select>
+
+	<select id="numContinuidad" resultType="java.lang.Integer">
+		SELECT MAX(S.NOCONTINUIDAD) AS NUMCONTINUIDAD
+		FROM MVSOLICITUDES S
+		WHERE UPPER(S.DSNCI) = UPPER('' || #{nci} || '')
+	</select>
+
+	<insert id="guardarSolicitud" parameterType="mvsolicitud" keyProperty="id" keyColumn="LLSOLICITUD"
+		useGeneratedKeys="true">
+		<!-- INSERT INTO mvsolicitudes (LLSOLICITUD,LLPAGO,LLOFICINA,DSNCI,FCINGRESO,FCLIMITE, -->
+		<!-- CRSOLICITANTE, LLTIPOSOLICITUD, NOCONTINUIDAD, DSOBSERVACIONES, LLESTATUS, LLETAPA, LLENTREGA, -->
+		<!-- LLCOMPFEDA, LLUSUARIO, LLGRUPOTRABAJO, LLTIPOACLARACION) VALUES () -->
+	</insert>
+
+	<resultMap type="mvsolicitud" id="detalleSolicitudMap">
+		<id column="LLSOLICITUD" property="id" />
+		<result column="DSNCI" property="nci" />
+		<result column="FCINGRESO" property="fechaIngreso" />
+		<result column="CRSOLICITANTE" property="solicitante" />
+		<result column="NOCONTINUIDAD" property="numContinuidad" />
+		<result column="DSOBSERVACIONES" property="observaciones" />
+		<collection property="solicitudCaratulafmes" resultMap="solicitudcaratulafmeMap" />
+		<collection property="solFrmPre" resultMap="solFrmPreMap" />
+	</resultMap>
+
+	<resultMap type="solicitudcaratulafme" id="solicitudcaratulafmeMap">
+		<result column="boprincipal" property="principal" />
+		<association property="mvSolicitud" resultMap="detalleSolicitudMap" />
+		<association property="caratula" resultMap="caratulasMap" />
+	</resultMap>
+
+	<resultMap type="caratula" id="caratulasMap">
+		<id column="LLCARATULA" property="llcaratula" />
+		<result column="CRFME" property="crfme" />
+		<result column="DSDENSOCIAL" property="dsdensocial" />
+		<collection property="solicitudCaratulafmes" resultMap="solicitudcaratulafmeMap" />
+	</resultMap>
+
+	<resultMap type="solfrmpre" id="solFrmPreMap">
+		<id column="LLSOLFRMPRE" property="id" />
+		<result column="BOACERVO" property="boacervo" />
+		<association property="cfDefFormaPrecodificada" resultMap="defFormaPrecodificadaMap" />
+		<collection property="mvFormasActos" resultMap="formaActoMap"></collection>
+	</resultMap>
+
+	<resultMap type="deffrmpre" id="defFormaPrecodificadaMap">
+		<id property="id" column="LLDEFFRMPRE" />
+		<association property="formaPrecodificada" resultMap="formaPreCodificadaMap" />
+	</resultMap>
+	<resultMap type="formaPreCodificada" id="formaPreCodificadaMap">
+		<id property="pkFormaPreCodificada" column="LLCTFRMPRE" />
+		<result property="titulo" column="DSFRMPRECOD" />
+		<result property="clave" column="DSFRMPRECLAVE" />
+	</resultMap>
+
+	<resultMap type="mvformaacto" id="formaActoMap">
+		<id column="LLMVFRMACTO" property="id" />
+		<result column="NOMONTOGRAVAMEN" property="nomontogravamen" />
+		<association property="estado" resultMap="estadoActoMap" />
+		<association property="formaActo" javaType="formasactos" column="LLFORMAACTO"
+			resultMap="formasactosMap" />
+		<association property="motivosRechazo" resultMap="motivosRechazoMap" />
+	</resultMap>
+	<resultMap type="estadoActo" id="estadoActoMap">
+		<id column="LLESTDOACTO" property="id" />
+		<result column="DSESTADOACTO" property="nombre" />
+	</resultMap>
+
+	<resultMap type="formasactos" id="formasactosMap">
+		<id property="id" column="LLFORMAACTO" />
+		<association property="acto" javaType="ctacto" column="LLACTO" resultMap="actoMap" />
+	</resultMap>
+	<resultMap type="ctacto" id="actoMap">
+		<id property="id" column="LLACTO" />
+		<result property="nombre" column="DSACTO" />
+	</resultMap>
+
+	<resultMap type="motivoRechazo" id="motivosRechazoMap">
+		<id column="LLMOTIVORECHAZO" property="id" />
+		<result column="DSMOTIVORECHAZO" property="motivoRechazo" />
+		<result column="FCMODIFICACION" property="fcModificacion" />
+		<result column="BOACTIVO" property="activo" />
+	</resultMap>
+
+	<resultMap type="documento" id="documentoMap">
+		<id property="id" column="LLDOCUMENTO" />
+		<result property="folio" column="NOFOLIO" />
+		<association property='ctTipoDocumento' resultMap='tipoDocumentoMap' />
+	</resultMap>
+
+	<resultMap type="tipoDocumento" id="tipoDocumentoMap">
+		<id property="lltipodocumento" column="LLTIPODOCUMENTO" />
+		<result property="dstipodocumento" column="DSTIPODOCUMENTO" />
+		<result property="dsclave" column="DSCLAVE" />
+		<result property="noorden" column="NOORDEN" />
+		<result property="fcmodificacion" column="FCMODIFICACION" />
+		<result property="boactivo" column="BOACTIVO" />
+	</resultMap>
+
+	<resultMap type="ctTipoFedatario" id="tiposFedatariosMap">
+		<id column="lltipofedatario" property="id" />
+		<result column="dstipofedatario" property="nombre" />
+		<result column="boactivo" property="activo" />
+	</resultMap>
+
+	<resultMap type="datoComponenteFedatario" id="dtCompFedaMap">
+		<id column="llcompfeda" property="id" />
+		<result column="boactuandobajo" property="actuandoBajo" />
+		<result column="bosustituyendo" property="sustituyendo" />
+		<result column="dscalidad" property="calidad" />
+		<result column="boautoadmin" property="autoAdmin" />
+		<result column="dsautoridad" property="autoridad" />
+		<result column="dsnombre" property="nombre" />
+		<result column="" property="idComponete" />
+		<result column="llcampocomp" property="idCfCampoComp" />
+
+		<association property="ctFedatarioSustituyendo" resultMap="ctfedatariosMap"
+			columnPrefix="FSA_" javaType="ctFedatario" />
+		<association property="ctFedatarioPublico" resultMap="ctfedatariosMap" columnPrefix="FP_"
+			javaType="ctFedatario" />
+		<association property="ctFedatarioActuandoBajo" resultMap="ctfedatariosMap"
+			columnPrefix="FAB_" javaType="ctFedatario" />
+
+		<association property="ctTipoFedatario" resultMap="tiposFedatariosMap" />
+		<association property="ctMunicipio" resultMap="ctmunicipiosMap" javaType="ctMunicipio" />
+	</resultMap>
+
+	<resultMap type="ctFedatario" id="ctfedatariosMap">
+		<id column="llfedatario" property="id" />
+		<result column="dsnombre" property="nombre" />
+		<result column="dsapellidopaterno" property="apellidoPaterno" />
+		<result column="dsapellidomaterno" property="apellidoMaterno" />
+		<result column="crnumero" property="numero" />
+		<association property="ctTipoFedatario" resultMap="tiposFedatariosMap" />
+	</resultMap>
+
+	<resultMap type="ctMunicipio" id="ctmunicipiosMap">
+		<id column="llmunicipio" property="id.idMunicipio" />
+		<id column="llestado" property="id.idEstado" />
+		<result column="dsmunicipio" property="nombre" />
+	</resultMap>
+
+	<resultMap type="ctTipoAutoridad" id="ctTipoAutoridadMap">
+		<id column="LLTIPOAUTORIDAD" property="id" />
+		<result column="DSAUTORIDAD" property="nombre" />
+	</resultMap>
+
+	<resultMap type="ctTipoAclaracion" id="ctTipoAclaracionMap">
+		<id column="LLTIPOACLARACION" property="id" />
+		<result column="DSTIPOACLARACION" property="nombre" />
+		<result column="BOACTIVO" property="activo" />
+	</resultMap>
+
+	<resultMap type="oficinas" id="ctOficinaMap">
+		<id column="lloficina" property="id" />
+		<result column="dsoficina" property="nombre" />
+	</resultMap>
+</mapper>

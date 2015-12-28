@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.tipofedatario.TipoFedatarioDAO">
+
+	<resultMap id="listaTipoFedatarios" type="tipoFedatario">
+		<result property="id" column="LLTIPOFEDATARIO"/>
+		<result property="descripcion" column="DSTIPOFEDATARIO"/>
+		<result property="estatus" column="BOACTIVO"/>
+	</resultMap>
+	
+	<select id="consultar" resultMap="listaTipoFedatarios">
+		SELECT * FROM CTTIPOFEDATARIO
+	</select>
+</mapper>

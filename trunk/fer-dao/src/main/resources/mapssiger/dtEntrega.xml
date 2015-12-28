@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+					
+<mapper namespace="mx.gob.se.siger2.dao.entrega.EntregaDAO">
+
+	<resultMap type="dtEntrega" id="listaEntregas">
+		<result column="LLENTREGA" property="id" />
+		<result column="DSNOMBRERECIBE" property="nombreRecibe" />
+		<result column="NOIDENTIFICACION" property="identificacion" />
+		<result column="FCENTREGA" property="fcEntrega" />
+		<result column="DSTIPOIDENT" property="tipoIdentificacion" />
+	</resultMap>
+	
+	<select id="consultarEntregas" resultMap="listaEntregas">
+		SELECT * FROM DTENTREGAS
+    	ORDER BY LLENTREGA
+	</select>
+	
+	<insert id="insertarEntrega" parameterType="dtEntrega" keyProperty="id" keyColumn="LLENTREGA" useGeneratedKeys="true">
+		
+		INSERT INTO DTENTREGAS(
+				LLENTREGA,
+				LLUSUARIO,
+				DSNOMBRERECIBE,
+				NOIDENTIFICACION,
+				FCENTREGA,
+				DSTIPOIDENT) 
+		VALUES (DTENTREGAS_SEQ.NEXTVAL,
+				#{ctUsuario.id},
+				#{nombreRecibe},
+				#{identificacion},
+				#{fcEntrega},
+				#{tipoIdentificacion})
+	</insert>
+	
+</mapper>

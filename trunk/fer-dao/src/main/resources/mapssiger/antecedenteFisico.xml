@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.antecedentefisico.AntecedenteFisicoDAO">
+
+	<!--  Query que inserta antecedentes fisicos. -->
+	<insert id="insertarAntecedenteFisico" >
+		INSERT INTO MVANTEFISICOS (
+			LLANTEFISICO,
+			LLSOLICITUD,
+			DSDENSOCIAL,
+			DSANTECENDENTE,
+			DSFME
+		) VALUES (
+			MVANTEFISICOS_SEQ.nextval,
+			#{mvSolicitud.id},
+			#{dsDenSocial},
+			#{dsAntecedente},
+			#{dsFme}
+		)
+	</insert>
+</mapper>

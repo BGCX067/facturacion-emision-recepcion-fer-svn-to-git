@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 3.7.2.v20120213 Build &lt;3.7.2.v20120214-1408></property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="numero_documento" id="238">
+            <text-property name="promptText">numero_documento</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">CONSTANT</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="fme" id="514">
+            <text-property name="promptText">fme</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="nombre_razon" id="357">
+            <text-property name="promptText">nombre_razon</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="nci" id="516">
+            <text-property name="promptText">nci</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="fecha_hora" id="364">
+            <text-property name="promptText">fecha_hora</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="solicitante" id="523">
+            <text-property name="promptText">solicitante</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="numero_continuidad" id="491">
+            <text-property name="promptText">numero_continuidad</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="tipo_aclaracion" id="493">
+            <text-property name="promptText">tipo_aclaracion</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="detalle_aclaracion" id="494">
+            <text-property name="promptText">detalle_aclaracion</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="fedatario_autoridad" id="495">
+            <text-property name="promptText">fedatario_autoridad</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="instrumento" id="524">
+            <text-property name="promptText">instrumento</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="acto_rechazo" id="501">
+            <text-property name="promptText">acto_rechazo</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="fundamento_rechazo" id="502">
+            <text-property name="promptText">fundamento_rechazo</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="sello_digital_tiempo" id="503">
+            <text-property name="promptText">sello_digital_tiempo</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="firma" id="526">
+            <text-property name="promptText">firma</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="pago_derechos" id="505">
+            <text-property name="promptText">pago_derechos</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <script-data-source name="Data Source" id="245"/>
+    </data-sources>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="NewStyle" id="228">
+            <property name="backgroundColor">#800040</property>
+        </style>
+        <style name="NewStyle1" id="229">
+            <property name="backgroundColor">#800000</property>
+        </style>
+        <style name="NewStyle2" id="230">
+            <property name="backgroundColor">#C0C0C0</property>
+        </style>
+        <style name="NewStyle3" id="368">
+            <property name="backgroundColor">#808080</property>
+        </style>
+        <style name="NewStyle4" id="522">
+            <property name="backgroundColor">#800000</property>
+            <property name="color">#C0C0C0</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <page-footer>
+                <text id="3">
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="122">
+            <column id="123"/>
+            <row id="124">
+                <cell id="125">
+                    <label id="11">
+                        <property name="fontSize">14pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">Boleta</text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <data id="513">
+            <property name="style">NewStyle4</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">numero_documento</property>
+                    <expression name="expression" type="javascript">"Número de Documento: " + params["numero_documento"]</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+            </list-property>
+            <property name="resultSetColumn">numero_documento</property>
+        </data>
+        <grid id="402">
+            <property name="width">7.947916666666667in</property>
+            <column id="403">
+                <property name="width">1.5520833333333333in</property>
+            </column>
+            <column id="404">
+                <property name="width">2.4270833333333335in</property>
+            </column>
+            <column id="405">
+                <property name="width">1.4479166666666667in</property>
+            </column>
+            <column id="406">
+                <property name="width">2.5208333333333335in</property>
+            </column>
+            <row id="407">
+                <cell id="408">
+                    <label id="468">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">FME</text-property>
+                    </label>
+                </cell>
+                <cell id="409">
+                    <data id="515">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">fme</property>
+                                <expression name="expression" type="javascript">params["fme"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">fme</property>
+                    </data>
+                </cell>
+                <cell id="410">
+                    <label id="469">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Nombre / Denominación o razón social</text-property>
+                    </label>
+                </cell>
+                <cell id="411">
+                    <data id="517">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">nombre_razon</property>
+                                <expression name="expression" type="javascript">params["nombre_razon"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">nombre_razon</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="412">
+                <cell id="413">
+                    <label id="473">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">NCI</text-property>
+                    </label>
+                </cell>
+                <cell id="414">
+                    <data id="518">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">nci</property>
+                                <expression name="expression" type="javascript">params["nci"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">nci</property>
+                    </data>
+                </cell>
+                <cell id="415">
+                    <label id="474">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Fecha y Hora</text-property>
+                    </label>
+                </cell>
+                <cell id="416">
+                    <data id="519">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">fecha_hora</property>
+                                <expression name="expression" type="javascript">params["fecha_hora"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">fecha_hora</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="417">
+                <cell id="418">
+                    <label id="477">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Solicitante</text-property>
+                    </label>
+                </cell>
+                <cell id="419">
+                    <data id="527">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">solicitante</property>
+                                <expression name="expression" type="javascript">params["solicitante"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">solicitante</property>
+                    </data>
+                </cell>
+                <cell id="420">
+                    <label id="478">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">No. De Continuidad</text-property>
+                    </label>
+                </cell>
+                <cell id="421">
+                    <data id="530">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">numero_continuidad</property>
+                                <expression name="expression" type="javascript">params["numero_continuidad"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">numero_continuidad</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="422">
+                <cell id="423">
+                    <label id="479">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Tipo de Aclaración</text-property>
+                    </label>
+                </cell>
+                <cell id="424">
+                    <data id="531">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">tipo_aclaracion</property>
+                                <expression name="expression" type="javascript">params["tipo_aclaracion"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">tipo_aclaracion</property>
+                    </data>
+                </cell>
+                <cell id="425">
+                    <label id="480">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Detalle de Aclaración</text-property>
+                    </label>
+                </cell>
+                <cell id="426">
+                    <data id="532">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">detalle_aclaracion</property>
+                                <expression name="expression" type="javascript">params["detalle_aclaracion"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">detalle_aclaracion</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="427">
+                <cell id="428">
+                    <label id="481">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Fedatario / Autoridad</text-property>
+                    </label>
+                </cell>
+                <cell id="429">
+                    <data id="533">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">fedatario_autoridad</property>
+                                <expression name="expression" type="javascript">params["fedatario_autoridad"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">fedatario_autoridad</property>
+                    </data>
+                </cell>
+                <cell id="430">
+                    <label id="482">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Instrumento</text-property>
+                    </label>
+                </cell>
+                <cell id="431">
+                    <data id="534">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">instrumento</property>
+                                <expression name="expression" type="javascript">params["instrumento"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">instrumento</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="432">
+                <cell id="433">
+                    <label id="483">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Actos solicitados para inscripción / Actos Inscritos / Rechazos</text-property>
+                    </label>
+                </cell>
+                <cell id="434">
+                    <data id="535">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">acto_rechazo</property>
+                                <expression name="expression" type="javascript">params["acto_rechazo"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">acto_rechazo</property>
+                    </data>
+                </cell>
+                <cell id="435">
+                    <label id="484">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Fundamento de Rechazo</text-property>
+                    </label>
+                </cell>
+                <cell id="436">
+                    <data id="536">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">fundamento_rechazo</property>
+                                <expression name="expression" type="javascript">params["fundamento_rechazo"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">fundamento_rechazo</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="437">
+                <cell id="438">
+                    <label id="485">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Sello digital de tiempo</text-property>
+                    </label>
+                </cell>
+                <cell id="439">
+                    <data id="538">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">sello_digital_tiempo</property>
+                                <expression name="expression" type="javascript">params["sello_digital_tiempo"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">sello_digital_tiempo</property>
+                    </data>
+                </cell>
+                <cell id="440">
+                    <label id="486">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Firma</text-property>
+                    </label>
+                </cell>
+                <cell id="441">
+                    <data id="539">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">firma</property>
+                                <expression name="expression" type="javascript">params["firma"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">firma</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="442">
+                <cell id="443">
+                    <label id="487">
+                        <property name="style">NewStyle3</property>
+                        <text-property name="text">Pago de Derechos Recepcionista / Responsable&#13;
+</text-property>
+                    </label>
+                </cell>
+                <cell id="444">
+                    <data id="540">
+                        <property name="style">NewStyle2</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">pago_derechos</property>
+                                <expression name="expression" type="javascript">params["pago_derechos"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">pago_derechos</property>
+                    </data>
+                </cell>
+                <cell id="445"/>
+                <cell id="446"/>
+            </row>
+            <row id="447">
+                <cell id="448"/>
+                <cell id="449"/>
+                <cell id="450"/>
+                <cell id="451"/>
+            </row>
+            <row id="452">
+                <cell id="453"/>
+                <cell id="454"/>
+                <cell id="455"/>
+                <cell id="456"/>
+            </row>
+            <row id="457">
+                <cell id="458"/>
+                <cell id="459"/>
+                <cell id="460"/>
+                <cell id="461"/>
+            </row>
+            <row id="462">
+                <cell id="463"/>
+                <cell id="464"/>
+                <cell id="465"/>
+                <cell id="466"/>
+            </row>
+        </grid>
+    </body>
+</report>

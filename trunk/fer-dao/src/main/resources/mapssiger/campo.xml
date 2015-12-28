@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.campo.CampoDAO">
+    <!-- Sección inserts -->
+    <insert id="crear" parameterType="elemento">
+        INSERT INTO CFCAMPOS (LLELEMENTO,LLTIPOCAMPO, NOMAXCARACTERES, BOACEPTACOMAS,BOACEPTADEC, NOMINIMO,NOMAXIMO,DSVERDADERO,DSFALSO,DSLEYENDA ) 
+               VALUES(#{id},#{campo.ctTipoCampo.id},#{campo.noMaxCaracteres},#{campo.aceptaComas},#{campo.aceptaDec},#{campo.noMinimo},#{campo.noMaximo},#{campo.verdadero},#{campo.falso},#{campo.leyenda})
+    </insert>
+    <!-- Fin sección insert -->
+    
+    <!-- Sección delete -->
+    <delete id="eliminarCampo">
+        DELETE CFCAMPOS WHERE LLELEMENTO = #{value}
+    </delete>
+    <!-- Fin de sección delete -->
+    <!-- Sección updates -->
+    <update id="modificar" parameterType="elemento">
+        UPDATE CFCAMPOS SET LLTIPOCAMPO = #{campo.ctTipoCampo.id}, NOMAXCARACTERES = #{campo.noMaxCaracteres}, BOACEPTACOMAS = #{campo.aceptaComas}, 
+                            BOACEPTADEC = #{campo.aceptaDec}, NOMINIMO = #{campo.noMinimo}, NOMAXIMO = #{campo.noMaximo}, DSVERDADERO = #{campo.verdadero},
+                            DSFALSO = #{campo.falso}, DSLEYENDA = #{campo.leyenda}
+                        WHERE LLELEMENTO = #{id}
+    </update>
+    <!-- Fin de sección updates -->
+    <!-- Sección resultMaps -->
+     <resultMap type="campo"      id="campo">
+         <id column="LLELEMENTO"            property="id"/>
+         <result column="NOMAXCARACTERES"   property="noMaxCaracteres"/>
+         <result column="BOACEPTACOMAS"     property="aceptaComas"/>
+         <result column="BOACEPTADEC"       property="aceptaDec"/>
+         <result column="NOMINIMO"          property="noMinimo"/>
+         <result column="NOMAXIMO"          property="noMaximo"/>
+         <result column="DSVERDADERO"       property="verdadero"/>
+         <result column="DSFALSO"           property="falso"/>
+         <result column="DSLEYENDA"         property="leyenda"/>
+    </resultMap>
+    <!-- fin de sección resultMaps -->
+</mapper>

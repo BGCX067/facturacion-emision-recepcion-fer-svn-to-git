@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.giro.GiroDAO">
+    <resultMap type="giro" id="listaGiros">
+        <result property="llgiro" column="llgiro"/>
+        <result property="dsgiro" column="dsgiro"/>
+        <result property="fcmodificacion" column="fcmodificacion"/>
+        <result property="boactivo" column="boactivo"/>
+    </resultMap>
+    <select id="obtenerGiros" resultMap="listaGiros">
+        SELECT * FROM CTGIROS
+    </select>
+    <select id="buscarGiros" parameterType="giro" resultMap="listaGiros">
+        SELECT LLGIRO,DSGIRO,FCMODIFICACION,BOACTIVO FROM CTGIROS 
+        where DSGIRO LIKE '%' || #{dsgiro} || '%' 
+		  
+    </select>
+    <select id="consultarPorClaveNombre" parameterType="giro" resultMap="listaGiros">
+    	SELECT LLGIRO, DSCLAVEGIRO, DSGIRO
+    	FROM CTGIROS
+		WHERE UPPER(DSCLAVEGIRO) LIKE UPPER( '%' || #{texto} || '%' )
+		OR UPPER(DSGIRO) LIKE UPPER( '%' || #{texto} || '%' )
+    </select>
+    
+    <insert id="agregarGiros"  parameterType="giro">
+        INSERT INTO  CTGIROS (LLGIRO,DSGIRO,FCMODIFICACION,BOACTIVO)
+        VALUES (ctgiros_llgiro_SEQ.nextval, #{dsgiro}, #{fcmodificacion}, #{boactivo})
+    </insert>
+    
+    <update id="actualizaGiro" parameterType="giro"> 
+	  UPDATE CTGIROS
+	    SET
+	     DSGIRO = #{dsgiro},  
+	   FCMODIFICACION = #{fcmodificacion},  
+	   BOACTIVO = #{boactivo} 
+	    where LLGIRO = #{llgiro} 
+	 </update>
+    
+</mapper>

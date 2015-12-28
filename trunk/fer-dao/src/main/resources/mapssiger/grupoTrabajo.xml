@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.grupotrabajo.GrupoTrabajoDAO">
+
+	<select id="consultarPorNombre" parameterType="grupoTrabajo" resultMap="grupoTrabajoMap">
+		SELECT gpotrj.*,
+      			ofic.*,
+      			et.*
+		FROM ctgrupostrabajo gpotrj JOIN
+		ctoficinas ofic ON gpotrj.lloficina = ofic.lloficina JOIN
+		ctetapas et ON gpotrj.lletapa = et.lletapa
+		WHERE gpotrj.dsgrupotrabajo LIKE ( '%' || #{nombre} || '%' )
+		ORDER BY gpotrj.dsgrupotrabajo
+	</select>
+	
+	<select id="consultaGpoTrabajoUsuarioSolicitud" parameterType="grupoTrabajo" resultMap="usuariosMap">
+		SELECT ctu.*, mvsol.*, ctgpotjo.*, ugpotjo.boactivo as usergpotjoactivo
+		FROM ctgrupostrabajo ctgpotjo,     
+		      usuario_grupotrabajo ugpotjo, 
+		      ctusuarios ctu, 
+		      mvsolicitudes mvsol      
+		WHERE ugpotjo.llusuario = ctu.llusuario
+		AND mvsol.llusuario(+) = ctu.llusuario  
+		AND ugpotjo.llgrupotrabajo = ctgpotjo.llgrupotrabajo
+		AND ctgpotjo.llgrupotrabajo = #{id}
+		ORDER BY ctu.dsnombre
+	</select>
+	
+	<select id="consultarPorOficinaYEtapa" parameterType="map" resultMap="gpoTrbjoConTramitesMap">
+	   SELECT gpoTrbjo.LLGRUPOTRABAJO, gpoTrbjoTramite.*, ctacto.*, ctfr.*, ctcert.*
+	   FROM CTGRUPOSTRABAJO gpoTrbjo
+       LEFT OUTER JOIN GRUPOTRABAJO_TRAMITE gpoTrbjoTramite ON  gpoTrbjo.LLGRUPOTRABAJO = gpoTrbjoTramite.LLGRUPOTRABAJO
+       LEFT JOIN CTACTOS ctacto ON ctacto.LLACTO = gpoTrbjoTramite.LLACTO
+       LEFT JOIN CTFRMPRE ctfr ON ctfr.LLCTFRMPRE = gpoTrbjoTramite.LLCTFRMPRE
+       LEFT JOIN CTTIPOCERTIFICA ctcert  ON ctcert.LLTIPOCERTIFICA = gpoTrbjoTramite.LLTIPOCERTIFICA
+	   WHERE gpoTrbjo.LLOFICINA=#{idOficina} AND gpoTrbjo.LLETAPA=#{idEtapa} AND gpoTrbjo.BOACTIVO = 1
+	</select>
+	
+	<select id="consultaGrupo" resultMap="consultaGrupoMap" > 
+		SELECT CTGRUPOSTRABAJO.LLGRUPOTRABAJO, CTGRUPOSTRABAJO.DSGRUPOTRABAJO, CTGRUPOSTRABAJO.LLGRUPOTRABAJO, CTGRUPOSTRABAJO.BOACTIVO, 
+			   CTOFICINAS.DSOFICINA, CTOFICINAS.LLOFICINA, ctetapas.DSetapa, ctetapas.lletapa
+			FROM CTGRUPOSTRABAJO 
+			JOIN CTOFICINAS ON CTGRUPOSTRABAJO.LLOFICINA = CTOFICINAS.LLOFICINA
+			JOIN CTETAPAS ON ctgrupostrabajo.lletapa = ctetapas.lletapa
+			WHERE DSGRUPOTRABAJO LIKE '%' || #{nombre} || '%'
+	</select>
+	<select id="consultaDetalleGrupo" parameterType="grupoTrabajo" resultMap="consultaGrupoMap">
+		SELECT CTGRUPOSTRABAJO.LLGRUPOTRABAJO, CTGRUPOSTRABAJO.DSGRUPOTRABAJO, CTOFICINAS.DSOFICINA, ctetapas.DSetapa
+			FROM CTGRUPOSTRABAJO 
+			JOIN CTOFICINAS ON CTGRUPOSTRABAJO.LLOFICINA = CTOFICINAS.LLOFICINA
+			JOIN CTETAPAS ON ctgrupostrabajo.lletapa = ctetapas.lletapa
+			 
+			WHERE LLGRUPOTRABAJO = #{id}
+	</select>
+	
+	<select id="consultaEtapa" resultMap="consultaEtapaMap">
+			SELECT DSETAPA, LLETAPA
+			FROM CTETAPAS
+			WHERE LLETAPA = 1 or LLETAPA = 4
+	</select>
+	<insert id="crearGrupos" parameterType="grupoTrabajo" useGeneratedKeys="true" keyColumn="LLGRUPOTRABAJO" keyProperty="id">
+	 INSERT INTO CTGRUPOSTRABAJO(
+	 		LLGRUPOTRABAJO,
+	 		DSGRUPOTRABAJO,
+	 		LLETAPA,
+	 		LLOFICINA,
+	 		BOACTIVO,
+      FCMODIFICACION)
+	 	VALUES (
+	 		CTGRUPOSTRABAJO_LLGRUPT_SEQ.NEXTVAL,
+	 		#{nombre},
+	 		#{etapa.id},
+	 		#{oficina.id},
+	 		#{activo},
+            #{fModificacion}) 		
+	</insert>
+	<update id="modificarGrupos" parameterType="grupoTrabajo" >
+		UPDATE CTGRUPOSTRABAJO
+			SET DSGRUPOTRABAJO=#{nombre},
+	 		   LLETAPA=#{etapa.id},
+	 		   LLOFICINA=#{oficina.id},
+	 		   BOACTIVO=#{activo},
+      		   FCMODIFICACION=#{fModificacion}
+      		WHERE LLGRUPOTRABAJO = #{id}
+	</update>
+	
+	<select id="consultaUsuarioPorOficina" parameterType="grupoTrabajo">
+		SELECT DSNOMBRE 
+		  FROM CTUSUARIOS
+		  JOIN USUARIO_OFICINA ON CTUSUARIOS.LLUSUARIO = USUARIO_OFICINA.LLUSUARIO
+		  WHERE LLOFICINA = #{oficina.id} 
+	</select>
+	
+	<select id="consultarUsuariosDisponiblesPorGrupo" resultMap="usuarioMap">
+		SELECT CTUSUARIOS.* FROM CTUSUARIOS 
+			JOIN USUARIO_OFICINA ON ctusuarios.llusuario = usuario_oficina.llusuario
+			WHERE usuario_oficina.lloficina = #{oficina.id}
+			and usuario_oficina.llusuario not in (
+			SELECT ctusuarios.llusuario FROM CTUSUARIOS 
+			JOIN USUARIO_OFICINA ON ctusuarios.llusuario = usuario_oficina.llusuario
+			JOIN USUARIO_GRUPOTRABAJO ON ctusuarios.llusuario = USUARIO_GRUPOTRABAJO.llusuario
+			WHERE usuario_oficina.lloficina = #{oficina.id} and usuario_grupotrabajo.llgrupotrabajo = #{id} )
+	</select>
+	
+	<select id="consultarUsuariosPorGrupo" resultMap="usuarioMap">
+		SELECT 
+		CTUSUARIOS.LLUSUARIO, 
+		CTUSUARIOS.DSNOMBRE,
+		CTUSUARIOS.DSAPELLIDOPATERNO,
+		CTUSUARIOS.DSAPELLIDOMATERNO
+		FROM CTUSUARIOS
+		JOIN USUARIO_GRUPOTRABAJO
+		ON CTUSUARIOS.LLUSUARIO = USUARIO_GRUPOTRABAJO.LLUSUARIO AND
+		USUARIO_GRUPOTRABAJO.LLGRUPOTRABAJO = #{id}
+	</select>
+	
+	
+	<insert id="insertarUsuariosPorGrupo" parameterType="java.util.Map">
+        INSERT ALL
+	    <foreach item="item" collection="usuariosInsertGpr" >
+	    INTO USUARIO_GRUPOTRABAJO (LLUSUARIO, LLGRUPOTRABAJO, FCULTIMAASGNCN, BOACTIVO) VALUES (#{item.id, jdbcType=NUMERIC},#{grupoTrabajo.id}, #{grupoTrabajo.fModificacion}, #{grupoTrabajo.activo})
+        </foreach>        
+        SELECT * FROM dual
+	</insert>
+	
+	<delete id="eliminarUsuariosPorGrupo" parameterType="java.util.Map">
+		DELETE FROM USUARIO_GRUPOTRABAJO WHERE LLUSUARIO IN
+	    <foreach item="item" collection="usuariosDelete" open="(" close=")" separator=",">
+	    #{item.id, jdbcType=NUMERIC}
+        </foreach>
+	     AND LLGRUPOTRABAJO = #{grupoTrabajo.id, jdbcType=NUMERIC}
+	</delete>
+	
+	<delete id="eliminarTramites" parameterType="grupoTrabajo">
+		DELETE FROM GRUPOTRABAJO_TRAMITE WHERE LLGRUPOTRABAJO = #{id}
+	</delete>
+	
+	<select id="consultaNombrePorOficina" parameterType="grupoTrabajo" resultMap="consultaGrupoMap">
+		SELECT * FROM CTGRUPOSTRABAJO WHERE DSGRUPOTRABAJO = #{nombre} AND LLOFICINA = #{oficina.id}
+	</select>
+	
+	<select id="consultaNombrePorOficinaModificacionGrupo" parameterType="grupoTrabajo" resultMap="consultaGrupoMap">
+		SELECT * FROM CTGRUPOSTRABAJO WHERE DSGRUPOTRABAJO = #{nombre} AND LLOFICINA = #{oficina.id} AND LLGRUPOTRABAJO not in #{id}
+	</select>
+	
+	<insert id="insertarTramitesFPrePorGrupo" parameterType="grupoTrabajoTramite">	
+	    INSERT INTO GRUPOTRABAJO_TRAMITE (LLGRUPOTRABTRAM, LLGRUPOTRABAJO, LLCTFRMPRE, LLACTO, LLTIPOCERTIFICA)
+        VALUES (GRUPOTRABAJO_TRAMITE_LLGRUPOTR.NEXTVAL, #{grupoTrabajo.id}, #{tramiteForma.pkFormaPreCodificada}, #{tramiteActo.id}, #{tramiteTipoCertif.id})
+	</insert>
+	
+	<insert id="insertarTramitesActoPorGrupo" parameterType="grupoTrabajoTramite">	
+	    INSERT INTO GRUPOTRABAJO_TRAMITE (LLGRUPOTRABTRAM, LLGRUPOTRABAJO, LLCTFRMPRE, LLACTO, LLTIPOCERTIFICA)
+        VALUES (GRUPOTRABAJO_TRAMITE_LLGRUPOTR.NEXTVAL, #{grupoTrabajo.id}, #{tramiteForma.pkFormaPreCodificada}, #{tramiteActo.id}, #{tramiteTipoCertif.id})
+	</insert>
+	
+	<insert id="insertarTramitesCertfPorGrupo" parameterType="grupoTrabajoTramite">	
+	    INSERT INTO GRUPOTRABAJO_TRAMITE (LLGRUPOTRABTRAM, LLGRUPOTRABAJO, LLCTFRMPRE, LLACTO, LLTIPOCERTIFICA)
+        VALUES (GRUPOTRABAJO_TRAMITE_LLGRUPOTR.NEXTVAL, #{grupoTrabajo.id}, #{tramiteForma.pkFormaPreCodificada}, #{tramiteActo.id}, #{tramiteTipoCertif.id})
+	</insert>
+	
+	<select id="consultaActosDisponiblesPorGrupo" resultMap="ActoMap">
+		SELECT * from CTACTOS WHERE LLACTO not in(
+ 		 SELECT LLACTO from GRUPOTRABAJO_TRAMITE
+     	 WHERE LLGRUPOTRABAJO = #{id} and LLACTO is not null 
+		 )
+	</select>
+	<select id="consultaActosPorGrupo" resultMap="ActoMap">
+		SELECT * from CTACTOS 
+  			JOIN GRUPOTRABAJO_TRAMITE on CTACTOS.LLACTO = GRUPOTRABAJO_TRAMITE.LLACTO
+  			WHERE GRUPOTRABAJO_TRAMITE.LLGRUPOTRABAJO = #{id}
+	</select>
+	
+	<select id="consultaFPreDisponiblesPorGrupo" resultMap="FormaMap" >
+		SELECT * FROM CTFRMPRE WHERE LLCTFRMPRE not in(
+		SELECT LLCTFRMPRE FROM GRUPOTRABAJO_TRAMITE
+		WHERE LLGRUPOTRABAJO = #{id} and LLCTFRMPRE is not null
+		)
+	</select>
+	<select id="consultaFprePorGrupo" resultMap="FormaMap">
+		SELECT * FROM CTFRMPRE
+			JOIN GRUPOTRABAJO_TRAMITE on CTFRMPRE.LLCTFRMPRE = GRUPOTRABAJO_TRAMITE.LLCTFRMPRE
+			WHERE GRUPOTRABAJO_TRAMITE.LLGRUPOTRABAJO = #{id}
+	</select>
+	
+	<select id="consultaTiCertfDisponiblesPorGrupo" resultMap="TipoCertificadoMap">
+		SELECT * FROM CTTIPOCERTIFICA WHERE LLTIPOCERTIFICA not in (
+		SELECT LLTIPOCERTIFICA FROM GRUPOTRABAJO_TRAMITE
+		WHERE LLGRUPOTRABAJO = #{id} and LLTIPOCERTIFICA is not null
+		)
+	</select>
+	
+	<select id="consultaTiCertPorGrupo" resultMap="TipoCertificadoMap">
+		SELECT * FROM CTTIPOCERTIFICA 
+			JOIN GRUPOTRABAJO_TRAMITE on CTTIPOCERTIFICA.LLTIPOCERTIFICA = GRUPOTRABAJO_TRAMITE.LLTIPOCERTIFICA
+			WHERE GRUPOTRABAJO_TRAMITE.LLGRUPOTRABAJO = #{id}
+	</select>
+	
+	<select id="consultaSolicitudesDeUsuariosFueraDelGrupo"  resultMap="grupoSolicitudesMap">
+	
+		SELECT llsolicitud FROM MVSOLICITUDES WHERE llusuario = #{usuario.id} and llgrupotrabajo = #{id}
+	
+	</select>
+	<resultMap type="grupoTrabajo" id="grupoTrabajoMap">
+		<id property="id" column="llgrupotrabajo"/>
+		<result property="nombre" column="dsgrupotrabajo"/>
+		<result property="fModificacion" column="fcmodificacion"/>
+		<result property="activo" column="boactivo"/>
+		
+		<association property="oficina" javaType="oficinas" column="lloficina" resultMap="oficinaMap" />
+		<association property="etapa" javaType="etapa" column="lletapa" resultMap="etapaMap" />		
+	</resultMap>
+	
+	<resultMap type="oficinas" id="oficinaMap">
+		<id property="id" column="lloficina"/>
+		<result property="nombre" column="dsoficina"/>
+	</resultMap>
+	
+	<resultMap type="etapa" id="etapaMap">
+		<id property="id" column="lletapa"/>
+		<result property="nombre" column="dsnombreetapa"/>
+		<result property="etapa" column="dsetapa"/>
+		<result property="activo" column="boactivo"/>
+	</resultMap>
+	
+	<resultMap type="usuarios" id="usuariosMap">
+		<id property="id" column="llusuario"/>
+		<result property="nombre" column="dsnombre"/>
+		<result property="apellidoPaterno" column="dsapellidopaterno"/>
+		<result property="apellidoMaterno" column="dsapellidomaterno"/>
+		<collection property="mvSolicitudes" ofType="mvsolicitud" javaType="ArrayList" column="llsolicitud" resultMap="mvsolicitudMap" />	
+		<collection property="usuarioGrupoTrabajos" ofType="usuarioGpoTrabajo" javaType="ArrayList" column="LLUSUARIO" resultMap="usuariogpotrabajoMap" />	
+	</resultMap>
+	
+	<resultMap type="mvsolicitud" id="mvsolicitudMap">
+		<id property="id" column="llsolicitud"/>
+		<result property="nci" column="dsnci"/>
+	</resultMap>
+	
+	<resultMap type="usuarioGpoTrabajo" id="usuariogpotrabajoMap">	   
+	   <result property="activo" column="usergpotjoactivo"/>
+	</resultMap>
+	
+	<!-- Grupo de trabajo con trámites específicos -->
+	<resultMap type="grupoTrabajo" id="gpoTrbjoConTramitesMap">
+	   <id property="id" column="llgrupotrabajo"/>
+	   <collection property="grupoTrbjoTramite" ofType="grupoTrabajoTramite" javaType="ArrayList" resultMap="gpoTrbjoTramiteMap" />
+	</resultMap>
+	
+	<resultMap type="grupoTrabajoTramite" id="gpoTrbjoTramiteMap">
+        <id property="id" column="LLGRUPOTRABAJOTRAMITE"/>
+        <association property="grupoTrabajo" javaType="grupoTrabajo" column="LLGRUPOTRABAJO" resultMap="grupoTrabajoMap" /> <!--Checar cómo es que hace referencia a sí mismo-->
+        <association property="tramiteForma" javaType="formaPreCodificada" column="LLCTFRMPRE" resultMap="ctFormaMap" />   
+        <association property="tramiteActo" javaType="ctacto" column="LLCTACTOS" resultMap="ctActoMap" />   
+        <association property="tramiteTipoCertif" javaType="ctTipoCertificado" column="LLTIPOCERTIFICA" resultMap="ctTipoCertificadoMap" />                
+    </resultMap>
+    
+    <resultMap type="formaPreCodificada" id="ctFormaMap">
+        <result property="pkFormaPreCodificada" column="LLCTFRMPRE"/>
+    </resultMap>
+    
+    <resultMap type="ctacto" id="ctActoMap">
+        <id property="id" column="LLACTO"/>
+        <id property="activo" column="BOACTIVO"/>           
+    </resultMap>
+    
+    <resultMap type="ctTipoCertificado" id="ctTipoCertificadoMap">
+        <id property="id" column="LLTIPOCERTIFICA"/>
+    </resultMap>
+    <!-- Termina grupo de trabajo con trámites específicos -->
+    
+    <resultMap type="usuario" id="usuarioMap">
+		<id column="LLUSUARIO" property="id" javaType="Integer" jdbcType="NUMERIC" />
+		<result column="DSNOMBRE" property="nombre" javaType="String" jdbcType="VARCHAR" />
+		<result column="DSAPELLIDOPATERNO" property="apellidoPaterno" javaType="String"	jdbcType="VARCHAR"/>
+		<result column="DSAPELLIDOMATERNO" property="apellidoMaterno" javaType="String"	jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap type="grupoTrabajo" id="consultaGrupoMap">
+		<result property="nombre"             column="DSGRUPOTRABAJO"/>
+		<result property="id" 				       column="LLGRUPOTRABAJO"/>
+		<result property="etapa.nombre"          column="DSETAPA"/>
+		<result property="etapa.id"              column="LLETAPA"/>
+		<result property="oficina.nombre"        column="DSOFICINA"/>
+		<result property="oficina.id"            column="LLOFICINA"/>
+		<result property="activo"                column="BOACTIVO"/>
+	</resultMap>
+	
+	<resultMap type="etapa" id="consultaEtapaMap">
+		<result property="nombre"          column="DSETAPA"/>
+		<result property="id"              column="LLETAPA"/>
+	</resultMap>
+	<resultMap type="ctacto" id="ActoMap">
+        <result property="id"       column="LLACTO"/>
+        <result property="nombre"   column="DSACTO"/>           
+    </resultMap>
+    <resultMap type="formaPreCodificada" id="FormaMap">
+        <result property="pkFormaPreCodificada" column="LLCTFRMPRE"/>
+        <result property="titulo"               column="DSFRMPRECOD"/>
+    </resultMap>
+    <resultMap type="ctTipoCertificado" id="TipoCertificadoMap">
+        <result property="id"       column="LLTIPOCERTIFICA"/>
+        <result property="nombre"   column="DSTIPOCERTIFICA"/>
+    </resultMap>
+    <resultMap type="grupoTrabajo"  id="grupoSolicitudesMap">
+    	<result property="usuario.id"      column="LLUSUARIO"/>
+    	<result property="solicitud"       column="LLSOLICITUD"/>
+    	<result property="id"              column="LLGRUPOTRABAJO"/>
+    </resultMap>
+
+</mapper>

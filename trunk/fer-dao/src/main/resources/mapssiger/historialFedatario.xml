@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.historialfedatario.HistorialFedatarioDAO">
+	
+	<resultMap id="historialFedatario" type="historialFedatario">
+		<result property="id" column="LLHISTORIALFEDAT"/>
+		<result property="fedatario.id" column="LLFEDATARIO"/>
+		<result property="fecha" column="FCHISTORIAL"/>
+		<result property="estatusFedatario.id" column="LLESTATUSFEDA"/>
+		<result property="estatusFedatario.descripcion" column="DSESTATUS"/>
+	</resultMap>
+	
+	<select id="consultar" parameterType="fedatario" resultMap="historialFedatario">
+		SELECT HISTORIAL_FEDATARIO.LLHISTORIALFEDAT,
+	          HISTORIAL_FEDATARIO.LLFEDATARIO,
+	          HISTORIAL_FEDATARIO.FCHISTORIAL,
+	          HISTORIAL_FEDATARIO.LLESTATUSFEDA,
+	          CTESTATUSFEDA.DSESTATUS
+		FROM HISTORIAL_FEDATARIO 
+	    JOIN CTESTATUSFEDA
+	    ON HISTORIAL_FEDATARIO.LLESTATUSFEDA = CTESTATUSFEDA.LLESTATUSFEDA
+		WHERE LLFEDATARIO = #{id}
+		ORDER BY FCHISTORIAL
+	</select>
+		
+	<select id="consultarPorIdFedatario" parameterType="fedatario" resultMap="historialFedatario">
+		SELECT *
+		FROM HISTORIAL_FEDATARIO
+		WHERE LLFEDATARIO = #{id}
+		ORDER BY FCHISTORIAL
+	</select>
+	
+	<insert id="crear" parameterType="historialFedatario">
+		INSERT INTO HISTORIAL_FEDATARIO(
+			LLHISTORIALFEDAT,
+			LLFEDATARIO,
+			FCHISTORIAL,
+			LLESTATUSFEDA
+		)
+		VALUES (
+			HISTORIALFEDATARIO_SEQ.NEXTVAL,
+			#{fedatario.id},
+			#{fecha},
+			#{estatusFedatario.id}
+		)
+	</insert>
+	
+	<update id="modificar" parameterType="historialFedatario">
+		UPDATE HISTORIAL_FEDATARIO
+		SET	LLESTATUSFEDA = #{estatusFedatario.id}
+		WHERE LLHISTORIALFEDAT = #{id}
+	</update>
+</mapper>

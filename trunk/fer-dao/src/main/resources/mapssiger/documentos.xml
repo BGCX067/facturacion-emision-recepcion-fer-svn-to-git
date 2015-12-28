@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.documentos.DocumentosDAO">
+
+	<select id="consultarPorIdSolicitud" resultMap="documento">
+		SELECT *
+        FROM DTDOCUMENTOS
+        WHERE LLSOLICITUD = #{idSolicitud}
+	</select>
+	
+	<resultMap type="documento" id="documento">
+		<id property="id" column="LLDOCUMENTO"/>
+		<result property="folio" column="NOFOLIO"/>
+	</resultMap>
+	
+	<!-- Query que elimina los documentos de una solicitud dada. -->
+	<delete id="eliminarDocumentosDeSolicitud" parameterType="java.lang.Long" >
+	    DELETE FROM DTDOCUMENTOS WHERE LLSOLICITUD = #{idSolicitud}
+	</delete>
+	
+	<!--  Query que inserta una lista de documentos. -->
+	<insert id="insertarListaDocumentos" parameterType="java.util.List">
+		INSERT ALL  
+		<foreach collection="list" item="element" index="index" >
+			INTO DTDOCUMENTOS (
+				LLDOCUMENTO,
+				NOFOLIO,
+				LLSOLICITUD,
+				LLTIPODOCUMENTO
+			) VALUES (
+				dtdocumentos_SEQ.nextval,
+				#{element.folio},
+				#{element.solicitud.llsolicitud},
+				#{element.ctTipoDocumento.lltipodocumento}
+			)
+		</foreach>
+		SELECT * FROM dual
+	</insert>
+
+	<!--  Query que inserta un documento. -->
+	<insert id="insertarDocumento" >
+		INSERT INTO DTDOCUMENTOS (
+			LLDOCUMENTO,
+			NOFOLIO,
+			LLSOLICITUD,
+			LLTIPODOCUMENTO
+		) VALUES (
+			dtdocumentos_SEQ.nextval,
+			#{folio},
+			#{mvSolicitud.id},
+			#{ctTipoDocumento.lltipodocumento}
+		)
+	</insert>
+
+</mapper>

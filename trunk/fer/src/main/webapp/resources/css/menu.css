@@ -1,0 +1,40 @@
+#site-header { padding-top: 18px; }
+#site-header #site-logo a { background-image: url(#{resource['img/logo_portal_transparente.png']}); background-repeat: no-repeat;  display: block; height: 100px; width: 1024px; text-indent: -9999px; left: 0; position: absolute; top: 0;}
+#site-header .top { min-height: 54px; overflow: hidden; padding-top: 26px; position: relative; }
+#site-sec-nav { float: right; font-size: 13px; line-height: 1em; }
+#site-sec-nav a { font-weight: normal;}
+#site-sec-nav ul { list-style-type: none; text-align: center; }
+#site-sec-nav ul li { display: inline; text-transform: uppercase; }
+#site-sec-nav ul li:before { content: "|"; margin: 0 6px; }
+#site-sec-nav ul li:first-child:before { content: ""; margin: 0; }
+#site-header .search-form { margin-top: 8px; }
+#site-header #site-nav { margin-bottom: 30px; font-variant: small-caps; text-transform: initial; font-family: trajan, serif; }
+#site-header #site-nav ul { list-style-type: none; }
+#site-header #site-nav #nav-bar { background: url(#{resource['img/fondo_menu.png']}) 0 0 repeat; height: 51px; margin-top: 15px; width: 1120px; padding: 0 20px; margin-left: -100px; }
+#site-header #site-nav #nav-bar > ul > li { float: left; font: 15px/37px trajan, serif; position: relative;}
+#site-header #site-nav #nav-bar > ul > li:before { background-image: url(#{resource['img/separador_menu.png']}); background-repeat: no-repeat; display: block; height: 10px; width: 10px; text-indent: -9999px; content: ""; float: left; margin: 13px 10px 0; }
+#site-header #site-nav #nav-bar > ul > li:first-child:before { background: none; content: ""; display: block; width:10px; }
+#site-header #site-nav #nav-bar > ul > li > a {font-weight: normal; border-left: 1px solid transparent; border-right: 1px solid transparent;  float: left; height: 37px; line-height: 37px; padding: 0 16px; position: relative; z-index: 20; margin-top: 2px;text-decoration: none;}
+#site-header #site-nav #nav-bar > ul > li > a.selected { color: #cf242a; }
+#site-header #site-nav #nav-bar > ul > li:hover > a { background: #fbfbfb; border-left-color: #CCCCCC; border-right-color: #CCCCCC; text-decoration: none; }
+#site-header #site-nav .submenu { background: #dfdfdf; filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,endColorstr='#cbcbcb',startColorstr='#fbfbfb'); /* for IE */ -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,endColorstr='#cbcbcb',startColorstr='#fbfbfb')"; /* for IE */ background-image: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#cbcbcb)); /* for webkit browsers */ background-image: -moz-linear-gradient(center top, #fbfbfb, #cbcbcb); /* for firefox 3.6+ */ border: 1px solid #fafafa; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25); display: none; font: 13px/14px serif; margin-left: 15px; min-width: 240px; padding: 18px; position: absolute; text-transform: uppercase; top: 39px; z-index: 15; }
+#site-header #site-nav .submenu a { font-weight: normal; }
+#site-header #site-nav .submenu ul li { border-top: 1px solid #ffffff; padding: 8px 5px; text-align: left; white-space: nowrap; }
+#site-header #site-nav .submenu ul li:first-child { border-top: 0; }
+#site-header #site-nav .submenu ul li a { display: block; font-weight: normal;}
+#site-header #site-nav #nav-bar > ul > li:hover > div.submenu {display: block; }
+
+#site-header #site-nav .submenu2 { background: #dfdfdf; filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,endColorstr='#cbcbcb',startColorstr='#fbfbfb'); /* for IE */ -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,endColorstr='#cbcbcb',startColorstr='#fbfbfb')"; /* for IE */ background-image: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#cbcbcb)); /* for webkit browsers */ background-image: -moz-linear-gradient(center top, #fbfbfb, #cbcbcb); /* for firefox 3.6+ */ border: 1px solid #fafafa; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25); display: none; font: 13px/14px serif; margin-left: 60px; min-width: 170px; padding: 5px; position: absolute; text-transform: uppercase; margin-top: 3px; z-index: 15; }
+#site-header #site-nav .submenu2 a { font-weight: normal;}
+#site-header #site-nav .submenu2 ul li { border-top: 1px solid #ffffff; padding: 8px 5px; text-align: left; white-space: nowrap; }
+#site-header #site-nav .submenu2 ul li:first-child { border-top: 0; }
+#site-header #site-nav .submenu2 ul li a { display: block; font-weight: normal;}
+#site-header #site-nav #nav-bar > ul > li > div.submenu > ul > li:hover > div.submenu2 {display: block; }
+
+#site-footer { margin-top: 48px; }
+#site-footer .middle { margin-top: 30px; margin-bottom: 30px; position: relative; }
+#site-footer .middle .search-form { float: right; }
+#site-footer .middle #logo-footer { background-image: url(#{resource['img/logo_footer.png']}); background-repeat: no-repeat; display: block; height: 74px; width: 298px; text-indent: -9999px; margin: -10px auto 0; }
+#site-footer .middle #logo-footer:before, #site-footer .middle #logo-footer:after { background: url(#{resource['img/line-01.gif']}) 0 100% repeat-x; content: ""; display: block; height: 4px; width: 320px; position: absolute; bottom: 33px; }
+#site-footer .middle #logo-footer:before { left: 0; }
+#site-footer .middle #logo-footer:after { right: 0; }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.tiposociedad.TipoSociedadDAO">
+        
+    <select id="consultarCatalogo" resultMap="listaTipoSociedad" parameterType="tipoSociedad">
+        SELECT tipoSoc.* 
+        FROM CTTIPOSOCIEDAD tipoSoc        
+    </select>
+    
+    <select id="consultaPorNombre" resultMap="listaTipoSociedad" parameterType="tipoSociedad">
+    	SELECT tipoSoc.* 
+        FROM CTTIPOSOCIEDAD tipoSoc
+        WHERE tipoSoc.dstiposociedad LIKE ('%'|| #{nombre} || '%') 
+    </select>
+    
+    <select id="consultaPorId" resultMap="listaTipoSociedad" parameterType="tipoSociedad">
+    	SELECT tipoSoc.* 
+        FROM CTTIPOSOCIEDAD tipoSoc
+        WHERE tipoSoc.lltiposociedad = #{idPadre}
+    </select>
+    
+    <select id="consultaPorIdPadre" resultMap="listaTipoSociedad" parameterType="tipoSociedad">
+    	SELECT tipoSoc.* 
+        FROM CTTIPOSOCIEDAD tipoSoc
+        WHERE tipoSoc.llpadretipsoc = #{id}
+    </select>
+    
+    <update id="actualizaTipoSociedadPorId" parameterType="tipoSociedad">
+    	UPDATE cttiposociedad 
+    	SET			
+			dstiposociedad = #{nombre},
+			boactivo = #{activo}			
+		WHERE lltiposociedad = #{id}
+    </update>
+    
+    <insert id="agregaTipoSociedad" parameterType="tipoSociedad">
+    	<selectKey keyProperty="id" resultType="java.lang.Long" order="BEFORE"> 
+			SELECT CTTIPOSOCIEDAD_SEQ.nextVal FROM dual
+		</selectKey>
+    	INSERT INTO CTTIPOSOCIEDAD 
+			(LLTIPOSOCIEDAD, DSTIPOSOCIEDAD, NONIVEL, LLPADRETIPSOC, BOACTIVO )
+		VALUES 
+			(#{id},
+			 #{nombre},
+			 #{noNivel},
+			 #{idPadre},
+			 #{activo})
+    </insert>
+    
+    <resultMap type="tipoSociedad" id="listaTipoSociedad">
+    	<id property="id" column="LLTIPOSOCIEDAD"/>
+        <result property="nombre" column="DSTIPOSOCIEDAD"/>
+        <result property="noNivel" column="NONIVEL"/>
+        <result property="idPadre" column="LLPADRETIPSOC"/>
+        <result property="activo"  column="BOACTIVO"/>
+    </resultMap>
+
+</mapper>

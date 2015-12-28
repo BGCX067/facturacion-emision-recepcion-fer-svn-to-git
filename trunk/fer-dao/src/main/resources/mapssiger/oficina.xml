@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.oficina.OficinaDAO">
+
+	<select 	id="consultarOficina" resultMap="oficina">
+		SELECT *
+		FROM CTOFICINAS
+	</select>
+	
+	<select 	id="consultarUsuarioOficina" resultMap="oficina" parameterType="usuario">
+		SELECT ctoficinas.lloficina, ctoficinas.dsoficina, usuario_oficina.llusuario, ctusuarios.dsnombre, ctusuarios.llusuario 
+		FROM ctoficinas
+		inner join usuario_oficina on usuario_oficina.lloficina = ctoficinas.lloficina
+		inner join ctusuarios on ctusuarios.llusuario = usuario_oficina.llusuario
+		WHERE ctusuarios.llusuario = #{id}
+	</select>
+	
+	
+	<resultMap 	id="oficina" type="oficinas">
+	
+		<result property="id" 		column="LLOFICINA"	jdbcType="NUMERIC"	javaType="java.lang.Long"/>
+		<result property="nombre" 	column="DSOFICINA"  jdbcType="VARCHAR"  javaType="java.lang.String"/>
+		
+	</resultMap>
+	
+	
+	<select 	id="consultaOficinaId" parameterType="oficinas" resultMap="oficina">
+		SELECT LLOFICINA, 
+			   DSOFICINA 
+		FROM CTOFICINAS
+		WHERE LLOFICINA = #{id}		
+	</select>
+	
+	<select id="consultaOficinaPorIdPorNombre" parameterType="oficinas" resultMap="oficina">
+		SELECT LLOFICINA, 
+			   DSOFICINA 
+		FROM CTOFICINAS
+		<where>
+			<if test="id != 0 and id != '' ">
+				LLOFICINA = #{id}
+			</if>
+			<if test="nombre != null and nombre != '' ">
+				OR DSOFICINA LIKE ( '%' || #{nombreOficina} || '%' )
+			</if>
+		</where>
+	</select>
+	
+	<select id="consultarPorClaveNombre" parameterType="oficina" resultMap="oficina">
+		SELECT LLOFICINA, LLOFICINA, DSOFICINA
+    	FROM CTOFICINAS
+		WHERE UPPER(LLOFICINA) LIKE UPPER( '%' || #{texto} || '%' )
+		OR UPPER(DSOFICINA) LIKE UPPER( '%' || #{texto} || '%' )
+	</select>
+        
+	<!-- JELL: Con este mapa obtengo los valores generales de oficina registral. -->
+	<resultMap type='oficinas' id='oficinaWithValsGralesOficRegResult'> 
+    	<id property='id' column='LLOFICINA'/>
+        <result property='nombre' column='DSOFICINA'/> 
+        <collection property='valsGralesOficReg' 
+                    ofType='valorgeneraloficinaregistral' 
+                    resultMap='ValGralOficRegResult' 
+                    columnPrefix='val_'></collection> 
+	</resultMap> 
+	
+	<resultMap type='valorgeneraloficinaregistral' id='ValGralOficRegResult'> 
+    	<id property='idConfigOficina' column='llconfigoficina'/> 
+        <result property='numSalarioMinimo' column='nosalariominimo'/> 
+        <result property='longitudLineaCapt' column='nolonglineacapt'/> 
+        <result property='escudo' column='blescudo'/> 
+        <result property='fechaModificacion' column='fcmodificacion'/> 
+        <result property='activoInactivo' column='boactivo'/> 
+	</resultMap>  
+	
+	<!-- JELL: Con este query obtengo los valores generales de oficina registral. -->
+	<select id='getOficinaWithValsGralesOficRegById' parameterType='int' resultMap='oficinaWithValsGralesOficRegResult'> 
+        SELECT
+        OFIC.LLOFICINA, OFIC.DSOFICINA,
+        CONFIG.LLCONFIGOFICINA AS val_LLCONFIGOFICINA,  
+        CONFIG.NOSALARIOMINIMO AS val_NOSALARIOMINIMO, CONFIG.NOLONGLINEACAPT AS val_NOLONGLINEACAPT, CONFIG.BLESCUDO AS val_BLESCUDO,
+        CONFIG.FCMODIFICACION AS val_FCMODIFICACION, CONFIG.BOACTIVO AS val_BOACTIVO
+        FROM CTOFICINAS OFIC LEFT OUTER JOIN CTCONFIGOFICINA CONFIG ON OFIC.LLOFICINA = CONFIG.LLOFICINA
+        WHERE OFIC.LLOFICINA = #{oficinaId}
+        ORDER BY CONFIG.FCMODIFICACION DESC
+	</select> 
+        
+	<resultMap type='oficinas' id='OficinaResult'>
+    	<id property='id' column='lloficina'/>
+        <result property='nombre' column='dsoficina'/> 
+        <result property='activo' column='boactivo'/>
+	</resultMap>
+        
+    <select id='consultarPorEntidadFederativa' parameterType='oficinas' resultMap='OficinaResult'> 
+    	SELECT
+        LLOFICINA, DSOFICINA, BOACTIVO
+        FROM CTOFICINAS
+       	<where>
+        	<if test="ctMunicipio != null and ctMunicipio.ctEstado != null and ctMunicipio.ctEstado.id != null">
+            	AND LLESTADO = #{ctMunicipio.ctEstado.id}
+            </if>
+            <if test="id != null">
+            	AND LLOFICINA = #{id}
+			</if>
+			<if test="nombre != null and nombre != '' ">
+            	AND UPPER(DSOFICINA) LIKE UPPER('%' || #{nombre} || '%')
+			</if>
+            <if test="activo != null">
+            	<if test="activo == true">
+                	AND BOACTIVO = '1'
+				</if>
+                <if test="activo != true">
+                	AND BOACTIVO = '0'
+				</if>
+			</if>
+		</where>
+	</select> 
+	
+	<select id="consultarOficinasPorEstado" parameterType="ctEstados" resultMap="ctOficinaMap">
+		SELECT ctof.*, ctest.* 
+		FROM CTOFICINAS ctof 
+		JOIN CTESTADOS ctest ON ctof.llestado = ctest.llestado
+		WHERE ctof.LLESTADO = #{id}
+	</select>
+	
+	<resultMap type="oficinas" id="ctOficinaMap">
+		<id property='id' column='LLOFICINA'/>
+        <result property='nombre' column='DSOFICINA'/> 
+        <result property='activo' column='BOACTIVO'/>
+	</resultMap>
+	
+		
+		<!-- CUH01 -->
+        <select id="getOficina" resultMap="oficinact" parameterType="java.util.Map">
+     		    select ctofi.*,ctuso.* from ctoficinas ctofi
+				join ctusohorario ctuso on ctuso.llusohorario=ctofi.llusohorario
+				where llEstado=#{llEstado}
+				and llMunicipio=#{llMunicipio}
+
+        </select>
+        
+		<select id="obtenerOficinaPorFme" resultMap="oficinact" parameterType="java.lang.String">
+     		    select ctofi.*,ctuso.* from ctoficinas ctofi
+				join ctusohorario ctuso on ctuso.llusohorario=ctofi.llusohorario
+				join ctmunicipios ctm on (ctm.llmunicipio=ctofi.llmunicipio and ctm.llestado=ctofi.llestado)
+        		join mvcaratulas mv on (mv.llestado=ctm.llestado and mv.llmunicipio = ctm.llmunicipio)
+        		and mv.crfme=#{fme} 
+        </select>
+        
+		<select id="obtenerOficinaPorIdOficina" resultMap="oficinact" parameterType="java.lang.Long">
+     		    select ctofi.*,ctuso.* from ctoficinas ctofi
+				join ctusohorario ctuso on ctuso.llusohorario=ctofi.llusohorario
+				where lloficina=#{lloficina}
+        </select>
+
+        <resultMap type='oficinas' id='oficinact'> 
+    		<id property='id' column='LLOFICINA'/> 
+        	<result property='nombre' column='DSOFICINA'/>
+        	<result property='domicilio' column='DSDOMICILIO'/>
+        	<result property='telefono' column='CRTELEFONO'/>
+        	<result property='fcAlta' column='FCALTA'/>
+        	<result property='fcModificacion' column='FCMODIFICACION'/>
+        	<result property='activo' column='BOACTIVO'/>
+        	<result property='nombreResponsable' column='DSNOMBRERESP'/>
+        	<result property='correoDirectorOficina' column='DSCORREODIROFI'/>
+        	<result property='correoResponsableOficina' column='DSCORREORESPOFI'/>
+        	<result property='extension' column='DSEXTENCION'/>
+        	<result property='fcInicioOperacion' column='FCINIOPERACION'/>
+        	<result property='paginaWeb' column='DSPAGINAWEB'/>
+        	<result property='acervo' column='BOACERVO'/>
+        	<result property='incidencias' column='BOINCIDENCIAS'/>
+        	<association property="ctUsoHorario" resultMap="ctHusoHorarioMap" />
+        	<association property="ctEstado" resultMap="ctEstadosMap" column="llestado"></association>
+        </resultMap>  
+    
+        <resultMap type="ctEstados" id="ctEstadosMap">
+        	<result column="LLESTADO" property="id" />
+       </resultMap>
+        
+        <resultMap type="ctHusoHorario" id="ctHusoHorarioMap">
+        	<result column="llusohorario" property="id" />
+        	<result column="DSNOMBRE" property="nombre" />
+        </resultMap>
+        
+        
+        
+        <!-- CUH01 -->
+        
+</mapper>

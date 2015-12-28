@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.catalogosfp.CatalogoFormaPrecodificadaDAO">
+
+	<resultMap id="resultCatalogoFormaPrecodificada" type="catalogoFormaPrecodificada">
+		<result property="llcatalogo" column="LLCATALOGO"/>
+		<result property="dsNombreCatalogo" column="DSNOMBRE"/>
+        <result property="dscatalogo" column="DSCATALOGO"/>
+        <result property="boactivo" column="BOACTIVO"/>
+    </resultMap>
+    
+    <select id="buscarCatalogo" 
+    	resultMap="resultCatalogoFormaPrecodificada" 
+    	parameterType="catalogoFormaPrecodificada">
+    		select 
+    			LLCATALOGO,
+    			DSNOMBRE,
+    			DSCATALOGO, 
+    			BOCATSISTEMA,
+    			BOACTIVO
+    		FROM 
+    			CTCATALOGOS
+    		where 
+    			DSCATALOGO like '%'||#{dscatalogo}||'%'
+    </select>
+    
+    <insert id="guardarRegistroCatalogo" parameterType="catalogoFormaPrecodificada" useGeneratedKeys="true" keyProperty="catalogoFormaPrecodificada.llcatalogo" keyColumn="LLCATALOGO">
+    	<selectKey keyProperty="llcatalogo" resultType="java.lang.Integer" order="BEFORE">
+    		
+		 	SELECT NVL(MAX(LLCATALOGO),0)+1 FROM CTCATALOGOS
+		 </selectKey>
+		INSERT INTO CTCATALOGOS 
+			(LLCATALOGO,
+			 DSNOMBRE,
+			 DSCATALOGO,
+			 BOCATSISTEMA,
+			 BOACTIVO)
+		VALUES 
+			(#{llcatalogo},
+			#{dsNombreCatalogo},
+			#{dscatalogo},
+			#{bocatsistema},
+			#{boactivo})
+	</insert>
+	
+	<update id="actualizaRegistroCatalogo" parameterType="catalogoFormaPrecodificada"> 
+		UPDATE CTCATALOGOS
+  		SET
+  			DSNOMBRE = #{dsNombreCatalogo},
+  			DSCATALOGO = #{dscatalogo},
+  			BOCATSISTEMA = #{bocatsistema},
+  			BOACTIVO = #{boactivo}
+  		where LLCATALOGO = #{llcatalogo} 
+	</update>
+
+</mapper>

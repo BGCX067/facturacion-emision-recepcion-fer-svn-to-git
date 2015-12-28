@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.localidadpago.LocalidadPagoDAO">
+
+	<resultMap id="listaLocalidadPago" type="localidadPago">
+		<result property="id" column="LLLOCALIDADPAGO"/>
+		<result property="municipio.nombre" column="DSMUNICIPIO"/>
+		<result property="municipio.id" column="LLMUNICIPIO"/>
+		<result property="estado.nombre" column="DSESTADO"/>
+		<result property="estado.id" column="LLESTADO"/>
+		<result property="localidad" column="CRLOCALIDAD"/>
+		<result property="validacion" column="BOVALIDACION"/>
+		<result property="municipio.nombre" column="DSMUNICIPIO"/>
+	</resultMap>
+	
+	<select id="consultar" resultMap="listaLocalidadPago">
+		SELECT L.LLLOCALIDADPAGO, E.DSESTADO, E.LLESTADO, 
+		M.DSMUNICIPIO, M.LLMUNICIPIO
+		FROM DTLOCALIDADPAGO L, CTESTADOS E, CTMUNICIPIOS M
+		WHERE L.LLMUNICIPIO = M.LLMUNICIPIO
+		AND L.LLESTADO = E.LLESTADO
+		AND E.LLESTADO = M.LLESTADO
+	</select>
+	
+	<select id="consultarPorId" resultMap="listaLocalidadPago">
+		SELECT L.LLLOCALIDADPAGO, L.LLMUNICIPIO, L.LLESTADO, DSESTADO, DSMUNICIPIO
+		FROM DTLOCALIDADPAGO L, CTESTADOS E, CTMUNICIPIOS M
+		WHERE L.LLLOCALIDADPAGO = #{id}
+		AND L.LLESTADO = E.LLESTADO
+		AND L.LLMUNICIPIO = M.LLMUNICIPIO
+		AND E.LLESTADO = M.LLESTADO
+	</select>
+	
+	<select id="consultarPorEstadoMunicipio" parameterType="map" resultMap="listaLocalidadPago"> 
+	   SELECT LLLOCALIDADPAGO
+	   FROM DTLOCALIDADPAGO LP
+	   JOIN CTESTADOS E ON LP.LLESTADO = E.LLESTADO
+	   JOIN CTMUNICIPIOS M ON LP.LLMUNICIPIO = M.LLMUNICIPIO
+	   WHERE E.LLESTADO = #{idEstado}
+	   AND M.LLMUNICIPIO = #{idMunicipio}	
+	   AND M.LLESTADO = #{idEstado} 
+	</select>
+</mapper>

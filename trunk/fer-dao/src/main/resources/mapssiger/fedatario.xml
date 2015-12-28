@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.fedatario.FedatarioDAO">
+	
+	<resultMap id="fedatario" type="fedatario">
+		<result property="id" column="LLFEDATARIO"/>
+		<result property="tipo.id" column="LLTIPOFEDATARIO"/>
+		<result property="numero" column="CRNUMERO"/>
+		<result property="nacionalidad.id" column="LLNACIONALIDAD"/>
+		<result property="pais" column="DSPAIS"/>
+		<result property="nombre" column="DSNOMBRE"/>
+		<result property="apellidoPaterno" column="DSAPELLIDOPATERNO"/>
+		<result property="apellidoMaterno" column="DSAPELLIDOMATERNO"/>
+		<result property="domicilio" column="DSDOMICILIO"/>
+		<result property="municipio.id" column="LLMUNICIPIO"/>
+		<result property="estado.id" column="LLESTADO"/>
+		<result property="estado.nombre" column="DSESTADO"/>
+		<result property="municipioAds.id" column="LLMUNICIPIOADS"/>
+		<result property="estadoAds.id" column="LLESTADOADS"/>
+		<result property="estatus.id" column="LLESTATUSFEDA"/>
+		<result property="movimientoMonedero.saldoActual" column="SALDO"/>
+		<result property="movimientoMonedero.saldoReservado" column="SALDORESERV"/>
+		<result property="localidadPago.id" column="LLLOCALIDADPAGO"/>
+	</resultMap>
+	
+	<resultMap id="listaFedatarios" type="fedatario">
+		<result property="id" column="LLFEDATARIO"/>
+		<result property="numero" column="CRNUMERO"/>
+		<result property="nombre" column="DSNOMBRE"/>
+		<result property="apellidoPaterno" column="DSAPELLIDOPATERNO"/>
+		<result property="apellidoMaterno" column="DSAPELLIDOMATERNO"/>
+		<result property="estado.nombre" column="DSESTADO"/>
+	</resultMap>
+	
+	<select id="consultarCatalogo" resultMap="listaFedatarios">
+		SELECT * 
+		FROM CTFEDATARIOS
+	</select>
+	
+	<select id="consultar" resultMap="listaFedatarios">
+		SELECT 	CTFEDATARIOS.LLFEDATARIO, 
+				CTFEDATARIOS.CRNUMERO, 
+				CTFEDATARIOS.DSNOMBRE, 
+		        CTFEDATARIOS.DSAPELLIDOPATERNO, 
+		        CTFEDATARIOS.DSAPELLIDOMATERNO, 
+		        CTESTADOS.DSESTADO
+		FROM CTFEDATARIOS
+		INNER JOIN CTESTADOS
+		ON CTFEDATARIOS.LLESTADO = CTESTADOS.LLESTADO
+	</select>
+
+	<select id="consultarPorNumero" parameterType="fedatario" resultMap="listaFedatarios">
+		SELECT 	CTFEDATARIOS.LLFEDATARIO, 
+				CTFEDATARIOS.CRNUMERO, 
+				CTFEDATARIOS.DSNOMBRE, 
+		        CTFEDATARIOS.DSAPELLIDOPATERNO, 
+		        CTFEDATARIOS.DSAPELLIDOMATERNO, 
+		        CTESTADOS.DSESTADO
+		FROM CTFEDATARIOS
+		INNER JOIN CTESTADOS
+		ON CTFEDATARIOS.LLESTADO = CTESTADOS.LLESTADO
+		WHERE LOWER(CRNUMERO) LIKE LOWER('%' || #{numero} || '%')
+	</select>
+	
+	<select id="consultarPorNombre" parameterType="fedatario" resultMap="listaFedatarios">
+		SELECT 	CTFEDATARIOS.LLFEDATARIO, 
+				CTFEDATARIOS.CRNUMERO, 
+				CTFEDATARIOS.DSNOMBRE, 
+		        CTFEDATARIOS.DSAPELLIDOPATERNO, 
+		        CTFEDATARIOS.DSAPELLIDOMATERNO, 
+		        CTESTADOS.DSESTADO
+		FROM CTFEDATARIOS
+		INNER JOIN CTESTADOS
+		ON CTFEDATARIOS.LLESTADO = CTESTADOS.LLESTADO
+		WHERE LOWER((CTFEDATARIOS.DSNOMBRE || ' ' || 
+					CTFEDATARIOS.DSAPELLIDOPATERNO || ' ' || 
+					CTFEDATARIOS.DSAPELLIDOMATERNO)) 
+		LIKE LOWER('%' || #{nombre} || '%')
+	</select>
+	
+	<select id="consultarPorNumeroPorNombre" parameterType="fedatario" resultMap="listaFedatarios">
+		SELECT 	CTFEDATARIOS.LLFEDATARIO, 
+				CTFEDATARIOS.CRNUMERO, 
+				CTFEDATARIOS.DSNOMBRE, 
+		        CTFEDATARIOS.DSAPELLIDOPATERNO, 
+		        CTFEDATARIOS.DSAPELLIDOMATERNO, 
+		        CTESTADOS.DSESTADO
+		FROM CTFEDATARIOS
+		INNER JOIN CTESTADOS
+		ON CTFEDATARIOS.LLESTADO = CTESTADOS.LLESTADO
+		WHERE LOWER(CRNUMERO) LIKE LOWER('%' || #{numero} || '%')
+		AND LOWER((CTFEDATARIOS.DSNOMBRE || ' ' || 
+					CTFEDATARIOS.DSAPELLIDOPATERNO || ' ' || 
+					CTFEDATARIOS.DSAPELLIDOMATERNO)) 
+		LIKE LOWER('%' || #{nombre} || '%')
+	</select>
+	
+	<select id="consultarPorId" parameterType="fedatario" resultMap="fedatario">
+		SELECT * 
+		FROM CTFEDATARIOS 
+		WHERE LLFEDATARIO = #{id}
+	</select>
+	
+	<select id="consultarPorFedatario" parameterType="java.lang.Integer" resultMap="fedatario">
+		SELECT * 
+		FROM CTFEDATARIOS 
+		WHERE LLFEDATARIO = #{id}
+	</select>
+	
+	<select 	id="consultarUsuarioFedatario" resultMap="fedatario" parameterType="usuario">
+		Select  * 
+		from ctfedatarios 
+		join ctusuarios on ctfedatarios.llfedatario = ctusuarios.llfedatario
+		WHERE ctusuarios.llusuario = #{id}
+	</select>
+	
+	<select id="consultarPorUsuario" resultMap="fedatario">
+		SELECT U.LLUSUARIO, U.LLFEDATARIO , F.DSNOMBRE, F.DSAPELLIDOPATERNO, F.DSAPELLIDOMATERNO, 
+        U.DSNOMBRE, L.LLLOCALIDADPAGO, F.CRNUMERO 
+        from ctusuarios U
+        inner join ctfedatarios F on U.llfedatario = F.llfedatario
+        INNER JOIN DTLOCALIDADPAGO L ON L.LLMUNICIPIO = F.LLMUNICIPIOADS AND L.LLESTADO = F.LLESTADOADS
+		WHERE U.LLUSUARIO = #{id}
+	</select>
+	
+	<select id="consultarPorClaveNombre" parameterType="fedatario" resultMap="fedatario">
+		SELECT LLFEDATARIO, CRNUMERO, DSNOMBRE, DSAPELLIDOPATERNO, DSAPELLIDOMATERNO
+    	FROM CTFEDATARIOS
+		WHERE UPPER(CRNUMERO) LIKE UPPER( '%' || #{texto} || '%' )
+		OR UPPER(DSNOMBRE) LIKE UPPER( '%' || #{texto} || '%' )
+		OR UPPER(DSAPELLIDOPATERNO) LIKE UPPER( '%' || #{texto} || '%' )
+		OR UPPER(DSAPELLIDOMATERNO) LIKE UPPER( '%' || #{texto} || '%' )
+	</select>
+	
+	<select id="consultarPorNumeroPorNotarioPorMunicipioAds" parameterType="fedatario" resultMap="fedatario">
+		SELECT *
+		FROM CTFEDATARIOS
+		WHERE CRNUMERO = #{numero}
+		AND LLMUNICIPIOADS = #{municipioAds.id}
+		AND LLTIPOFEDATARIO = #{tipo.id}
+	</select>
+	
+	<select id="consultarPorNumeroPorCorredorPorEstadoAds" parameterType="fedatario" resultMap="fedatario">
+		SELECT *
+		FROM CTFEDATARIOS
+		WHERE CRNUMERO = #{numero}
+		AND LLESTADOADS = #{estadoAds.id}
+		AND LLTIPOFEDATARIO = #{tipo.id}
+	</select>
+	
+	<select id="consultarPorNumeroUnico" parameterType="fedatario" resultMap="fedatario">
+		SELECT 	CTFEDATARIOS.*
+		FROM CTFEDATARIOS		
+		WHERE CRNUMERO = #{numero} 
+	</select>
+	
+	<insert id="crear" parameterType="fedatario" keyColumn="LLFEDATARIO" keyProperty="id"  useGeneratedKeys="true">
+		INSERT INTO CTFEDATARIOS(
+			LLFEDATARIO, 
+			LLTIPOFEDATARIO, 
+			LLNACIONALIDAD, 
+			DSPAIS, 
+			DSNOMBRE, 
+			DSAPELLIDOPATERNO, 
+			DSAPELLIDOMATERNO,
+			DSDOMICILIO, 
+			LLMUNICIPIO, 
+			LLESTADO, 
+			CRNUMERO,
+			LLMUNICIPIOADS, 
+			LLESTADOADS, 
+			LLESTATUSFEDA
+		)
+		VALUES (
+			FEDATARIO_SEQ.NEXTVAL,
+			#{tipo.id},
+			#{nacionalidad.id},
+			#{pais},
+			#{nombre},
+			#{apellidoPaterno},
+			#{apellidoMaterno},
+			#{domicilio},
+			#{municipio.id},
+			#{estado.id},
+			#{numero},
+			#{municipioAds.id},
+			#{estadoAds.id},
+			#{estatus.id}
+		)
+	</insert>
+	
+	<update id="modificar" parameterType="fedatario">
+		UPDATE CTFEDATARIOS
+		SET	LLTIPOFEDATARIO = #{tipo.id},
+			LLNACIONALIDAD = #{nacionalidad.id}, 
+			DSPAIS = #{pais}, 
+			DSNOMBRE = #{nombre}, 
+			DSAPELLIDOPATERNO = #{apellidoPaterno}, 
+			DSAPELLIDOMATERNO = #{apellidoMaterno},
+			DSDOMICILIO = #{domicilio}, 
+			LLMUNICIPIO = #{municipio.id}, 
+			LLESTADO = #{estado.id}, 
+			CRNUMERO = #{numero},
+			LLMUNICIPIOADS = #{municipioAds.id}, 
+			LLESTADOADS = #{estadoAds.id}, 
+			LLESTATUSFEDA = #{estatus.id}
+		WHERE LLFEDATARIO = #{id}
+	</update>
+	
+</mapper>

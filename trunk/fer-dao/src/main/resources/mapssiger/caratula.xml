@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.caratula.CaratulaDAO">
+
+
+	<resultMap type="Caratula" id="listaCaratulas">
+		<result column="LLCARATULA" property="llcaratula" />
+		<result column="CRFME" property="crfme" />
+		<result column="FCAPERTURA" property="fcapertura" />
+		<result column="BOESTADO" property="boestado" />
+		<result column="DSRFC" property="dsrfc" />
+		<result column="DSANTREG" property="dsantreg" />
+		<result column="DSDENSOCIAL" property="dsdensocial" />
+		<result column="DSDIRECCION" property="dsdireccion" />
+		<result column="LLMUNICIPIO" property="llmunicipio" />
+		<result column="LLESTADO" property="llestado" />
+		<result column="NODURACION" property="noduracion" />
+		<result column="LLGIRO" property="llgiro" />
+		<result column="NOOBJETO" property="noobjeto" />
+		<result column="BOCERRADO" property="bocerrado" />
+		<result column="LLNACIONALIDAD" property="llnacionalidad" />
+		<result column="LLSOCIO" property="llsocio" />
+
+
+	</resultMap>
+
+	<select id="consultaCaratula" resultMap="listaCaratulas"
+		parameterType="Caratula">
+
+		select LLCARATULA, CRFME, FCAPERTURA, BOESTADO, DSRFC, DSANTREG,
+		DSDENSOCIAL,
+		DSDIRECCION, LLMUNICIPIO, LLESTADO, NODURACION, LLGIRO, NOOBJETO,
+		BOCERRADO, LLNACIONALIDAD, LLSOCIO
+		from MVCARATULAS
+		where LLCARATULA is not null
+		<if test="llcaratula != 0">
+			and llcaratula = #{llcaratula}
+		</if>
+	</select>
+
+
+	<!-- CUH01 -->
+	<select id="obtieneSocios" resultMap="buscaSocios"
+		parameterType="java.util.Map">
+		<!--select mv.crfme,mv.dsdensocial,cts.dsnombresocio,mv.dsrfc,dscurp from 
+			mvcaratulas mv join caratula_socio cs on mv.llcaratula=cs.llcaratula join 
+			ctsocios cts on cs.llsocio=cts.llsocio and cts.dsnombresocio like '%'||#{nombre}||'%' -->
+		select ct.llmunicipio,
+		mv.llcaratula,
+		mv.fcapertura,
+		cest.dsestado,
+		ct.dsmunicipio,
+		ctn.dsnacionalidad,
+		ctg.dsgiro,
+		mv.dsantreg,
+		mv.bocerrado,
+		mv.dsduracion,
+		mv.dsdireccion,
+		bomoral,
+		mv.crfme,
+		mv.dsdensocial,
+		cts.dsnombresocio,
+		mv.dsrfc,
+		dscurp,
+		cts.dsapellidopaterno,
+		cts.dsapellidomaterno
+
+		from mvcaratulas mv
+		join caratula_socio cs on mv.llcaratula=cs.llcaratula
+		join ctsocios cts on cs.llsocio=cts.llsocio
+		join ctmunicipios ct on (ct.llmunicipio=mv.llmunicipio and
+		ct.llestado=mv.llestado)
+		join ctgiros ctg on ctg.llgiro=mv.llgiro
+		join ctnacionalidades ctn on mv.llnacionalidad=ctn.llnacionalidad
+		join ctestados cest on cest.llestado=ct.llestado
+		and cts.dsnombresocio like '%'||#{socio}||'%' and
+		mv.dsdensocial like '%'||#{razon}||'%' and
+		mv.crfme like '%'||#{fme}||'%'
+
+	</select>
+
+	<resultMap type="socio" id="buscaSocios">
+		<id property="id" column="LLSOCIO" />
+		<result column="DSNOMBRESOCIO" property="nombre" />
+		<result column="DSAPELLIDOPATERNO" property="apellidoPaterno" />
+		<result column="DSAPELLIDOMATERNO" property="apellidoMaterno" />
+		<result column="DSRFC" property="rfc" />
+		<result column="NOTELEFONO" property="telefono" />
+		<result column="BOACTIVO" property="activo" />
+		<collection property="caratulaSocios" column="LLCARATULA" ofType="caratula" resultMap="caratulaMap" />
+	</resultMap>
+
+	<resultMap type="caratula" id="caratulaMap">
+		<result column="LLCARATULA" property="llcaratula" />
+		<result column="LLOFICINA" property="lloficina" />
+		<result column="CRFME" property="crfme" />
+		<result column="FCAPERTURA" property="fcapertura" />
+		<result column="LLESTATUSCARATULA" property="llestatus" />
+		<result column="DSRFC" property="dsrfc" />
+		<result column="DSANTREG" property="dsantreg" />
+		<result column="DSDENSOCIAL" property="dsdensocial" />
+		<result column="DSDIRECCION" property="dsdireccion" />
+		<result column="LLMUNICIPIO" property="llmunicipio" />
+		<result column="LLESTADO" property="llestado" />
+		<result column="NODURACION" property="noduracion" />
+		<result column="LLGIRO" property="llgiro" />
+		<result column="BOCERRADO" property="bocerrado" />
+		<result column="LLNACIONALIDAD" property="llnacionalidad" />
+		<result column="DSCURP" property="dscurp" />
+		<result column="BOMORAL" property="bomoral" />
+		<association property="giro" resultMap="giroMap" />
+		<association property="nacionalidad" resultMap="nacionalidadMap" />
+		<association property="municipio" resultMap="municipioMap" />
+		<association property="ctEstatus" resultMap="ctEstatusMap" />
+		<association property="oficina" resultMap="oficinaMap" ></association>
+
+	</resultMap>
+
+	<resultMap type="oficinas" id="oficinaMap">
+	  <result column="LLOFICINA" property="id"/>
+	  <result column="DSOFICINA" property="nombre" />
+	  <result column="DSDOMICILIO" property="domicilio" />
+	  <association property="ctUsoHorario" resultMap="ctHusoHorarioMap" ></association>
+	</resultMap>
+	
+	<resultMap type="ctHusoHorario" id="ctHusoHorarioMap">
+	  <result property="nombre" column="DSNOMBRE" />
+	</resultMap>
+	
+<resultMap type="ctesatuscaratula" id="ctEstatusMap">
+<result column="DSESTATUS" property="dsEstatus" />
+
+</resultMap>
+	<resultMap type="municipio" id="municipioMap">
+		<result column="LLMUNICIPIO" property="id" />
+		<result column="DSMUNICIPIO" property="nombre" />
+		<result column="BOACTIVO" property="estatus" />
+		<association property="estado" resultMap="estadoMap" />
+	</resultMap>
+
+	<resultMap type="estado" id="estadoMap">
+		<result property="id" column="LLESTADO" />
+		<result property="nombre" column="DSESTADO" />
+		<result property="estatus" column="BOACTIVO" />
+
+
+	</resultMap>
+
+
+	<resultMap type="giro" id="giroMap">
+		<result property="llgiro" column="LLGIRO" />
+		<result property="dsgiro" column="DSGIRO" />
+		<result property="fcmodificacion" column="FCMODIFICACION" />
+		<result property="boactivo" column="BOACTIVO" />
+		<result property="dsclavegiro" column="DSCLAVEGIRO" />
+
+	</resultMap>
+	<resultMap id="nacionalidadMap" type="nacionalidad">
+		<result property="id" column="LLNACIONALIDAD" />
+		<result property="nombre" column="DSNACIONALIDAD" />
+		<result property="fecha" column="FCMODIFICACION" />
+		<result property="estatus" column="BOACTIVO" />
+	</resultMap>
+
+
+	<select id="obtieneSociosCaratula" parameterType="int"
+		resultMap="socios">
+		 select cts.*
+      from ctsocios cts 
+      where cts.llcaratula=#{llcaratula}
+		
+
+	</select>
+
+	<resultMap type="socio" id="socios">
+		<id property="id" column="LLSOCIO" />
+		<result column="DSNOMBRESOCIO" property="nombre" />
+		<result column="DSAPELLIDOPATERNO" property="apellidoPaterno" />
+		<result column="DSAPELLIDOMATERNO" property="apellidoMaterno" />
+		<result column="DSRFC" property="rfc" />
+		<result column="NOTELEFONO" property="telefono" />
+		<result column="BOACTIVO" property="activo" />
+		<!-- <collection property="caratulaSocios" column="LLCARATULA" ofType="caratula" 
+			resultMap="caratulaMap"/> -->
+	</resultMap>
+
+
+	<select id="getCaratula" parameterType="String" resultMap="caratulaMap">
+	 select 
+	 ctsts.dsestatus,
+	 mv.llcaratula,
+    mv.crfme,
+    mv.dsdensocial,
+    mv.dsobjeto,
+    mv.dsdireccion,
+    mv.dsrfc,
+    mv.bomoral,
+    mv.dsantreg,
+    mv.fcapertura,
+    mv.dscurp,
+    est.llestatuscaratula,
+    est.dsestatus,
+    ctg.dsgiro,
+    esta.dsestado,
+    ctm.dsmunicipio,ctm.llmunicipio,ctn.dsnacionalidad,
+    mv.lloficina,
+    ctofi.LLOFICINA,
+    ctofi.DSOFICINA,
+    ctofi.DSOFICINA,
+    ctuso.DSNOMBRE
+    from mvcaratulas mv 
+		  join ctestatuscaratula est on est.llestatuscaratula=mv.llestatuscaratula
+		  join ctgiros ctg on ctg.llgiro=mv.llgiro
+		  join ctmunicipios ctm on (ctm.llmunicipio=mv.llmunicipio and mv.llmunicipio=ctm.llestado)
+		  join ctestados esta on mv.llestado=esta.llestado
+		  join ctoficinas ctofi on ctofi.lloficina=mv.lloficina
+      join ctnacionalidades ctn on ctn.llnacionalidad=mv.llnacionalidad
+      join ctestatuscaratula ctsts on ctsts.llestatuscaratula=mv.llestatuscaratula
+      join ctusohorario ctuso on ctuso.llusohorario=ctofi.llusohorario
+		  where mv.crfme=#{fme}
+	</select>
+	<!-- CUH01 -->
+
+
+	<!-- Inicio CUC01 -->	
+	<select id="obtieneFMECaratula" resultMap="caratulaFMEMap" parameterType="caratula">
+		SELECT MVCAR.*, 
+		      SOLCARFME.*, 
+		      DEFFRMPRE.*, 
+		      FRMPRE.*, 
+		      FRMACTO.*, 
+		      FA.*, 
+		      ACTO.*
+		FROM MVCARATULAS MVCAR 
+		JOIN SOLICITUD_CARATULAFME SOLCARFME ON MVCAR.LLCARATULA = SOLCARFME.LLCARATULA		
+		JOIN MVSOLFRMPRE SOLFRMPRE ON SOLCARFME.LLSOLCARFME = SOLFRMPRE.LLSOLCARFME
+		JOIN CFDEFFRMPRE DEFFRMPRE ON SOLFRMPRE.LLDEFFRMPRE = DEFFRMPRE.LLDEFFRMPRE 
+		JOIN CTFRMPRE FRMPRE ON DEFFRMPRE.LLCATFRMPRE = FRMPRE.LLCTFRMPRE 
+		JOIN MVFRMACTO FRMACTO ON SOLFRMPRE.LLSOLFRMPRE = FRMACTO.LLSOLFRMPRE 
+		JOIN FORMAS_ACTOS FA ON FRMACTO.LLFORMAACTO = FA.LLFORMAACTO 
+		JOIN CTACTOS ACTO ON FA.LLACTO = ACTO.LLACTO
+		WHERE  MVCAR.LLOFICINA = #{oficina.id}		
+		AND MVCAR.CRFME LIKE ('%' || #{crfme} || '%' )
+		AND MVCAR.DSDENSOCIAL LIKE ('%' || #{dsdensocial} || '%')
+		ORDER BY MVCAR.CRFME
+	</select>
+		
+	<!--
+	<select id="obtieneFMECaratula" resultMap="caratulaFMEMap" parameterType="caratula">
+	    SELECT MVCAR.*, 
+	           SOLCARFME.*, 
+	           DEFFRMPRE.*, 
+	           FRMPRE.*, 
+	           FRMACTO.*, 
+	           FA.*, 
+	           ACTO.*
+		FROM MVCARATULAS MVCAR 
+		JOIN (SELECT * FROM (SELECT ROWNUM AS LLSOLICITUD_CARATULAFME,    
+		                                      LLSOLICITUD, 
+		                                      LLCARATULA, 
+		                                      BOPRINCIPAL 
+		                      FROM SOLICITUD_CARATULAFME) VW_SOLICITUD_CARATULAFME) SOLCARFME
+		ON MVCAR.LLCARATULA = SOLCARFME.LLCARATULA
+		JOIN MVSOLICITUDES MVSOL ON MVSOL.LLSOLICITUD = SOLCARFME.LLSOLICITUD
+		JOIN MVSOLFRMPRE SOLFRMPRE ON MVSOL.LLSOLICITUD = SOLFRMPRE.LLSOLICITUD
+		JOIN CFDEFFRMPRE DEFFRMPRE ON SOLFRMPRE.LLDEFFRMPRE = DEFFRMPRE.LLDEFFRMPRE 
+		JOIN CTFRMPRE FRMPRE ON DEFFRMPRE.LLCATFRMPRE = FRMPRE.LLCTFRMPRE 
+		JOIN MVFRMACTO FRMACTO ON SOLFRMPRE.LLSOLFRMPRE = FRMACTO.LLSOLFRMPRE 
+		JOIN FORMAS_ACTOS FA ON FRMACTO.LLFORMAACTO = FA.LLFORMAACTO 
+		JOIN CTACTOS ACTO ON FA.LLACTO = ACTO.LLACTO
+	   WHERE MVCAR.LLOFICINA = #{oficina.id}
+	   <if test="crfme != null">
+		   AND MVCAR.CRFME LIKE ('%' || #{crfme} || '%' )
+	   </if>
+	   <if test="dsdensocial != null">
+		   AND MVCAR.DSDENSOCIAL LIKE ('%' || #{dsdensocial} || '%')	     
+	   </if>
+	</select>
+	-->
+
+	<select id="obtieneFMECaratulaPorFME" resultMap="caratulaFMEMap" parameterType="caratula">
+        SELECT MVCAR.*, 
+               SOLCARFME.*, 
+               DEFFRMPRE.*, 
+               FRMPRE.*, 
+               FRMACTO.*, 
+               FA.*, 
+               ACTO.*
+        FROM MVCARATULAS MVCAR 
+        JOIN (SELECT * FROM (SELECT ROWNUM AS LLSOLICITUD_CARATULAFME,    
+                                              LLSOLICITUD, 
+                                              LLCARATULA, 
+                                              BOPRINCIPAL 
+                              FROM SOLICITUD_CARATULAFME) VW_SOLICITUD_CARATULAFME) SOLCARFME
+        ON MVCAR.LLCARATULA = SOLCARFME.LLCARATULA
+        JOIN MVSOLICITUDES MVSOL ON MVSOL.LLSOLICITUD = SOLCARFME.LLSOLICITUD
+        JOIN MVSOLFRMPRE SOLFRMPRE ON MVSOL.LLSOLICITUD = SOLFRMPRE.LLSOLICITUD
+        JOIN CFDEFFRMPRE DEFFRMPRE ON SOLFRMPRE.LLDEFFRMPRE = DEFFRMPRE.LLDEFFRMPRE 
+        JOIN CTFRMPRE FRMPRE ON DEFFRMPRE.LLCATFRMPRE = FRMPRE.LLCTFRMPRE 
+        JOIN MVFRMACTO FRMACTO ON SOLFRMPRE.LLSOLFRMPRE = FRMACTO.LLSOLFRMPRE 
+        JOIN FORMAS_ACTOS FA ON FRMACTO.LLFORMAACTO = FA.LLFORMAACTO 
+        JOIN CTACTOS ACTO ON FA.LLACTO = ACTO.LLACTO
+       WHERE MVCAR.LLOFICINA = #{oficina.id}  
+       AND MVCAR.CRFME = #{crfme}
+    </select>
+    
+    <select id="consultaCaratulaPorRazonDenSocial" resultMap="caratulaFMEMap" parameterType="caratula">
+        SELECT MVCAR.*
+		FROM MVCARATULAS MVCAR
+		WHERE MVCAR.LLOFICINA = #{oficina.id}
+		AND MVCAR.DSDENSOCIAL = #{dsdensocial}
+    </select>
+	
+	<resultMap type="caratula" id="caratulaFMEMap">
+		<id property="llcaratula" column="LLCARATULA" />
+		<result property="crfme" column="CRFME" />
+		<result property="dsdensocial" column="DSDENSOCIAL" />
+
+		<collection property="solicitudCaratulafmes" javaType="ArrayList" ofType="solicitudcaratulafme" column="LLCARATULA" resultMap="solicitudcaratulafmeMap" />
+	</resultMap>
+
+	<resultMap type="solicitudcaratulafme" id="solicitudcaratulafmeMap">
+	   <id property="id" column="LLSOLCARFME"/>
+	   
+	   <collection property="solFrmPre" javaType="ArrayList" ofType="solfrmpre" column="LLSOLCARFME" resultMap="solfrmpreMap" />	   
+	   <!-- association property="mvSolicitud" javaType="mvsolicitud" column="LLSOLICITUD" resultMap="mvsolicitudMap" /-->
+	</resultMap>
+
+	<resultMap type="mvsolicitud" id="mvsolicitudMap">
+       <id property="id" column="LLSOLICITUD"/>
+       <result property="nci" column="DSNCI"/>
+       <result property="solicitante" column="CRSOLICITANTE"/>
+       
+       <collection property="solFrmPre" javaType="ArrayList" ofType="solfrmpre" column="LLSOLICITUD" resultMap="solfrmpreMap" />       
+    </resultMap>
+	
+	<resultMap type="solfrmpre" id="solfrmpreMap">
+		<id property="id" column="LLSOLFRMPRE" />
+		<association property="cfDefFormaPrecodificada" javaType="deffrmpre" column="LLDEFFRMPRE" resultMap="deffrmpreMap" />
+		<collection property="mvFormasActos" javaType="ArrayList" ofType="mvformaacto" column="LLSOLFRMPRE" resultMap="mvformaactoMap" />
+	</resultMap>
+
+	<resultMap type="deffrmpre" id="deffrmpreMap">
+		<id property="id" column="LLDEFFRMPRE" />
+		<association property="ctFormaPrecodificada" javaType="ctformaprecod" column="LLCATFRMPRE" resultMap="ctformaprecodMap" />
+	</resultMap>
+    
+    <resultMap type="ctformaprecod" id="ctformaprecodMap">
+        <id property="id" column="LLCTFRMPRE"/>
+        <result property="descripcionForma" column="DSFRMPRECOD"/>
+        <result property="claveForma" column="DSFRMPRECLAVE"/>
+    </resultMap>
+
+	<resultMap type="mvformaacto" id="mvformaactoMap">
+		<id property="id" column="LLMVFRMACTO" />
+		<result property="fcIngreso" column="FCINGRESO" />
+		<result property="fcInscripcion" column="FCINSCRIPCION" />
+		<result property="aceptado" column="BOACEPTADO" />
+
+		<association property="formaActo" javaType="formasactos" column="LLFORMAACTO" resultMap="formasactosMap" />
+	</resultMap>
+
+	<resultMap type="formasactos" id="formasactosMap">
+		<id property="id" column="LLFORMAACTO" />
+		<association property="acto" javaType="ctacto" column="LLACTO" resultMap="actoMap" />
+	</resultMap>
+
+	<resultMap type="ctacto" id="actoMap">
+		<id property="id" column="LLACTO" />
+		<result property="nombre" column="DSACTO" />
+		<result property="nombreCorto" column="DSACTOCORTA" />
+		<result property="fcModificacion" column="FCMODIFICACION" />
+		<result property="activo" column="BOACTIVO" />
+	</resultMap>    	
+	<!-- Fin CUC01 -->
+	
+	
+	<!-- <resultMap type="caratula" id="caratulaFMEMap">
+		<id property="llcaratula" column="LLCARATULA" />
+		<result property="crfme" column="CRFME" />
+		<result property="dsdensocial" column="DSDENSOCIAL" />
+	</resultMap> -->
+
+	<!-- Inicio CUC02 -->
+	<!-- Query que obtiene el detalle del FME, NCI y Razon social -->
+	<select id="consultaFMECaratulaPorFMENCIRzonSocial" parameterType="map" resultMap="caratulaFMEMap">
+	   SELECT MVCAR.*, 
+	       SOLCARFME.*, 
+	       DEFFRMPRE.*, 
+	       FRMPRE.*, 
+	       FRMACTO.*, 
+	       FA.*, 
+	       ACTO.*, 
+	       MOTREC.*, 
+	       MVSOL.*
+		FROM MVCARATULAS MVCAR JOIN SOLICITUD_CARATULAFME SOLCARFME
+		ON MVCAR.LLCARATULA = SOLCARFME.LLCARATULA JOIN MVSOLICITUDES MVSOL
+		ON SOLCARFME.LLSOLICITUD = MVSOL.LLSOLICITUD JOIN MVSOLFRMPRE SOLFRMPRE
+		ON SOLCARFME.LLSOLFRMPRE = SOLFRMPRE.LLSOLFRMPRE JOIN CFDEFFRMPRE DEFFRMPRE
+		ON SOLFRMPRE.LLDEFFRMPRE = DEFFRMPRE.LLDEFFRMPRE JOIN CTFRMPRE FRMPRE
+		ON DEFFRMPRE.LLCATFRMPRE = FRMPRE.LLCTFRMPRE JOIN MVFRMACTO FRMACTO
+		ON SOLFRMPRE.LLSOLFRMPRE = FRMACTO.LLSOLFRMPRE JOIN DTMOTIVOSRECHAZO MOTREC
+		ON FRMACTO.LLMVFRMACTO = MOTREC.LLMVFRMACTO JOIN FORMAS_ACTOS FA
+		ON FRMACTO.LLFORMAACTO = FA.LLFORMAACTO JOIN CTACTOS ACTO
+		ON FA.LLACTO = ACTO.LLACTO
+		WHERE MVCAR.CRFME LIKE ('%' || #{caratula.crfme} || '%')
+		AND MVCAR.DSDENSOCIAL LIKE ('%' || #{caratula.dsdensocial} || '%')   
+		AND MVSOL.DSNCI LIKE ('%' || #{solicitud.nci} || '%')
+	</select>
+	
+	
+	
+	<resultMap type="motivoRechazo" id="motivoRechazoMap">
+	   <id property="id" column="LLMOTIVORECHAZO"/>
+	   <result property="motivoRechazo" column="DSMOTIVORECHAZO"/>
+	   <result property="fcModificacion" column="FCMODIFICACION"/>
+	</resultMap>	
+	<!-- Fin CUC02 -->
+
+
+	<resultMap type="CaratulaFme" id="listaFme">
+		<result column="LLCARATULA" property="llcaratula" />
+		<result column="CRFME" property="crfme" />
+		<result column="DSDENSOCIAL" property="dsdensocial" />
+		<result column="BOACERVO" property="boacervo" />
+		<result column="LLOFICINA" property="lloficina" />
+	</resultMap>
+
+    <select id="consultaFme" resultMap="listaFme" parameterType="CaratulaFme">	
+	    SELECT  LLCARATULA, CRFME,  DSDENSOCIAL, BOACERVO, LLOFICINA
+	    FROM    MVCARATULAS
+	    WHERE   LLCARATULA IS NOT NULL 
+		AND UPPER(CRFME) LIKE UPPER('%' || #{crfme} || '%') 
+		OR UPPER(DSDENSOCIAL) LIKE UPPER('%' || #{dsdensocial} || '%') 
+	</select>
+</mapper>

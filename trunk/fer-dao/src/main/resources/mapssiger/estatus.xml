@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.estatus.EstatusDAO">
+
+    <resultMap type="estatus" id="listaEstatus">
+		<result column="LLESTATUS" property="idEstatus" />
+		<result column="DSESTATUS" property="dsEstatus" />
+		<result column="BOACTIVO" property="activoinactivo" />
+	</resultMap>
+	
+    <select id="consultaEstatus" resultMap="listaEstatus" parameterType="estatus">	
+	    select LLESTATUS, DSESTATUS, BOACTIVO
+	    from CTESTATUS
+	    where LLESTATUS = #{idEstatus}		
+	</select>
+</mapper>

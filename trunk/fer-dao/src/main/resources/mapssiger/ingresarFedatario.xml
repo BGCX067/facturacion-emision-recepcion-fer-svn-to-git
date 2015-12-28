@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.ingresarfedatario.IngresarFedatarioDAO">
+	
+	<resultMap id="ingresarfedatarioResult" type="ingresarfedatario">
+		<result property="llcompfeda" column="LLCOMPFEDA"/>
+		<result property="lltipofedatario" column="LLTIPOFEDATARIO"/>
+		<result property="llfedpublico" column="LLFEDPUBLICO"/>
+		<result property="boactuandobajo" column="BOACTUANDOBAJO"/>
+		<result property="llactuandobajo" column="LLACTUANDOBAJO"/>
+		<result property="bosustituyendo" column="BOSUSTITUYENDO"/>
+		<result property="llsustituyendo" column="LLSUSTITUYENDO"/>
+		<result property="dscalidad" column="DSCALIDAD"/>
+		<result property="boactojudicial" column="BOACTOJUDICIAL"/>
+		<result property="boautoadmon" column="BOAUTOADMIN"/>
+		<result property="dsautoridad" column="DSAUTORIDAD"/>
+		<result property="dsnombre" column="DSNOMBRE"/>
+		<result property="llestado" column="LLESTADO"/>
+		<result property="llmunicipio" column="LLMUNICIPIO"/>
+
+	</resultMap>
+
+	<select id="consultarComponente" parameterType="ingresarfedatario" resultMap="ingresarfedatarioResult">
+		SELECT LLCOMPFEDA, LLTIPOFEDATARIO, LLFEDPUBLICO, BOACTUANDOBAJO, LLACTUANDOBAJO, 
+		BOSUSTITUYENDO, LLSUSTITUYENDO, DSCALIDAD, BOACTOJUDICIAL, BOAUTOADMIN, 
+		DSAUTORIDAD, DSNOMBRE,LLESTADO,LLMUNICIPIO FROM DTCOMPFEDA
+		WHERE LLCOMPFEDA =  #{llcompfeda}
+	</select>
+	
+	<insert id="crear" parameterType="ingresarfedatario">
+		INSERT INTO DTCOMPFEDA(
+			LLCOMPFEDA, 
+			LLTIPOFEDATARIO, 
+			LLFEDPUBLICO, 
+			BOACTUANDOBAJO, 
+			LLACTUANDOBAJO, 
+			BOSUSTITUYENDO, 
+			LLSUSTITUYENDO, 
+			DSCALIDAD, 
+			BOACTOJUDICIAL, 
+			BOAUTOADMIN, 
+			DSAUTORIDAD, 
+			DSNOMBRE,
+			LLESTADO,
+			LLMUNICIPIO
+		)
+		VALUES (
+			DTCOMPFEDA_SEQ.NEXTVAL,
+			#{lltipofedatario},
+			#{llfedpublico},
+			#{boactuandobajo},
+			#{llactuandobajo},
+			#{bosustituyendo},
+			#{llsustituyendo},
+			#{dscalidad},
+			#{boactojudicial},
+			#{boautoadmon},
+			#{dsautoridad},
+			#{dsnombre},
+			#{llestado},
+			#{llmunicipio}
+		)
+	</insert>
+	
+</mapper>

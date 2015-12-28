@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.beltsoft.jim.fer.dao.UsuarioDAO">
+
+
+	<insert id="crear" parameterType="usuario"  keyProperty="id" keyColumn="LLUSUARIO" useGeneratedKeys="true">
+		INSERT INTO CTUSUARIOS(
+			LLUSUARIO, 
+			DSCORREO, 
+			DSNOMBRE, 
+			DSAPELLIDOPATERNO, 
+			DSAPELLIDOMATERNO, 
+			DSRFC, 
+			DSTELEFONO,
+			DSCURP, 
+			DSTELCONTACTO, 
+			DSJUSTIFICACION, 
+			FCMODIFICACION,
+			LLESTATUSUSUA,
+			LLUSOHORARIO,
+			DSFEA,
+			LLFEDATARIO
+		)
+		VALUES (
+			CTUSUARIOS_SEQ.NEXTVAL,
+			#{correo},
+			#{nombre},
+			#{apellidoPaterno},
+			#{apellidoMaterno},
+			#{rfc},
+			#{telefono},
+			#{curp},
+			#{telContacto},
+			#{justificacion jdbcType=CLOB},
+			#{fechaReactivacion},
+			#{estatus.id},
+			#{husoHorarioDefecto},
+			#{fea},
+			#{fedatario.id}
+			
+		)
+	</insert>
+
+	<insert id="crearUsuarioAtoservicio" parameterType="usuario" keyColumn="LLUSUARIO"   keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO CTUSUARIOS(
+			LLUSUARIO, 
+			DSCORREO, 
+			DSNOMBRE, 
+			DSAPELLIDOPATERNO, 
+			DSAPELLIDOMATERNO,
+			DSCURP, 
+			DSTELCONTACTO,
+			DSCONTRASENIA,
+			LLESTATUSUSUA,
+			LLUSOHORARIO,
+			CRCODCONFIRMACION
+		)
+		VALUES (
+			CTUSUARIOS_SEQ.NEXTVAL,
+			#{correo},
+			#{nombre},
+			#{apellidoPaterno},
+			#{apellidoMaterno},
+			#{curp},
+			#{telContacto},
+			#{contrasenia},
+			2,
+			1,
+			#{idConfirmacion}
+						
+		) 
+	
+	</insert>
+
+
+	<insert id="crearUsuarioRol" parameterType="java.util.Map">
+		INSERT INTO USUARIO_ROL(
+			LLUSUARIO, 
+			LLROL
+		)
+		VALUES (
+			#{Usuario,	 	jdbcType=NUMERIC},
+			#{Rol, 			jdbcType=NUMERIC}
+		)
+	</insert>
+	
+	<insert id="crearUsuarioGrupo" parameterType="java.util.Map">
+		INSERT INTO USUARIO_GRUPOTRABAJO(
+			LLUSUARIO, 
+			LLGRUPOTRABAJO,
+			FCULTIMAASGNCN
+		)
+		VALUES (
+			#{Usuario,	 		jdbcType=NUMERIC},
+			#{Grupo, 			jdbcType=NUMERIC},
+			sysdate
+		)
+	</insert>	
+	<insert id="crearUsuarioOficina" parameterType="java.util.Map">
+		INSERT INTO USUARIO_OFICINA(
+			LLUSUARIO, 
+			LLOFICINA
+		)
+		VALUES (
+			#{Usuario,	 		jdbcType=NUMERIC},
+			#{Oficina, 			jdbcType=NUMERIC}
+		)
+	</insert>
+
+	<delete id="eliminarUsuarioRoles" parameterType="usuario">
+		DELETE from usuario_rol 
+		where usuario_rol.llusuario = #{id}
+	</delete>
+	<delete id="eliminarUsuarioGrupos" parameterType="usuario">
+		DELETE from usuario_grupotrabajo
+		where usuario_grupotrabajo.llusuario = #{id}
+	</delete>	
+	<delete id="eliminarUsuarioOficina" parameterType="usuario">
+		DELETE from usuario_oficina
+		where usuario_oficina.llusuario = #{id}
+	</delete>
+	
+	<update id="actualizar" parameterType="usuario">
+	UPDATE CTUSUARIOS 
+		SET	DSCORREO = #{correo},
+			DSNOMBRE = #{nombre}, 
+			DSAPELLIDOPATERNO = #{apellidoPaterno}, 
+			DSAPELLIDOMATERNO = #{apellidoMaterno}, 
+			DSRFC = #{rfc},
+			DSTELEFONO = #{telefono},
+			DSCURP = #{curp},
+			DSTELCONTACTO = #{telContacto}, 
+			DSJUSTIFICACION = #{justificacion jdbcType=CLOB},
+			FCMODIFICACION = #{fechaReactivacion},
+			LLESTATUSUSUA = #{estatus.id},
+			LLUSOHORARIO = #{husoHorarioDefecto},
+			DSFEA = #{fea},
+			LLFEDATARIO = #{fedatario.id}
+		WHERE LLUSUARIO = #{id}
+		
+	</update>
+	
+	<select 		id="consultarUsuario" parameterType="java.lang.String" resultMap="usuario">
+		SELECT
+			LLUSUARIO, 
+			DSCORREO, 
+			DSNOMBRE, 
+			DSAPELLIDOPATERNO, 
+			DSAPELLIDOMATERNO, 
+			DSRFC, 
+			DSTELEFONO,
+			DSCURP, 
+			DSTELCONTACTO, 
+			DSJUSTIFICACION, 
+			FCMODIFICACION,
+			LLESTATUSUSUA,
+			LLUSOHORARIO,
+			DSFEA,
+			CASE 
+			 WHEN LLFEDATARIO IS NULL THEN 0
+			 ELSE 1
+			END AS BOESFEDATARIO 
+		
+		 FROM CTUSUARIOS
+		WHERE LOWER((CTUSUARIOS.DSNOMBRE || ' ' || CTUSUARIOS.DSAPELLIDOPATERNO || ' ' || CTUSUARIOS.DSAPELLIDOMATERNO)) 
+		LIKE LOWER('%' || #{consulta} || '%')
+	</select>
+	
+	<select id="validarContrasenia" parameterType="usuario" resultType="java.lang.Boolean">
+		SELECT COUNT(DSCONTRASENIA)
+		FROM CTUSUARIOS 
+		WHERE LLUSUARIO = #{id} AND DSCONTRASENIA = #{contrasenia}
+	</select>
+	
+	<update id="actualizarIdentificacion" parameterType="usuario">
+		UPDATE CTUSUARIOS
+		<set>
+			<if test="contrasenia != ''">
+			    DSCONTRASENIA = #{nuevaContrasenia},
+			    FCACTUALIZCONTRAS = #{fechaModContrasenia},
+			</if>
+			<if test="mimeTypeFoto != null">
+			    BLFOTO = #{foto},
+			    DSMIMETYPEFOTO = #{mimeTypeFoto},
+			</if>
+				LLUSOHORARIO = #{husoHorario.id}
+		</set>
+		WHERE LLUSUARIO = #{id}
+	</update>
+	<select id="consultarPorCorreo" parameterType="java.lang.String" resultMap="usuario">
+	   SELECT * FROM CTUSUARIOS WHERE DSCORREO = #{value}
+	</select>	
+	<update id="actualizarEstatus"  parameterType="usuario">
+       UPDATE CTUSUARIOS SET LLESTATUSUSUA = #{estatus.id}
+              WHERE DSCORREO = #{correo}
+    </update>
+    
+<!-- 	(SELECT NOINTLOGIN + 1 FROM CTUSUARIOS WHERE LLUSUARIO = #{id}) -->
+    <update id="registrarIntentoLogin" parameterType="usuario" >
+        UPDATE CTUSUARIOS SET NOINTLOGIN = 1, 
+            FCULTINTLOGIN = #{ultimoIntentoLogin}
+            WHERE LLUSUARIO = #{id}
+    </update>   
+    <update id="reiniciarIntentosLogin" parameterType="usuario">
+        UPDATE CTUSUARIOS SET NOINTLOGIN = 1
+            WHERE LLUSUARIO = #{id}
+    </update>   
+    <update id="actualizarFeachaLogin" parameterType="usuario">
+        UPDATE CTUSUARIOS SET FCULTINTLOGIN = #{ultimoIntentoLogin}
+             WHERE LLUSUARIO = #{id}
+    </update>
+	<select id="validarAcceso" parameterType="usuario"  resultMap="usuario">
+		SELECT ctu.*,  ctuh.*, cteu.*
+            FROM CTUSUARIOS ctu
+                JOIN CTUSOHORARIO ctuh ON ctuh.LLUSOHORARIO = ctu.LLUSOHORARIO
+                JOIN CTESTATUSUSUA cteu ON cteu.LLESTATUSUSUA = ctu.LLESTATUSUSUA
+                WHERE ctu.DSCORREO = #{correo}
+                        AND ctu.DSCONTRASENIA = #{contrasenia}
+	</select>
+	
+	<select id="consulta" resultMap="usuarioRol">
+		SELECT LLUSUARIO, DSNOMBRE, DSAPELLIDOPATERNO, DSAPELLIDOMATERNO FROM CTUSUARIOS
+	</select>
+	
+	<select id="consultaUsuariosFedatario" resultMap="usuarioRol" parameterType="java.util.List">
+		SELECT 
+		CTUSUARIOS.LLUSUARIO,
+		CTUSUARIOS.DSNOMBRE,
+		CTUSUARIOS.DSAPELLIDOPATERNO,
+		CTUSUARIOS.DSAPELLIDOMATERNO
+		FROM CTUSUARIOS  
+		WHERE LLFEDATARIO IS NOT NULL 
+		 AND LLUSUARIO in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item.id}
+		</foreach>
+	</select>
+	
+	<select id="consultarPorCurp" parameterType="java.lang.String" resultMap="usuarioAutoservicioMap">
+		SELECT * FROM CTUSUARIOS WHERE DSCURP = #{curp}
+	</select>
+	<update id="activarUsuarioAutoservicio" parameterType="usuario">
+		UPDATE CTUSUARIOS SET LLESTATUSUSUA = 1
+             WHERE LLUSUARIO = #{id} 
+	</update>
+	<select id="obtenerSiguienteNoConfirmacion" resultType="java.lang.Long">
+	  SELECT  CTUSUARIOS_CRCODCONFIRMACION.nextval from dual
+	</select>
+	
+	<select id="validarAdmonNacional" parameterType="usuario" resultType="java.lang.Boolean">
+		SELECT COUNT(U.LLFEDATARIO)
+		FROM CTUSUARIOS U
+		WHERE U.LLUSUARIO = #{id}
+	</select>
+	<select id="consultaUsuarioPorOficina" resultMap="usuarioGrupo">
+		SELECT CTUSUARIOS.LLUSUARIO,
+		CTUSUARIOS.DSNOMBRE,
+		CTUSUARIOS.DSAPELLIDOPATERNO,
+		CTUSUARIOS.DSAPELLIDOMATERNO 
+		  FROM CTUSUARIOS
+		  JOIN USUARIO_OFICINA ON CTUSUARIOS.LLUSUARIO = USUARIO_OFICINA.LLUSUARIO
+		 WHERE LLOFICINA = #{id}	  
+	</select>
+	
+	<resultMap 		id="usuario" type="usuario">
+	
+		<result property="id" 					column="LLUSUARIO"/>
+		<result property="nombre"		 		column="DSNOMBRE" />
+		<result property="apellidoPaterno" 		column="DSAPELLIDOPATERNO" />
+		<result property="apellidoMaterno" 		column="DSAPELLIDOMATERNO" />
+		<result property="correo" 				column="DSCORREO" />
+		<result property="foto"					column="BLFOTO"/>
+		<result property="contrasenia" 			column="DSCONTRASENIA" />
+		<result property="rfc"					column="DSRFC"/>
+		<result property="telefono"				column="DSTELEFONO"/>
+		<result property="correo"				column="DSCORREO"/>
+		<result property="curp"					column="DSCURP"/>
+		<result property="telContacto"			column="DSTELCONTACTO"/>
+		<result property="justificacion"		column="DSJUSTIFICACION"/>
+		<result property="fechaReactivacion"	column="FCMODIFICACION"/>
+		<result property="fea"					column="DSFEA"/>
+		<result property="ultimoIntentoLogin"   column="FCULTINTLOGIN"/>
+		<result property="intentosLogin"   column="NOINTLOGIN"/>
+		<result property="esFedatario"	   column="BOESFEDATARIO" />
+		
+		
+
+		<association property="husoHorario" javaType="husoHorario" column="LLUSOHORARIO" resultMap="husoHorario" />
+		<association property="estatus" javaType="estatusUsuario" column="LLESTATUSUSUA" resultMap="estatusUsuario" />
+	</resultMap>
+	<resultMap id="husoHorario" type="husoHorario">
+		<id 	property="id"				column="LLUSOHORARIO"/>
+		<result property="nombre" 			column="DSNOMBRE" />
+		<result property="descripcion" 		column="DSDESCRIPCION" />
+		<result property="noDiferencia" 	column="NODIFERENCIA" />
+	</resultMap>
+	<resultMap id="usuarioRol"	type="usuario">
+		<result property="id"					column="LLUSUARIO"			javaType="Integer"	jdbcType="NUMERIC"/>
+		<result property="nombre"				column="DSNOMBRE"			javaType="String"	jdbcType="VARCHAR"/>
+		<result property="apellidoPaterno" 		column="DSAPELLIDOPATERNO"	javaType="String"	jdbcType="VARCHAR"/>
+		<result property="apellidoMaterno" 		column="DSAPELLIDOMATERNO"	javaType="String"	jdbcType="VARCHAR"/>
+	</resultMap>
+	<resultMap id="estatusUsuario" type="estatusUsuario">
+        <id     property="id"                   column="LLESTATUSUSUA"/>
+        <result property="descripcion"               column="DSESTATUSUSUA" />
+    </resultMap>
+    <resultMap id="usuarioAutoservicioMap" type="usuario">
+		<result property="curp"					column="DSCURP"/>
+    </resultMap>    
+       
+	<resultMap type="usuario" id="usuarioConOficinasResult">
+		<id     property="id"			   column="LLUSUARIO"			javaType="Integer"	jdbcType="NUMERIC"/>
+		<result property="nombre"		   column="DSNOMBRE"			javaType="String"	jdbcType="VARCHAR"/>
+		<result property="apellidoPaterno" column="DSAPELLIDOPATERNO"	javaType="String"	jdbcType="VARCHAR"/>
+		<result property="apellidoMaterno" column="DSAPELLIDOMATERNO"	javaType="String"	jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	
+	<resultMap id="usuarioGrupo"	type="usuario">
+		<result property="id"					column="LLUSUARIO"			javaType="Integer"	jdbcType="NUMERIC"/>
+		<result property="nombre"				column="DSNOMBRE"			javaType="String"	jdbcType="VARCHAR"/>
+		<result property="apellidoPaterno" 		column="DSAPELLIDOPATERNO"	javaType="String"	jdbcType="VARCHAR"/>
+		<result property="apellidoMaterno" 		column="DSAPELLIDOMATERNO"	javaType="String"	jdbcType="VARCHAR"/>
+	</resultMap>
+	
+</mapper>

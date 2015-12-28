@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.componente.ComponenteDAO">
+    <!-- Sección selects -->
+    <select id="consultar" resultMap="componente">
+       SELECT * FROM CTCOMPONENTES
+    </select>
+    <select id="consultarCamposDeComponentePorElemento" resultMap="cfCampoComponente">
+       SELECT * FROM CFCAMPOCOMP campoComp
+               JOIN CTCAMPOCOMP ct ON ct.llcampocompo = campoComp.llcampocompo               
+              WHERE campoComp.llelemento = #{value}
+    </select>
+    <select id="consultarCampoCaratulaPorElemento" resultMap="cfComponenteCaratula">
+        SELECT * FROM CFCOMPCARATULA car
+              JOIN CTCAMPOCOMP ct ON ct.llcampocompo = car.llcampocompo               
+              WHERE llelemento = #{value}
+    </select>
+    <!-- Fin sección selects -->
+    
+    <!-- Sección inserts -->
+    <insert id="crearComponenteElemento">
+        INSERT INTO COMP_ELEM (LLELEMENTO, LLCOMPONENTE) VALUES(#{idElemento},#{idComponente})
+    </insert>
+    <insert id="crearCampoComponente" parameterType="elemento">
+        INSERT INTO CFCAMPOCOMP (LLCOMPONENTE, LLELEMENTO, LLCAMPOCOMPO, LLCAMPOCOMP)
+               VALUES(#{idComponete},#{idCfElemento},#{ctCampoComponente.id},CFCAMPOCOMP_SEQ.nextval)
+    </insert>
+    <insert id="crearCampoComponenteCaratula" parameterType="elemento">
+        INSERT INTO CFCOMPCARATULA (LLELEMENTO, LLCOMPONENTE, LLCAMPOCOMPO, BOPOBLARCAR, BOACTUALIZACAR)
+               VALUES (#{id},#{componenteElemento.ctComponente.id},#{componenteElemento.cfComponenteCaratula.ctCampoComponente.id},#{componenteElemento.cfComponenteCaratula.poblarCaratula},#{componenteElemento.cfComponenteCaratula.actualizaCaratula})
+    </insert>    
+    <!-- Fin sección inserts -->
+    
+    <!-- Sección deletes -->
+    <delete id="eliminarCampoComponente">
+        DELETE CFCAMPOCOMP WHERE  LLELEMENTO = #{value}
+    </delete>
+    <delete id="eliminarCampoCaratula">
+        DELETE CFCOMPCARATULA WHERE  LLELEMENTO = #{value}
+    </delete>
+    <delete id="eliminarComponenteElemento">
+        DELETE COMP_ELEM WHERE  LLELEMENTO = #{value}
+    </delete>
+    <!-- Fin sección deletes -->
+    <!-- Sección de updates -->
+    <update id="actualizarComponenteCaratula" parameterType="elemento">
+       UPDATE CFCOMPCARATULA SET LLCAMPOCOMPO = #{componenteElemento.cfComponenteCaratula.ctCampoComponente.id}, BOPOBLARCAR = #{componenteElemento.cfComponenteCaratula.poblarCaratula}, BOACTUALIZACAR = #{componenteElemento.cfComponenteCaratula.actualizaCaratula}
+               WHERE LLELEMENTO = #{id}
+    </update>
+    <!-- Fin de sección upudates -->
+    <!-- Sección resultMaps -->
+    <resultMap type="cfCampoComponente" id="cfCampoComponente">
+        <id column="LLCAMPOCOMP" property="idCfCampoComponente"/>
+        <result column="LLCOMPONENTE" property="idComponete"/>
+        <result column="LLELEMENTO" property="idCfElemento"/>
+        
+        <association property="ctCampoComponente" javaType="campoComponente" column="LLCAMPOCOMPO" resultMap="ctCampoComponente" />
+        <!-- ctcampocomponente -->
+    </resultMap>
+    <resultMap type="cfComponenteCaratula" id="cfComponenteCaratula">
+        <result column="LLELEMENTO" property="idElementoCaratula"/>
+        <result column="LLCOMPONENTE" property="idComponenteCaratula"/>
+        <result column="BOPOBLARCAR" property="poblarCaratula"/>
+        <result column="BOACTUALIZACAR" property="actualizaCaratula"/>
+        
+        <association property="ctCampoComponente" javaType="campoComponente" column="LLCAMPOCOMPO" resultMap="ctCampoComponente" />
+    </resultMap>
+    <resultMap type="componente"      id="componente">
+         <id column="LLCOMPONENTE"      property="id"/>
+         <result column="DSCOMPONENTE"  property="nombre"/>
+    </resultMap>
+    <resultMap type="campoComponente" id="ctCampoComponente">
+        <id column="LLCAMPOCOMPO" property="id"/>
+        <result column="DSNOMBRE" property="nombre"/>
+    </resultMap>
+    <!-- fin de sección resultMaps -->
+</mapper>

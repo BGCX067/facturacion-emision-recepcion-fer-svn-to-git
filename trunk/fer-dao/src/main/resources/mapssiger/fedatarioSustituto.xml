@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.fedatariosustituto.FedatarioSustitutoDAO">
+	
+	<resultMap id="fedatarioSustituto" type="fedatarioSustituto">
+		<result property="id" column="LLFEDATARIOSUST"/>
+		<result property="fedatarioSustituido.id" column="LLFEDATSUSTITUIDO"/>
+		<result property="motivo" column="DSMOTIVO"/>
+		<result property="fechaInicio" column="FCINICIO"/>
+		<result property="fechaFin" column="FCFIN"/>
+		<result property="fedatarioSustituto.id" column="LLFEDATSUSTITUTO"/>
+		<result property="fedatarioSustituto.numero" column="CRNUMERO"/>
+		<result property="fedatarioSustituto.nombre" column="DSNOMBRE"/>
+		<result property="permanente" column="BOPERMANENTE"/>
+	</resultMap>
+	
+	<insert id="crear" parameterType="fedatarioSustituto">
+		INSERT INTO FEDATARIO_SUSTITUTO(
+			LLFEDATARIOSUST,
+			LLFEDATSUSTITUIDO,
+			DSMOTIVO,
+			FCINICIO,
+			FCFIN,
+			LLFEDATSUSTITUTO,
+			BOPERMANENTE
+		)
+		VALUES (
+			FEDATARIOSUSTITUTO_SEQ.NEXTVAL,
+			#{fedatarioSustituido.id},
+			#{motivo},
+			#{fechaInicio},
+			#{fechaFin},
+			#{fedatarioSustituto.id},
+			#{permanente}
+		)
+	</insert>
+	
+	<select id="consultarPorId" parameterType="fedatarioSustituto" resultMap="fedatarioSustituto">
+		SELECT * 
+		FROM FEDATARIO_SUSTITUTO 
+		WHERE LLFEDATARIOSUST = #{id}
+	</select>
+	
+	<select id="consultarPorFedatarioSustituido" parameterType="fedatario" resultMap="fedatarioSustituto">
+		SELECT FEDATARIO_SUSTITUTO.LLFEDATARIOSUST,
+		      FEDATARIO_SUSTITUTO.LLFEDATSUSTITUIDO,
+		      FEDATARIO_SUSTITUTO.DSMOTIVO,
+		      FEDATARIO_SUSTITUTO.FCINICIO,
+		      FEDATARIO_SUSTITUTO.FCFIN,
+		      FEDATARIO_SUSTITUTO.LLFEDATSUSTITUTO,
+		      FEDATARIO_SUSTITUTO.BOPERMANENTE,
+		      CTFEDATARIOS.CRNUMERO,
+		      CTFEDATARIOS.DSNOMBRE
+		FROM FEDATARIO_SUSTITUTO 
+		JOIN CTFEDATARIOS
+		ON FEDATARIO_SUSTITUTO.LLFEDATSUSTITUTO = CTFEDATARIOS.LLFEDATARIO
+		WHERE LLFEDATSUSTITUIDO = #{id}
+	</select>
+	
+	<update id="modificar" parameterType="fedatarioSustituto">
+		UPDATE FEDATARIO_SUSTITUTO
+		SET	LLFEDATSUSTITUIDO = #{fedatarioSustituido.id},
+			DSMOTIVO = #{motivo},
+			FCINICIO = #{fechaInicio},
+			FCFIN = #{fechaFin},
+			LLFEDATSUSTITUTO = #{fedatarioSustituto.id},
+			BOPERMANENTE = #{permanente}
+		WHERE LLFEDATARIOSUST = #{id}
+	</update>
+</mapper>

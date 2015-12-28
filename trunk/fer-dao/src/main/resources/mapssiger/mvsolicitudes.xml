@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.solicitud.SolicitudDAO">
+
+    <resultMap type="Solicitud" id="listaSolicitudes">
+		<result column="LLSOLICITUD" property="llsolicitud" />
+		<result column="LLPAGO" property="llpago" />
+		<result column="LLUSUARIO" property="llusuario" />
+		<result column="FCINGRESO" property="fcingreso" />
+		<result column="CRSOLICITANTE" property="crsolicitante" />
+		<result column="LLFEDATARIO" property="llfedatario" />
+		<result column="LLTIPOSOLICITUD" property="lltiposolicitud" />
+		<result column="NOCONTINUIDAD" property="nocontinuidad" />
+		<result column="DSOBSERVACIONES" property="dsobservaciones" />
+		<result column="LLESTATUS" property="llestatus" />
+		<result column="DSNCI" property="dsnci" />
+
+	</resultMap>
+	
+	<resultMap type="mvsolicitud" id="solicitudes">
+		<id property="id" column="LLSOLICITUD"/> 
+     	<result property="fechaIngreso" column="FCINGRESO"/>
+    	<result property="nci" column="DSNCI"/>
+    	<result property="solicitante" column="CRSOLICITANTE"/>
+    	<association property="mvpagos" javaType="pago" column="LLPAGO" resultMap="pagoMap" />
+    	<association property="fedatario" javaType="fedatario" column="LLFEDATARIO" resultMap="fedatarioMap" />
+    	<association property="tipoSolicitud" javaType="tipoSolicitud" column="LLTIPOSOLICITUD" resultMap="tipoSolicitudMap" />
+    	<association property="estatus" javaType="ctestatus" column="LLESTATUS" resultMap="estatusMap" />
+    	<association property="oficina" javaType="oficinas" column="LLOFICINA" resultMap="oficinaMap"></association>   	 	 	 	
+    	<collection property="solFrmPre" javaType="ArrayList" ofType="solfrmpre" column="LLSOLFRMPRE" resultMap="solfrmpreMap" />
+        <collection property="solicitudCaratulafmes" javaType="ArrayList" ofType="solicitudcaratulafme" column="LLSOLICITUD" resultMap="solicitudcaratulafmeMap" />
+        <collection property="dtDocumento" javaType="ArrayList" ofType="documento" column="LLDOCUMENTO" resultMap="documentoMap" />
+	</resultMap>
+	
+	<resultMap type="fedatario" id="fedatarioMap">
+    	<id property="id" column="LLFEDATARIO"/>
+    	<result property="numero" column="CRNUMERO"/>
+    	<result property="nombre" column="DSNOMBRE"/>
+    	<result property="apellidoPaterno" column="DSAPELLIDOPATERNO"/>
+    	<result property="apellidoMaterno" column="DSAPELLIDOMATERNO"/>
+    </resultMap>
+	
+	 <resultMap type="tipoSolicitud" id="tipoSolicitudMap">
+    	<id property="id" column="LLTIPOSOLICITUD"/>
+    	<result property="nombre" column="DSTIPOSOLICITUD"/>
+    	<result property="activo" column="BOACTIVO"/>
+    </resultMap>
+
+	<resultMap type="ctestatus" id="estatusMap">
+    	<id property="id" column="LLESTATUS"/>
+    	<result property="nombre" column="DSESTATUS"/>
+    	<result property="activo" column="BOACTIVO"/>
+    </resultMap>
+    
+    <resultMap type="pago" id="pagoMap">
+    	<id property="id" column="LLPAGO"/>
+    	<result property="descripcionPago" column="DSPAGO"/>
+    	<result property="monto" column="NOMONTO"/>
+    	<collection property="monedero" javaType="ArrayList" ofType="movimientoMonedero" column="LLMOVMONEDERO" resultMap="mvMonederoMap"></collection>
+    </resultMap>
+    
+    <resultMap type="movimientoMonedero" id="mvMonederoMap">
+    	<id property="id" column="LLMOVMONEDERO"/>
+    	<result property="idPago" column="LLPAGO"/>
+    	<association property="monedero" javaType="monedero" column="LLMONEDEROELEC" resultMap="monederoMap" />
+    </resultMap>
+    
+    <resultMap type="monedero" id="monederoMap">
+    	<id property="id" column="LLMONEDEROELEC"/>
+    	<result property="saldoDisponible" column="NOSALDO"/>
+    	<result property="saldoReservado" column="NOSALDORESERVADO"/>
+    </resultMap>
+    
+    <resultMap type="solfrmpre" id="solfrmpreMap">
+    	<id property="id" column="LLSOLFRMPRE"/>
+    	<association property="cfDefFormaPrecodificada" javaType="deffrmpre" column="LLDEFFRMPRE" resultMap="deffrmpreMap" />
+    	<collection property="mvFormasActos" javaType="ArrayList" ofType="mvformaacto" column="LLSOLFRMPRE" resultMap="mvformaactoMap" />
+    </resultMap>
+    
+    <resultMap type="mvformaacto" id="mvformaactoMap">
+    	<id property="id" column="LLMVFRMACTO"/>
+    	<result property="fcIngreso" column="FCINGRESO"/>
+    	<result property="fcInscripcion" column="FCINSCRIPCION"/>
+    	<result property="aceptado" column="BOACEPTADO"/>
+    	<association property="estado" javaType="estadoActo" column="llestdoacto" resultMap="estdoActoMap" />
+       	<association property="formaActo" javaType="formasactos" column="LLFORMAACTO" resultMap="formasactosMap" />    	
+    </resultMap>
+    
+    <resultMap type="deffrmpre" id="deffrmpreMap">
+    	<id property="id" column="LLDEFFRMPRE" />		
+		<association property="formaPrecodificada" javaType="formaPreCodificada" column="LLCATFRMPRE" resultMap="formaPreCodificadaMap" />
+    </resultMap>
+    
+    <resultMap type="estadoActo" id="estdoActoMap">
+    	<id property="id"       column="LLESTDOACTO"/>
+    	<result  property="nombre"   column="DSESTADOACTO"/>
+    </resultMap>
+    
+    <resultMap type="formaPreCodificada" id="formaPreCodificadaMap">
+    	<id property="pkFormaPreCodificada" column="LLCTFRMPRE"/>
+    	<result property="titulo" column="DSFRMPRECOD"/>
+    	<result property="clave" column="DSFRMPRECLAVE"/>
+    </resultMap>
+    
+   <resultMap type="solicitudcaratulafme" id="solicitudcaratulafmeMap">
+       <association property="mvSolicitud" javaType="mvsolicitud" column="LLSOLICITUD" resultMap="solicitudMap"/>
+       <association property="caratula" javaType="caratula" column="LLCARATULA" resultMap="caratulaMap"/>
+   </resultMap>
+   
+   <resultMap type="caratula" id="caratulaMap">
+        <id property="llcaratula" column="LLCARATULA"/>
+    	<result property="crfme" column="CRFME"/>
+    	<result property="dsdensocial" column="DSDENSOCIAL"/>
+   </resultMap>
+   
+   <resultMap type="mvsolicitud" id="solicitudMap">
+        <id property="id" column="LLSOLICITUD"/>
+    	
+   </resultMap>
+   
+   <resultMap type="formasactos" id="formasactosMap">
+    	<association property="acto" javaType="ctacto" column="LLACTO" resultMap="actoMap" />
+    </resultMap>
+    
+     <resultMap type="ctacto" id="actoMap">
+    	<id property="id" column="LLACTO"/>
+    	<result property="nombre" column="DSACTO"/>
+    	<result property="nombreCorto" column="DSACTOCORTA"/>
+    	<result property="fcModificacion" column="FCMODIFICACION"/>
+    	<result property="activo" column="BOACTIVO"/>    	
+    </resultMap>  
+    
+    <resultMap type="documento" id="documentoMap">
+    	<id property="id" column="LLDOCUMENTO"/>
+    	<result property="folio" column="NOFOLIO"/>
+    </resultMap>
+    
+    <resultMap type="oficinas" id="oficinaMap">
+    	<id property="id" column="LLOFICINA"/>
+    	<result property="nombre" column="DSOFICINA"/>
+    </resultMap>
+	
+    <select id="consultaSolicitudes" resultMap="listaSolicitudes">	
+	
+	    select LLSOLICITUD, LLPAGO, LLUSUARIO, FCINGRESO, CRSOLICITANTE, LLFEDATARIO, LLTIPOSOLICITUD, NOCONTINUIDAD, DSOBSERVACIONES, LLESTATUS, DSNCI
+	    from MVSOLICITUDES WHERE DSNCI IS NOT NULL
+	    <if test="nci != null and nci != ''">
+			and DSNCI LIKE '%' || #{nci} || '%' 
+		</if>
+		<if test="fechaIngrIn != null and fechaIngrIn != '' ">
+			<if test="fechaIngrFn != null and fechaIngrFn != '' ">			
+				and FCINGRESO between #{fechaIngrIn} and #{fechaIngrFn}
+			</if>
+		</if>
+	    
+
+	</select>
+	
+	<select id="consultarSolicitudesPorNCI" resultType="java.lang.Integer" parameterType="java.lang.String">
+		SELECT COUNT(*) 
+		FROM MVSOLICITUDES
+		WHERE DSNCI = #{dsnci}
+	</select>
+	
+	<select id="consultarPorNciFmeFedatarioFechas" resultMap="solicitudes">
+		SELECT MVSOL.*,CTFED.*,MVFRMPRE.*,FRMPRE.*,CTES.*,MVCARAT.*, CTTIPOSOL.*,      
+       			CTACTO.*,FRMA.*,AFRM.*,EDOACTO.*,MVPAG.*, DTDOC.*	   
+	   	FROM MVSOLICITUDES MVSOL, DTCOMPFEDA COMPF, CTFEDATARIOS CTFED, MVPAGOS MVPAG, DTDOCUMENTOS DTDOC, CTTIPOSOLICITUDES CTTIPOSOL,
+	   		MVSOLFRMPRE MVFRMPRE, CFDEFFRMPRE DFFRMPRE, CTFRMPRE FRMPRE, MVFRMACTO FRMA, CTESTADOSACTO EDOACTO, FORMAS_ACTOS AFRM,
+	   		CTACTOS CTACTO, CTESTATUS CTES, SOLICITUD_CARATULAFME SOLICARATFME, MVCARATULAS MVCARAT
+	   	
+           WHERE MVSOL.LLCOMPFEDA = COMPF.LLCOMPFEDA
+	       AND COMPF.LLFEDPUBLICO = CTFED.LLFEDATARIO
+	       AND MVSOL.LLPAGO = MVPAG.LLPAGO
+	       AND MVSOL.LLSOLICITUD = DTDOC.LLSOLICITUD
+	       AND MVSOL.LLTIPOSOLICITUD = CTTIPOSOL.LLTIPOSOLICITUD
+	       AND MVSOL.LLSOLICITUD = MVFRMPRE.LLSOLICITUD
+	       AND MVFRMPRE.LLDEFFRMPRE = DFFRMPRE.LLDEFFRMPRE
+	       AND DFFRMPRE.LLCATFRMPRE = FRMPRE.LLCTFRMPRE
+	       AND MVFRMPRE.LLSOLFRMPRE = FRMA.LLSOLFRMPRE
+	       AND EDOACTO.LLESTDOACTO = FRMA.LLESTDOACTO  
+		   AND FRMA.LLFORMAACTO = AFRM.LLFORMAACTO 
+		   AND AFRM.LLACTO = CTACTO.LLACTO 
+	       AND MVSOL.LLESTATUS = CTES.LLESTATUS
+	       AND MVSOL.LLSOLICITUD = SOLICARATFME.LLSOLICITUD
+	       AND MVCARAT.LLCARATULA = SOLICARATFME.LLCARATULA
+    	<if test="nci != null and nci != '' ">
+			AND UPPER(DSNCI) LIKE UPPER('%' || #{nci} || '%')
+		</if>
+		<if test="fme != null and fme != '' ">
+			AND UPPER(MVCARAT.CRFME) LIKE UPPER('%' || #{fme} || '%')
+		</if>
+		<if test="idFedatario != null and idFedatario != '' ">
+			AND CTFED.LLFEDATARIO = #{idFedatario}
+		</if>
+		<if test="fecha1 != null and fecha1 != '' and fecha2 != null and fecha2 != '' ">
+			AND MVSOL.FCINGRESO BETWEEN #{fecha1} AND #{fecha2}
+		</if>
+		ORDER BY MVSOL.LLSOLICITUD
+	</select>
+	
+	<select id="consultarEstadoActosPorId" resultMap="solicitudes">
+        SELECT *
+	    FROM MVSOLICITUDES S, MVSOLFRMPRE SF, MVFRMACTO FA, CTESTADOSACTO E
+	    WHERE SF.LLSOLICITUD = S.LLSOLICITUD
+	    AND SF.LLSOLFRMPRE = FA.LLSOLFRMPRE
+	    AND FA.LLESTDOACTO = E.LLESTDOACTO
+	    AND S.LLSOLICITUD = #{id}
+	</select>
+	
+	<select id="consultarMonederoPorId" resultMap="solicitudes">
+		SELECT S.*, P.*,M.*,ME.*
+		FROM MVSOLICITUDES S 
+		JOIN MVPAGOS P ON S.LLPAGO = P.LLPAGO
+		JOIN MVMONEDERO M ON M.LLPAGO = S.LLPAGO
+		JOIN MVMONEDEROELEC ME ON ME.LLMONEDEROELEC = M.LLMONEDEROELEC
+		WHERE S.LLSOLICITUD = #{id}
+		AND M.LLMOVMONEDERO = (SELECT MAX(LLMOVMONEDERO)
+								FROM MVMONEDERO WHERE LLPAGO = 
+								(SELECT P.LLPAGO FROM MVPAGOS P, MVSOLICITUDES S 
+									WHERE P.LLPAGO = S.LLPAGO 
+									AND S.LLSOLICITUD = #{id}))
+		
+	</select>
+	
+	<update id="actualizarIdEntrega" parameterType="mvsolicitud">
+		UPDATE MVSOLICITUDES
+		SET	LLENTREGA = #{idEntrega}
+		WHERE LLSOLICITUD = #{idSolicitud}
+	</update>
+	
+	<!--  mis consultas -->
+	
+	
+	
+	<!-- resultMap type="caratula" id="caratulaMap">
+        <id property="llcaratula" column="LLCARATULA"/>
+    	<result property="crfme" column="CRFME"/>
+    	<result property="dsdensocial" column="DSDENSOCIAL"/>
+   </resultMap>
+	
+	<select id="consultaFmes" parameterType="java.lang.long" resultMap="caratulaMap">
+		select mvcarat.* 
+		from mvcaratulas mvcarat
+		join solicitud_caratulafme solfme on mvcarat.llcaratula =solfme.llcaratula 
+		join mvsolicitudes mvsol on solfme.llsolicitud=mvsol.llsolicitud
+		join dtcompfeda dtcomp on mvsol.llcompfeda=dtcomp.llcompfeda
+		join ctfedatarios ctfed on dtcomp.llfedpublico=ctfed.llfedatario
+		where
+		<if test="id != null and id != 0">
+	    	ctfed.llfedatario = #{id}
+	    </if>
+	</select-->
+	
+</mapper>

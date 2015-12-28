@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.boleta.BoletaDAO">
+	
+	<resultMap id="boleta" type="boleta">
+		<result property="id" column="LLBOLETA"/>
+		<result property="mvSolicitud.id" column="LLSOLICITUD"/>
+		<result property="ctTipoBoleta.id" column="LLTIPOBOLETA"/>
+		<result property="noBoleta" column="NOBOLETA"/>
+		<result property="fcExpedicion" column="FCEXPEDICION"/>
+		<result property="xmlBoleta" column="XMLBOLETA"/>
+	</resultMap>
+	
+	<select id="consultarPorNumeroBoleta" parameterType="boleta" resultMap="boleta">
+		SELECT * 
+		FROM ENBOLETAS
+		WHERE NOBOLETA = #{noBoleta}
+	</select>
+	
+	<insert id="crear" parameterType="boleta" keyColumn="LLBOLETA" keyProperty="id"  useGeneratedKeys="true">
+		INSERT INTO ENBOLETAS(
+			LLBOLETA,
+			LLSOLICITUD,
+			LLTIPOBOLETA,
+			NOBOLETA,
+			FCEXPEDICION,
+			XMLBOLETA
+		)
+		VALUES(
+			ENBOLETAS_LLBOLETA_SEQ.NEXTVAL,
+			#{mvSolicitud.id},
+			#{ctTipoBoleta.id},
+			#{noBoleta},
+			#{fcExpedicion},
+			#{xmlBoleta}
+		)
+	</insert>
+
+	<!-- Query que obtiene los tipos de boleta que tiene una solicitud. -->
+	<select id="consultaTiposBoletasPorSolicitud" resultMap="tipoBoletaMap">
+		SELECT cttipob.LLTIPOBOLETA, cttipob.DSTIPOBOLETA
+		FROM mvsolicitudes mvsol 
+    	JOIN enboletas enbol on mvsol.llsolicitud = enbol.llsolicitud
+    	JOIN cttipoboletas cttipob on enbol.lltipoboleta = cttipob.lltipoboleta
+    	<where>
+        	<if test="idSolicitud != null">
+            	AND mvsol.LLSOLICITUD = #{idSolicitud}
+			</if>
+		</where>
+		GROUP BY cttipob.LLTIPOBOLETA, cttipob.DSTIPOBOLETA
+    	ORDER BY cttipob.LLTIPOBOLETA
+    </select>
+    
+    <resultMap id="tipoBoletaMap" type="cttipoboleta">
+		<id     property="id"     column="LLTIPOBOLETA"/>
+		<result property="nombre" column="DSTIPOBOLETA"/>
+		<result property="activo" column="BOACTIVO"/>
+	</resultMap>
+	
+</mapper>

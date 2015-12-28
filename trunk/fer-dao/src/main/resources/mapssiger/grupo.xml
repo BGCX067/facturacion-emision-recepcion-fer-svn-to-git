@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.grupo.GrupoDAO">
+
+	<select 	id="consulta" resultMap="grupo" parameterType="oficinas">
+		SELECT
+		LLGRUPOTRABAJO, DSGRUPOTRABAJO 
+		FROM CTGRUPOSTRABAJO
+		WHERE LLOFICINA = #{id}
+		
+	</select>
+	
+	<select 	id="consultaUsuarioGrupo" resultMap="grupo" parameterType="usuario">
+		SELECT usuario_grupotrabajo.llusuario, usuario_grupotrabajo.llgrupotrabajo, ctusuarios.dsnombre, ctgrupostrabajo.dsgrupotrabajo from usuario_grupotrabajo
+		inner join ctgrupostrabajo on usuario_grupotrabajo.llgrupotrabajo = ctgrupostrabajo.llgrupotrabajo
+		inner join ctusuarios on usuario_grupotrabajo.llusuario = ctusuarios.llusuario
+		WHERE ctusuarios.llusuario = #{id}
+		
+	</select>
+	<resultMap 	id="grupo" type="grupo">
+	
+		<result property="id" 				column="LLGRUPOTRABAJO"		jdbcType="NUMERIC"	javaType="java.lang.Integer"/>
+		<result property="nombreGrupo" 		column="DSGRUPOTRABAJO"  	jdbcType="VARCHAR"  javaType="java.lang.String"/>
+		
+	</resultMap>
+	
+	
+	
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"	
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:head />
+	<h:body>
+     	<ui:composition template="#{pageContext.request.contextPath}/xhtml/layout/common/layout.xhtml" >
+     		<ui:define name="content">
+				<h:form enctype="multipart/form-data" id="uploadForm">
+					 <div align="center" style="width:100%">
+						    <p:panelGrid style="margin-top:20px;width:100%">  							   
+							<p:row>  
+							        <p:column> <h:outputLabel value="Documento XML"/></p:column>   
+							  
+							        <p:column> 
+								        <p:fileUpload label="Documento XML" 
+													value="#{facturaMB.xml}" 
+													mode="simple" id="xml"
+													tipo="xml"
+													disabled="false" >
+								        	<f:validator validatorId="uploadValidator" />
+								        </p:fileUpload>
+								        <p:message  for="xml"/>
+							        </p:column>    
+							  							          
+							    </p:row>  					
+							
+							<p:row>  
+							        <p:column> <h:outputLabel value="Documento PDF"/></p:column>   							  
+							        <p:column> 
+								          <p:fileUpload label="Documento PDF" 
+												  value="#{facturaMB.pdf}" 
+												  mode="simple" id="pdf"
+												  tipo="pdf"
+												  disabled="false" >
+								        	<f:validator validatorId="uploadValidator" />
+								        </p:fileUpload>
+								        <p:message  for="pdf"/>
+							        </p:column>    
+							  							          
+							    </p:row> 
+							    
+							    <p:row>  
+							        <p:column> <h:outputLabel value="Archivo Zip"/></p:column>   							  
+							        <p:column> 
+									     <p:fileUpload label="Archivo Zip" 
+									value="#{facturaMB.zip}" 
+									mode="simple" id="zip" 
+									disabled="false" >
+								        	<f:validator validatorId="uploadValidator" />
+								        </p:fileUpload>
+								        <p:message  for="zip"/>
+							        </p:column>						
+							    </p:row>				        	
+					</p:panelGrid>	
+					</div>
+			        <p:growl id="messages" showDetail="true" />
+					<h:commandButton class="boton_principal" actionListener="#{facturaMB.upload}" value="#{messageSource['boton.guardar']}" ajax="false"></h:commandButton>
+				</h:form>
+			</ui:define>
+     	</ui:composition>
+     </h:body>	
+</html>

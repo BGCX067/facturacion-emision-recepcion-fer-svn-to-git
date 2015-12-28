@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.beltsoft.jim.fer.dao.FacturaDAO">
+
+	<insert id="insertar" parameterType="factura" useGeneratedKeys="true" keyColumn="IDFACTURA" keyProperty="idFactura">
+	    INSERT INTO ctfactura (RFCEMISOR,RFCRECEPTOR,UUID,ACUSEESTADO,ACUSECODIGO,FECHAEMISION,FECHACREACION,FECHATIMBRADO,XML,PDF)
+		VALUES(#{rfcEmisor},#{rfcReceptor},#{uuid},#{acuseEstado},#{acuseCodigo},#{fechaEmision},#{fechaCreacion},#{fechaTimbrado},#{xml},#{factura})	    
+	</insert>
+	
+	<select id="selectFilter" resultMap="facturaMap" parameterType="factura">
+	    SELECT IDFACTURA, RFCEMISOR, RFCRECEPTOR, UUID, ACUSEESTADO, ACUSECODIGO, 
+	    	   FECHAEMISION, FECHACREACION, FECHATIMBRADO
+		FROM ctfactura	    
+	</select>
+	
+	<resultMap type="factura" id="facturaMap">
+		<id column="IDFACTURA" property="idFactura" javaType="Integer" jdbcType="NUMERIC" />
+		<result column="RFCEMISOR" property="rfcEmisor" javaType="String" jdbcType="VARCHAR" />
+		<result column="RFCRECEPTOR" property="rfcReceptor" javaType="String" jdbcType="VARCHAR" />
+		<result column="UUID" property="uuid" javaType="String" jdbcType="VARCHAR" />
+		<result column="ACUSEESTADO" property="acuseEstado" javaType="String" jdbcType="VARCHAR" />
+		<result column="ACUSECODIGO" property="acuseCodigo" javaType="String" jdbcType="VARCHAR" />		
+		<result column="FECHAEMISION" property="fechaEmision" javaType="Date"	jdbcType="DATE"/>
+		<result column="FECHACREACION" property="fechaCreacion" javaType="Date"	jdbcType="DATE"/>
+		<result column="FECHATIMBRADO" property="fechaTimbrado" javaType="Date"	jdbcType="DATE"/>
+<!-- 		<result column="XML" property="xml" javaType="byte[]"	jdbcType="LONGVARCHAR"/> -->
+<!-- 		<result column="PDF" property="factura" javaType="byte[]"	jdbcType="BLOB"/> -->
+	</resultMap>
+	
+</mapper>

@@ -1,0 +1,302 @@
+@font-face { font-family: 'trajan'; src: url(#{resource['fonts/trajan_pro_regular-webfont.eot']}); src: url(#{resource['fonts/trajan_pro_regular-webfont.eot?#iefix']}) format("embedded-opentype"), url(#{resource['fonts/trajan_pro_regular-webfont.woff']}) format("woff"), url(#{resource['fonts/trajan_pro_regular-webfont.ttf']}) format("truetype"), url(#{resource['fonts/trajan_pro_regular-webfont.svg#TrajanProRegular']}) format("svg"); font-weight: normal; font-style: normal; }
+
+article,aside,details,figcaption,figure,
+footer,header,hgroup,menu,nav,section { 
+    display:block;
+}
+
+h1, h2, h3, h4, h5, h6, .label_h4
+{
+   margin: 0;
+   padding: 0;
+   font-family: "trajan", serif;   
+   text-transform: capitalize;
+}
+
+h1, h2, h3, h4, .label_h4
+{
+    color: #BA2025;   
+}
+
+.label_h4{
+	font-weight: bold;
+}
+
+.float_right{
+	float: right;
+}
+
+ a
+{
+   font-style: normal;
+   font-weight: bold;
+   text-decoration: none;
+   color: #515151;
+}
+
+ a:link
+{
+   font-style: normal;
+   font-weight: bold;
+   text-decoration: none;
+   color: #515151;
+}
+
+ a:visited,  a.visited
+{
+   text-decoration: underline;
+   color: #515151;
+}
+
+a:hover,  a.hover
+{
+   text-decoration: none;
+   color: #BA2025;
+}
+
+.ui-widget button.ui-button.ui-button-text-only ,button,input[type="submit"],input[type="button"],input[type="reset"] {
+	color: #ffffff;
+	height: 26px;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	-khtml-border-radius: 20px;
+	border-radius: 20px;
+	width: 132px;
+	border: 0 none;
+	background: #999999 url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_999999_40x100.png']}") 50% 50% repeat-x;    
+	cursor: pointer; 
+	margin: 5px;
+}
+
+.ui-widget button.ui-button.ui-button-text-only.boton_principal, button.boton_principal,input[type="submit"].boton_principal,input[type="button"].boton_principal,input[type="reset"].boton_principal {
+    background: #E9E9EB url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_007733_40x100.png']}") 50% 50% repeat-x;    
+}    
+
+.ui-widget button.ui-button.ui-button-text-only:hover, button:hover,input[type="submit"]:hover,input[type="button"]:hover,input[type="reset"]:hover,
+button:active,input[type="submit"]:active,input[type="button"]:active,input[type="reset"]:active{
+     background: #BA2025 url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_BA2025_40x100.png']}") 50% 50% repeat-x;    
+}
+
+
+.ui-widget button.ui-button.ui-button-text-only:disabled, button:disabled,input[type="submit"]:disabled,input[type="button"]:disabled,input[type="reset"]:disabled{
+    border: 1px solid rgb(153, 153, 153);
+    color: rgb(153, 153, 153);
+    cursor: default;    
+    background: #D3D3D3 url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_D3D3D3_40x100.png']}") 50% 50% repeat-x;    
+}
+
+
+.ui-widget-header .ui-state-active {
+    border: 1px solid #e3a1a1;
+    background: #BA2025 url("#{resource['primefaces-sesiger:images/ui-bg_highlight-soft_15_BA2025_1x100.png']}") 50% 50% repeat-x;
+    font-weight: normal;
+    color: #FFFFFF;
+}
+
+.ui-widget-header .ui-state-active a {    
+    color: #FFFFFF;
+}
+
+.ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
+	border: 1px solid #e3a1a1;
+	background: #BA2025 url("#{resource['primefaces-sesiger:images/ui-bg_highlight-soft_15_BA2025_1x100.png']}") 50% 50% repeat-x;
+	color: #FFFFFF;
+	font-weight: normal;
+}
+
+
+div.derechos_reservados{
+	border-top-style:Double;
+	border-bottom-style:Double;
+	border-top-width:3px;
+	border-bottom-width:3px;
+	border-top-color:#DEDEDE;
+	border-bottom-color:#DEDEDE;
+	padding-top: 15px;padding-right: 0px;
+	padding-bottom: 15px;padding-left: 0px;	
+	font-size: 14px;
+}
+
+.error {
+border: 1px solid #BA2025;
+}
+
+#indicador-usuario {
+	padding-top: 15px;
+	float: right;
+}
+
+#indicador-usuario form img {
+	vertical-align: bottom;
+	width: 16px;
+	height: 16px;	
+}
+
+#indicador-usuario form a {
+	font-style: italic;
+	font-weight: bold;
+	color: #BA2025;
+}
+
+/*modificaciones a tema de primefaces
+*/
+
+.ui-breadcrumb {
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	padding: 5px 5px 7px 5px;
+	background-color: transparent;
+	background-image: none;
+	border: none;	
+	font-family: "Times new roman", serif;	
+}
+
+.ui-breadcrumb > ul > li:first-of-type {
+	background-image: none;
+	width:0;
+}
+
+
+.ui-breadcrumb > ul > li:nth-of-type(2)  {
+	background-image: none;
+	width:0;
+}
+
+.ui-breadcrumb > ul > li:last-of-type {
+	text-transform: uppercase;
+	font-family: "trajan", serif;	
+}
+
+ .ui-panelgrid td {
+    border-style: none;
+    text-align: left;
+}
+
+.ui-panelgrid tr {
+    border-style: none;
+}
+
+.ui-panelgrid .ui-panelgrid td {
+	padding: 0;
+}
+
+
+.ui-panelgrid-footer .ui-widget-header {
+    background: #eeeeee url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_eeeeee_40x100.png']}") 50% 50% repeat-x;    
+}
+
+.ui-paginator {
+	background: #D3D3D3 url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_D3D3D3_40x100.png']}") 50% 50% repeat-x;
+}
+
+ .ui-tabs {
+	position: relative;
+	padding: 0;
+	zoom: 1;
+}
+
+.ui-tabs.ui-tabs-top > .ui-tabs-nav {
+    padding: 0;
+}
+
+.ui-tabs.ui-tabs-top > .ui-tabs-nav li {
+    border: 0;
+    margin: 0;
+    top: 0;
+}
+
+.ui-radiobutton {
+	border: none;
+}
+
+.ui-state-active .ui-radiobutton-icon , .ui-state-active .ui-chkbox-icon ,
+.ui-state-default .ui-radiobutton-icon , .ui-state-default .ui-chkbox-icon ,
+.ui-state-highlight .ui-radiobutton-icon ,.ui-state-highlight .ui-chkbox-icon ,
+.ui-radiobutton-icon, .ui-chkbox-icon {
+	background-image: url("#{resource['primefaces-sesiger:images/ui-icons_BA2025_256x240.png']}");
+}
+
+ 
+
+.ui-chkbox {
+    border: none;
+}
+
+.ui-datatable table tbody td {
+	background: transparent;
+	border-top:inherit;
+    border-bottom:inherit;
+    border-left:none;
+    border-right:none;
+}
+
+.ui-datatable table tbody td.ui-state-highlight {
+    background: transparent;
+    border-top:inherit;
+    border-bottom:inherit;   
+    border-left:none;
+    border-right:none;
+}
+ 
+.ui-datatable tr {
+    background: #FAFAFA url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_FAFAFA_40x100.png']}") 50% 50% repeat-x;
+    border-top:1px solid #eeeeee;
+    border-bottom:1px solid #eeeeee;    
+    border-left:none;
+    border-right:none;
+}
+
+.ui-datatable tr.ui-state-highlight {
+    background: #EEEEEE url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_eeeeee_40x100.png']}") 50% 50% repeat-x;
+    border-top:1px solid #eeeeee;
+    border-bottom:1px solid #eeeeee;  
+    border-left:none;
+    border-right:none;  
+}
+      
+
+.ui-datatable table thead th, .ui-datatable table thead th.ui-state-default {
+    background: #333333 url("#{resource['primefaces-sesiger:images/ui-bg_flat_0_333333_40x100.png']}") 50% 50% repeat-x;
+    color: #DADADA;
+}
+
+.ui-picklist .ui-picklist-list {
+	background: #FAFAFA url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_FAFAFA_40x100.png']}") 50% 50% repeat-x;
+	    
+}
+
+.ui-picklist .ui-picklist-list .ui-picklist-item{
+    background: inherit;
+    border-top:1px solid #eeeeee;
+    border-bottom:1px solid #eeeeee;  
+    border-left:none;
+    border-right:none; 
+    margin-top: -1px;
+    margin-bottom: 0px; 
+}
+
+.ui-picklist .ui-picklist-list .ui-picklist-item.ui-state-highlight{
+	background: #EEEEEE url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_eeeeee_40x100.png']}") 50% 50% repeat-x;
+}
+
+.ui-picklist .ui-picklist-list .ui-picklist-item.ui-state-hover{
+    background: #f6f6f6 url("#{resource['primefaces-sesiger:images/ui-bg_flat_100_f6f6f6_40x100.png']}") 50% 50% repeat-x;
+}
+
+.ui-icon-alert.ui-confirm-dialog-severity{
+	background-image: url("#{resource['primefaces-sesiger:images/ui-icons_BA2025_256x240.png']}");	
+}
+
+
+/* begin: jQuery UI Datepicker moving pixels fix */
+	table.ui-datepicker-calendar {border-collapse: separate;}
+	.ui-datepicker-calendar td {border: 1px solid transparent;}
+/* end: jQuery UI Datepicker moving pixels fix */
+
+/* begin: jQuery UI Datepicker emphasis on selected dates */
+.ui-datepicker .ui-datepicker-calendar .ui-state-highlight a {
+	background: #743620 none; /* a color that fits the widget theme */
+	color: white; /* a color that is readeable with the color above */
+}
+/* end: jQuery UI Datepicker emphasis on selected dates */

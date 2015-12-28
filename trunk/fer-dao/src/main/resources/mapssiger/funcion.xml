@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.funcion.FuncionDAO">
+	<select id="consultar" resultMap="funcionMap">
+		SELECT * FROM CTFUNCIONES
+		ORDER BY LLFUNCION
+	</select>
+	<select id="consultarPorFormaPrecodificadaPorActo" resultMap="actoMap">
+	   SELECT acto.*, func.*, paramfunc.LLPARAMFUNCION, paramfunc.DSNOMBRE  DSNOMBREPAR, paramfunc.DSCODIGO,paramfunc.LLFUNCION,td.*  FROM CTACTOS acto
+              JOIN CTACTOS_CTFUNC actofun ON actofun.LLACTO = acto.LLACTO
+              JOIN CTFUNCIONES func ON func.LLFUNCION = actofun.LLFUNCION
+              JOIN CFPARAMFUNCION paramfunc ON paramfunc.LLFUNCION = func.LLFUNCION
+              JOIN CTTIPODATOPF td ON td.LLTIPODATOPF =  paramfunc.LLTIPODATOPF
+           WHERE acto.LLCTFRMPRE = #{value}       
+               ORDER BY acto.LLACTO,func.LLFUNCION, paramfunc.LLPARAMFUNCION
+	</select>
+	<delete id="eliminarFuncionesPorActo" parameterType="java.util.Map">
+	    DELETE FROM CTACTOS_CTFUNC WHERE LLFUNCION IN 
+	    <foreach item="item" collection="funcionesDelete" open="(" close=")" separator=",">
+	    #{item.id, jdbcType=NUMERIC}
+        </foreach>
+	     AND LLACTO = #{acto.id, jdbcType=NUMERIC}
+	</delete>
+	<insert id="insertarFuncionesPorActo" parameterType="java.util.Map">
+        INSERT ALL
+	    <foreach item="item" collection="funcionesInsert" >
+	    INTO CTACTOS_CTFUNC (LLACTO, LLFUNCION) VALUES (#{acto.id, jdbcType=NUMERIC},#{item.id, jdbcType=NUMERIC})
+        </foreach> 
+        SELECT * FROM dual
+	</insert>
+	<resultMap type="ctacto" id="actoMap">
+        <id property="id" column="LLACTO"/>
+        <result property="nombre" column="DSACTO"/>
+        <result property="nombreCorto" column="DSACTOCORTA"/>
+        <result property="fcModificacion" column="FCMODIFICACION"/>
+        <result property="activo" column="BOACTIVO"/>
+        
+        <collection property="funciones" column="LLFUNCION" javaType="ArrayList" ofType="funcion" resultMap="funcionMap"></collection>
+    </resultMap>
+	<resultMap type="funcion" id="funcionMap">
+		<id column="LLFUNCION" property="id" javaType="Integer" jdbcType="NUMERIC" />
+		<result column="DSNOMBRE" property="nombre" javaType="String" jdbcType="VARCHAR" />
+		
+		<collection property="parametros" column="LLPARAMFUNCION" javaType="ArrayList" ofType="ctParametroFuncion" resultMap="ctParametroFuncion"></collection>
+	</resultMap>
+	<resultMap type="ctParametroFuncion" id="ctParametroFuncion">
+        <result column="LLPARAMFUNCION" property="id"/>
+        <result column="DSNOMBREPAR" property="nombre"/>
+        <result column="DSCODIGO" property="codigo"/>
+        
+        <association property="tipoDato" javaType="ctTipoDatoPf" column="LLTIPODATOPF" resultMap="ctTipoDatoPf" />
+    </resultMap>
+    <resultMap type="ctTipoDatoPf" id="ctTipoDatoPf">
+        <id column="LLTIPODATOPF" property="id"/>
+        <result column="DSTIPODATOPF" property="nombre"/>
+    </resultMap>
+</mapper>

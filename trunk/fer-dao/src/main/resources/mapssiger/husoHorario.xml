@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.husohorario.HusoHorarioDAO">
+
+	<select id="consultar" resultMap="husoHorario">
+		SELECT LLUSOHORARIO, DSNOMBRE
+		FROM CTUSOHORARIO
+	</select>
+
+	<resultMap id="husoHorario" type="husoHorario">
+
+		<result property="id" column="LLUSOHORARIO" jdbcType="NUMERIC"
+			javaType="java.lang.Integer" />
+		<result property="nombre" column="DSNOMBRE" jdbcType="VARCHAR"
+			javaType="java.lang.String" />
+
+	</resultMap>
+
+	<resultMap type="ctHusoHorario" id="husoHorarios">
+		<result property="id" column="LLUSOHORARIO" javaType="java.lang.Long" jdbcType="NUMERIC"/>
+		<result property="nombre" column="DSNOMBRE" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<result property="descripcion" column="DSDESCRIPCION" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		<result property="diferencia" column="NODIFERENCIA" javaType="java.math.BigDecimal" jdbcType="NUMERIC"/>
+	</resultMap>
+	
+	<select id="consultarHusosHorarios" resultMap="husoHorarios">
+		SELECT * FROM CTUSOHORARIO
+	</select>
+
+</mapper>

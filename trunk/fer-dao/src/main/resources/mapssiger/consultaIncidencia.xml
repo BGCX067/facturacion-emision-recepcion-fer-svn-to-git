@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.consultaincidencia.ConsultaIncidenciaDAO">
+    
+      
+      <select id="todasIncidencias" resultMap="mvSolicitudMap">  
+    						SELECT mvsol.*,
+		       ctfed.*,
+		       cttiposol.*,
+		       cte.*,
+		       cto.*,
+		       dtdoc.*,
+		       mvfrmpre.*,
+		       dffrmpre.*,
+		       frmpre.*,
+		       ctes.*
+		FROM mvsolicitudes mvsol JOIN ctfedatarios ctfed
+		ON mvsol.llfedatario = ctfed.llfedatario JOIN cttiposolicitudes cttiposol 
+		ON mvsol.lltiposolicitud = cttiposol.lltiposolicitud JOIN ctetapas cte
+		ON mvsol.lletapa = cte.lletapa JOIN ctoficinas cto
+		ON mvsol.lloficina = cto.lloficina JOIN dtdocumentos dtdoc
+		ON mvsol.llsolicitud = dtdoc.llsolicitud JOIN mvsolfrmpre mvfrmpre
+		ON mvsol.llsolicitud = mvfrmpre.llsolicitud JOIN cfdeffrmpre dffrmpre
+		ON mvfrmpre.lldeffrmpre = dffrmpre.lldeffrmpre JOIN ctfrmpre frmpre
+		ON dffrmpre.llcatfrmpre = frmpre.llctfrmpre JOIN ctestatus ctes
+		ON mvsol.llestatus = ctes.llestatus
+		
+		JOIN FORMAS_ELEMENTOS frele ON frele.LLDEFFRMPRE=mvfrmpre.lldeffrmpre
+		JOIN ACTOS_FORMAS acfrm ON frele.LLELEMENTO=acfrm.LLELEMENTO
+		JOIN CTACTOS ctact ON acfrm.LLACTO=ctact.LLACTO
+  	</select>  
+     
+      <select id="filtradoIncidencias" resultMap="solicitudMap">  
+		select LLSOLICITUD,FCINGRESO,CRSOLICITANTE,NOCONTINUIDAD,DSOBSERVACIONES,DSNCI
+		from MVSOLICITUDES
+	</select>  
+    
+      
+    <resultMap type="solicitud" id="solicitudMap">
+        <id column="LLSOLICITUD" property="id" javaType="Integer" jdbcType="NUMERIC" />        
+        <result column="FCINGRESO" property="fechaIngreso" javaType="Date" jdbcType="DATE" />
+        <result column="CRSOLICITANTE" property="solicitante" javaType="String" jdbcType="VARCHAR" />
+        <result column="NOCONTINUIDAD" property="numContinuidad" javaType="Integer" jdbcType="NUMERIC" />
+        <result column="DSOBSERVACIONES" property="observaciones" javaType="String" jdbcType="VARCHAR" />        
+        <result column="DSNCI" property="nci" javaType="String" jdbcType="VARCHAR" />                    
+        <!-- <collection column="LLTIPOSOLICITUD" property="tipoSolicitud" javaType="tipoSolicitud" resultMap="tipoSolicitudMap" />    -->            
+    </resultMap>
+    
+    <!-- <resultMap type="tipoSolicitud" id="tipoSolicitudMap">
+        <id column="LLTIPOSOLICITUD" property="dsTipoSolicitud" javaType="Integer" jdbcType="NUMERIC" />
+        <result column="DSTIPOSOLICITUD" property="dsTipoSolicitud" javaType="String" jdbcType="VARCHAR" />
+        <result column="BOACTIVO" property="activoInactivo" javaType="Boolean" jdbcType="CHAR" />        
+    </resultMap> -->
+    
+    <resultMap type="mvsolicitud" id="mvSolicitudMap">
+    	<id property="id" column="LLSOLICITUD"/>
+    	<result property="fechaIngreso" column="FCINGRESO"/>
+    	<result property="nci" column="DSNCI"/>
+    	<association property="fedatario" javaType="fedatario" column="LLFEDATARIO" resultMap="fedatarioMap" />
+    	<association property="tipoSolicitud" javaType="tipoSolicitud" column="LLTIPOSOLICITUD" resultMap="tipoSolicitudMap" />
+    	<association property="etapa" javaType="etapa" column="LLETAPA" resultMap="etapaMap" />
+    	<association property="oficina" javaType="oficinas" column="LLOFICINA" resultMap="oficinasMap" /> 
+    	<association property="estatus" javaType="ctestatus" column="LLESTATUS" resultMap="estatusMap" />   	
+    	<collection property="dtDocumento" javaType="ArrayList" ofType="documento" column="LLDOCUMENTO" resultMap="documentoMap" />
+    	<collection property="solFrmPre" javaType="ArrayList" ofType="solfrmpre" column="LLSOLFRMPRE" resultMap="solfrmpreMap" />    	
+    </resultMap>
+    
+    <resultMap type="fedatario" id="fedatarioMap">
+    	<id property="id" column="LLFEDATARIO"/>
+    	<result property="numero" column="CRNUMERO"/>
+    	<result property="nombre" column="DSNOMBRE"/>
+    	<result property="apellidoPaterno" column="DSAPELLIDOPATERNO"/>
+    	<result property="apellidoMaterno" column="DSAPELLIDOMATERNO"/>
+    </resultMap>
+    
+    <resultMap type="tipoSolicitud" id="tipoSolicitudMap">
+    	<id property="id" column="LLTIPOSOLICITUD"/>
+    	<result property="nombre" column="DSTIPOSOLICITUD"/>
+    	<result property="activo" column="BOACTIVO"/>
+    </resultMap>
+    
+    <resultMap type="etapa" id="etapaMap">
+    	<id property="id" column="LLETAPA"/>
+    	<result property="nombre" column="dsnombreetapa."/>
+    	<result property="etapa" column="DSETAPA"/>
+    	<result property="activo" column="BOACTIVO"/>
+    </resultMap>
+    
+    <resultMap type="oficinas" id="oficinasMap">
+    	<id property="id" column="LLOFICINA" />
+    	<result property="nombre" column="DSOFICINA"/>
+    </resultMap>
+    
+    <resultMap type="ctestatus" id="estatusMap">
+    	<id property="id" column="LLESTATUS"/>
+    	<result property="nombre" column="DSESTATUS"/>
+    	<result property="activo" column="BOACTIVO"/>
+    </resultMap>
+    
+    <resultMap type="documento" id="documentoMap">
+    	<id property="id" column="LLDOCUMENTO"/>
+    	<result property="folio" column="NOFOLIO"/>
+    </resultMap>
+    
+    <resultMap type="solfrmpre" id="solfrmpreMap">
+    	<id property="id" column="LLSOLFRMPRE"/>
+    	<association property="cfDefFormaPrecodificada" javaType="deffrmpre" column="LLDEFFRMPRE" resultMap="deffrmpreMap" />
+    </resultMap>
+    
+    <resultMap type="deffrmpre" id="deffrmpreMap">
+    	<id property="id" column="LLDEFFRMPRE" />		
+		<association property="formaPrecodificada" javaType="formaPreCodificada" column="LLCATFRMPRE" resultMap="formaPreCodificadaMap" />
+    </resultMap>
+    
+    <resultMap type="formaPreCodificada" id="formaPreCodificadaMap">
+    	<id property="pkFormaPreCodificada" column="LLCTFRMPRE"/>
+    	<result property="titulo" column="DSFRMPRECOD"/>
+    	<result property="clave" column="DSFRMPRECLAVE"/>
+    </resultMap>
+    
+</mapper>
+    

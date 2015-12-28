@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<body>
+	<ui:composition
+		template="#{pageContext.request.contextPath}/xhtml/layout/common/layout.xhtml">
+		<ui:define name="menu">
+     			&nbsp;     				
+     	</ui:define>
+     	<ui:define name="header">
+               &nbsp;                  
+        </ui:define>
+        <ui:define name="breadcrumb">
+               &nbsp;                  
+        </ui:define>
+		<ui:define name="content">
+			<h:panelGroup>
+			   <h:form id="formulario">
+			           <pe:tooltip global="true" myPosition="left center"
+							atPosition="right center" forSelector=".ui-state-error" />
+						<p:panelGrid  style="margin-left: 35%;width:30%" >
+					    <p:row>
+					       <p:column colspan="2">
+	                            <h2><h:outputText value="#{messageSource['login.ingreso.titulo']}" /></h2>
+	                       </p:column>
+	                    </p:row>
+                        <p:row>
+                            <p:column style="text-align: right;">
+                                <h:outputLabel for="usuario" value="#{messageSource['login.ingreso.usuario']}" style="text-align:right"/>
+                            </p:column>  
+                            <p:column style="text-align: left;">
+	                            <p:inputText value="#{loginMB.usuarioLogin.correo}" id="usuario" maxlength="50" size="35"
+	                                      required="true"
+	                                      requiredMessage="#{messageSource['login.ingreso.msg.usuarioRequerido']}"
+	                                      title="#{component.valid ? '' : loginMB.getErrorMessage(component.clientId)}"/>
+                            </p:column>  
+                        </p:row>
+						<p:row>
+						    <p:column style="text-align: right; ">
+						          <h:outputLabel for="contrasenia" value="#{messageSource['login.ingreso.contrasenia']}" style="text-align:right"/>
+						    </p:column>
+						     <p:column style="text-align: left;">
+						          <p:password value="#{loginMB.usuarioLogin.contrasenia}" id="contrasenia"  maxlength="100" size="35"
+                                            required="true"
+                                            requiredMessage="#{messageSource['login.ingreso.msg.contraseniaRequerida']}"
+                                            title="#{component.valid ? '' : loginMB.getErrorMessage(component.clientId)}"  />
+                            </p:column>
+						</p:row>
+						 <p:row>
+                           <p:column colspan="2">
+                                <h:commandButton value="#{messageSource['login.ingreso.ingresar']}" type="submit"  action="#{loginMB.login}" id="ingresarBtn" class="boton_principal float_right" />
+                           </p:column>
+                        </p:row>
+					</p:panelGrid>
+				</h:form>
+			</h:panelGroup>
+		</ui:define>
+		<ui:define name="footer">
+                &nbsp;                  
+        </ui:define>
+	</ui:composition>
+</body>
+</html>

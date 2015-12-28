@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.monedero.MonederoDAO">
+	<select id="consultaMonedero" parameterType="map" resultMap="monederoMap">
+		SELECT  *
+		FROM MVMONEDEROELEC M
+		JOIN DTLOCALIDADPAGO L
+		ON M.LLLOCALIDADPAGO = L.LLLOCALIDADPAGO
+		WHERE LLFEDATARIO = #{idFedatario}
+		AND M.LLLOCALIDADPAGO = #{idLocalidadPago} 
+	</select>
+	
+	<select id="consultarResumenMonedero" resultMap="monedero" >
+		SELECT M.NOSALDO, M.NOSALDORESERVADO, DSESTADO, M.LLLOCALIDADPAGO
+		FROM CTFEDATARIOS F, MVMONEDEROELEC M, CTESTADOS E
+		WHERE F.LLFEDATARIO = M.LLFEDATARIO
+		AND E.LLESTADO = F.LLESTADOADS
+		AND F.LLFEDATARIO = #{id}
+    	AND M.LLLOCALIDADPAGO = #{localidadPago.id}
+	</select>
+	
+	<select id="consultarResumenEstados" resultMap="monedero">
+        SELECT NOSALDO, NOSALDORESERVADO, L.LLESTADO, E.DSESTADO, M.LLLOCALIDADPAGO
+    	FROM MVMONEDEROELEC M, DTLOCALIDADPAGO L, CTESTADOS E
+    	WHERE M.LLLOCALIDADPAGO = L.LLLOCALIDADPAGO
+      	AND E.LLESTADO = L.LLESTADO
+    	AND LLFEDATARIO = #{id}
+      	AND L.LLLOCALIDADPAGO NOT IN (SELECT L.LLLOCALIDADPAGO
+      								FROM CTFEDATARIOS F, MVMONEDEROELEC M, DTLOCALIDADPAGO L
+      								WHERE F.LLFEDATARIO = M.LLFEDATARIO
+      								AND F.LLESTADOADS = L.LLESTADO
+      								AND F.LLMUNICIPIOADS = L.LLMUNICIPIO
+     								AND F.LLFEDATARIO = #{id}
+  									GROUP BY L.LLLOCALIDADPAGO)
+	</select>
+	
+	<update id="actualizarSaldos" parameterType="map">
+		UPDATE MVMONEDEROELEC SET 
+			NOSALDO = #{nuevoSaldoDisponible}, 
+			NOSALDORESERVADO = #{nuevoSaldoReservado}
+			WHERE LLMONEDEROELEC = #{idMonedero}
+	</update>
+	
+	<resultMap type="monedero" id="monederoMap">
+		<id column="LLMONEDEROELEC" property="id" javaType="Long" jdbcType="NUMERIC" />
+		<result column="LLFEDATARIO" property="idFedatario" javaType="Long" jdbcType="NUMERIC" />				
+		<result column="NOSALDO" property="saldoDisponible" javaType="Double" jdbcType="NUMERIC" />
+		<result column="NOSALDORESERVADO" property="saldoReservado" javaType="Double" jdbcType="NUMERIC" />	
+		<association column="LLLOCALIDADPAGO" property="localidadPago" javaType="localidadPago"  resultMap="localidadPago" />	
+	</resultMap>
+	<resultMap id="localidadPago" type="localidadPago">
+		<id property="id" column="LLLOCALIDADPAGO"/>
+		<result property="municipio" column="LLMUNICIPIO" />
+		<result property="estado" column="LLESTADO" />
+		<result property="localidad" column="CRLOCALIDAD" />
+		<result property="validacion" column="BOVALIDACION" />
+	</resultMap>
+
+	<resultMap id="monedero" type="monedero">
+		<result property="id" column="LLMONEDEROELEC"/>
+		<result property="saldoDisponible" column="NOSALDO" />
+		<result property="saldoReservado" column="NOSALDORESERVADO" />
+		<result property="localidadPago.estado.nombre" column="DSESTADO"/>
+		<result property="localidadPago.id" column="LLLOCALIDADPAGO"/>
+	</resultMap>
+	
+</mapper>

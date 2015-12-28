@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.bitacora.BitacoraDAO">
+
+    <resultMap type="btsolicitud" id="listaBitacora">
+		<id     column="LLBTSOLICITUD"  property="id" />
+		<result column="LLSOLICITUD"    property="solicitud.id" />
+		<result column="LLUSUARIO"      property="usuario.id" />
+		<result column="LLGRUPOTRABAJO" property="grupoTrabajo.id" />
+		<result column="LLESTATUS"      property="etapa.id" />
+		<result column="FCESTATUS"      property="fechaEtapa" />
+		
+	</resultMap>
+	
+    <select id="consultaBitacora" resultMap="listaBitacora" parameterType="btsolicitud">	
+	    select LLBTSOLICITUD, LLSOLICITUD, LLESTATUS, FCESTATUS, LLUSUARIO, LLGRUPOTRABAJO
+	    from BTSOLICITUDES
+	    where  LLSOLICITUD = #{llsolicitud}		
+	</select>
+	
+    <select id="consultaEstatusBitacora" resultMap="listaBitacora" parameterType="btsolicitud">	
+	    select LLSOLICITUD, LLESTATUS, max(FCESTATUS) as FCESTATUS
+	    from BTSOLICITUDES
+	    where LLSOLICITUD is not null 
+	    and LLSOLICITUD = #{llsolicitud}		
+		and LLESTATUS = #{llestatus}
+		group by LLSOLICITUD, LLESTATUS
+	</select>
+
+	<select id="bitacoraAnalisis" parameterType="mvsolicitud" resultMap="BitacoraMap" >
+		SELECT bt.*
+		FROM btsolicitudes bt 
+		WHERE bt.FCETAPA= (select max(FCETAPA) from btsolicitudes where lletapa=4) 
+		and LLSOLICITUD=#{id}
+    </select>
+    
+    <select id="bitacoraCalificacion" parameterType="mvsolicitud" resultMap="BitacoraMap" >
+		SELECT bt.*
+		FROM btsolicitudes bt 
+		WHERE bt.FCETAPA= (select max(FCETAPA) from btsolicitudes where lletapa=1) 
+		and LLSOLICITUD=#{id}
+    </select>
+    
+    <resultMap type="btsolicitud" id="BitacoraMap">
+		<id     column="LLBTSOLICITUD"  property="id" />
+		<result column="LLSOLICITUD"    property="solicitud.id" />
+		<result column="LLUSUARIO"      property="usuario.id" />
+		<result column="LLGRUPOTRABAJO" property="grupoTrabajo.id" />
+		<result column="LLESTATUS"      property="etapa.id" />
+		<result column="FCETAPA"        property="fechaEtapa" />
+		<result column="DSMOTIVO"       property="motivo" />
+		
+	</resultMap>
+	
+	<!--  Query que inserta un registro en el historial o bitacora de las solicitudes. -->
+	<insert id="insertarRegistroEnBitacora" parameterType="btsolicitud" >
+		INSERT INTO BTSOLICITUDES (
+			llbtsolicitud,
+			llsolicitud,
+			llusuario,
+			llgrupotrabajo,
+			fcetapa,
+			lletapa,
+			dsmotivo,
+			llestatus
+		) VALUES ( 
+			btsolicitudes_SEQ.nextval,
+			#{solicitud.id},
+			#{usuario.id},
+			#{grupoTrabajo.id},
+			sysdate,
+			#{etapa.id},
+			#{motivo},
+			#{estatus.id}
+		)
+	</insert>
+
+</mapper>

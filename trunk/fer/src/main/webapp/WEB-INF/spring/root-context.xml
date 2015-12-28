@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd"
+	xmlns:p="http://www.springframework.org/schema/p" >
+	 
+	<!-- Scans the classpath of this application for @Components to deploy as beans -->
+	<context:component-scan base-package="com.beltsoft.jim.fer" />
+	<task:annotation-driven/>
+	<import resource="classpath:negocio-context.xml"/>	
+	<import resource="classpath:spring/spring-security.xml" />
+	
+	 
+	<bean id="messageSource" class="com.beltsoft.jim.fer.util.CustomReloadableResourceBundleMessageSource">
+		<property name="servletContext" ref="servletContext"></property>
+		<property name="customMessageSources" value="/WEB-INF/messageSource/**"/>		
+		 <property name="defaultEncoding" value="ISO-8859-1"/>
+      	<!-- Se deshabilita la recarga de archivos de propiedades para evitar
+      		carga innnecesaria al servidor -->
+        <property name="cacheSeconds" value="-1"/>
+	</bean>
+	<bean id="invalidaSesionScheduler" class="com.beltsoft.jim.fer.util.InvalidaSesionScheduler" />
+</beans>

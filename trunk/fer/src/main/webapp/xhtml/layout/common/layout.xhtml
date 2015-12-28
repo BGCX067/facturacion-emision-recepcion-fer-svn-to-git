@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      >
+    <h:head>
+    	<h:outputText value="&lt;!--[if lt IE 9]&gt;" escape="false" />
+    	<h:outputScript name="/js/html5shiv.js"></h:outputScript>
+    	<h:outputText value="&lt;![endif]--&gt;" escape="false" />    	
+    	<h:outputScript name="/js/jquery.validate.min.js"></h:outputScript>
+    	<h:outputScript name="/js/jquery.tooltipster.min.js"></h:outputScript>
+    </h:head>
+    <h:body>
+        <h:outputStylesheet name="css/tooltipster.css"/>
+        <h:outputStylesheet name="css/ferweb.css"/>
+        <h:outputStylesheet name="css/ferweb2.css"/>  
+        <h:outputStylesheet name="css/menu.css"/>
+    
+        <ui:insert name="notificaciones" >
+            <ui:include src="#{pageContext.request.contextPath}/xhtml/layout/common/commonGrowl.xhtml" />
+        </ui:insert>
+<!--         <ui:insert name="notificacionesCarga" > -->
+<!--             <ui:include src="#{pageContext.request.contextPath}/xhtml/cargaTrabajo/notificacionCarga.xhtml" /> -->
+<!--         </ui:insert>         -->
+		<div id="art-page-background-glare-wrapper">
+		    <div id="art-page-background-glare"></div>
+		</div>
+		<div id="page">		
+			<div id="art-main">
+			    <div class="cleared reset-box"></div>
+			    <div class="art-box art-sheet">
+			        <div class="art-box-body art-sheet-body">
+			        <header id="site-header">		
+			        				
+							<ui:insert name="header" >
+								<ui:include src="#{pageContext.request.contextPath}/xhtml/layout/common/commonHeader.xhtml" />
+							</ui:insert>					    
+					    
+						   	<ui:insert name="menu" >
+						   		<ui:include src="#{pageContext.request.contextPath}/xhtml/layout/common/commonMenu.xhtml" />
+						   	</ui:insert>
+						   	
+<!-- 						   	<ui:insert name="breadcrumb" > -->
+<!-- 						   		<ui:include src="#{pageContext.request.contextPath}/xhtml/layout/common/commonBreadcrumb.xhtml" /> -->
+<!-- 						   	</ui:insert> -->
+						   						    
+					 </header>
+					    <div id="content"  style="text-align:center">
+						   	<ui:insert name="content" >
+						   		<ui:include src="#{pageContext.request.contextPath}/xhtml/layout/common/commonContent.xhtml" />
+						   	</ui:insert>
+					    </div>
+					    <div id="footer" style="text-align:center">
+					    	<ui:insert name="footer" style="text-align:center">
+					    		<ui:include src="#{pageContext.request.contextPath}/xhtml/layout/common/commonFooter.xhtml" />
+					    	</ui:insert>
+				    	</div>
+				    </div>
+				</div>
+			</div>
+	    </div>    
+    </h:body>
+</html>

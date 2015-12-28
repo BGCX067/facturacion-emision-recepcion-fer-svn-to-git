@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.formasprecodificadas.FormaPreCodificadaDAO">
+    <resultMap type="formaPreCodificada" id="listaFormasCodificadas">
+        <result column="LLCTFRMPRE"       property="pkFormaPreCodificada" javaType="Long"     jdbcType="NUMERIC"/>
+        <result column="DSFRMPRECOD"      property="titulo"               javaType="String"   jdbcType="VARCHAR"/>
+        <result column="DSFRMPRECLAVE"    property="clave"                javaType="String"   jdbcType="VARCHAR"/>
+        <result column="BOACTIVO"         property="estatus"              javaType="Boolean"  jdbcType="CHAR" />
+        <result column="DSNOMFRMPRECOD"   property="descripcion"          javaType="String"   jdbcType="VARCHAR"/>
+		<collection property="actos" column="LLCTFRMPRE" ofType="ctacto" javaType="ArrayList" resultMap="actoMap"/>
+    </resultMap>
+    <resultMap type="deffrmpre" id="listaDefinicionFormaPrecodificada">
+        <result column="LLDEFFRMPRE"      property="id"               javaType="Long"         jdbcType="NUMERIC" />
+        <result column="NOVERSION"        property="noVersion"        javaType="Long"         jdbcType="NUMERIC" />
+        <result column="FCINICIO"         property="fcInicio"         javaType="Date"         jdbcType="DATE" />
+        <result column="FCFIN"            property="fcFin"            javaType="Date"         jdbcType="DATE" />
+        <result column="FCMODIFICACION"   property="fcModificacion"   javaType="Date"         jdbcType="DATE" />
+        <result column="DSINSTRUCCION"    property="instruccion"      javaType="String"       jdbcType="CLOB" />
+        <result column="BOACTIVOFORMA"    property="activo"           javaType="Boolean"      jdbcType="CHAR" />
+        
+        <association property="formaPrecodificada" javaType="formaPreCodificada" column="LLCATFRMPRE" resultMap="listaFormasCodificadas" />
+    </resultMap>
+    <select id="consultarCatalogo" resultMap="listaFormasCodificadas">
+        SELECT * 
+        FROM CTFRMPRE
+    </select>
+    
+    <select id="consultarPorClaveNombre" parameterType="formaPreCodificada" resultMap="listaFormasCodificadas">
+        SELECT LLCTFRMPRE, DSFRMPRECLAVE, DSFRMPRECOD
+        FROM CTFRMPRE
+        WHERE UPPER(DSFRMPRECLAVE) LIKE UPPER( '%' || #{texto} || '%' )
+        OR UPPER(DSFRMPRECOD) LIKE UPPER( '%' || #{texto} || '%' )
+    </select>
+    
+    <select id="consultar" resultMap="listaDefinicionFormaPrecodificada">
+        SELECT A.LLCTFRMPRE,A.DSFRMPRECOD,A.DSFRMPRECLAVE,B.DSINSTRUCCION, B.LLDEFFRMPRE FROM CTFRMPRE A, CFDEFFRMPRE B
+        WHERE B.LLCATFRMPRE = A.LLCTFRMPRE
+        ORDER BY LLDEFFRMPRE ASC
+    </select>
+    <resultMap type="elementoFormaPreCodificada" id="listaElementosFrmCod">
+        <result column="LLELEMENTO" property="pkElementoPreCodificado" javaType="Long" jdbcType="NUMERIC"/> 
+        <result column="DSCLAVE" property="id" javaType="String" jdbcType="VARCHAR"/>
+        <result column="DSNOMBRE" property="nombre" javaType="String" jdbcType="VARCHAR"/>
+        <result column="DSTEXTOAYUDA" property="tooltip" javaType="String" jdbcType="VARCHAR"/>
+        <result column="LLTIPOELEMENTO" property="tipo" javaType="Long" jdbcType="NUMERIC"/>
+        <result column="NOPOSICION" property="posicion" javaType="Integer" jdbcType="NUMERIC"/>
+    </resultMap>
+    <select id="consultarElementos" resultMap="listaElementosFrmCod" parameterType="deffrmpre" >
+        SELECT A.LLELEMENTO, A.DSCLAVE, A.DSNOMBRE,A.DSTEXTOAYUDA, B.LLTIPOELEMENTO, A.NOPOSICION 
+        FROM CFELEMENTOS A, CTTIPOELEMENTOS B, FORMAS_ELEMENTOS C  
+        WHERE B.LLTIPOELEMENTO = A.LLTIPOELEMENTO
+        AND C.LLELEMENTO = A.LLELEMENTO
+        AND C.LLDEFFRMPRE = #{id}
+        ORDER BY NOPOSICION ASC
+    </select>
+    <resultMap type="campoFormaPreCodificada" id="listaCamposFrmCod"> 
+        <result column="LLTIPOCAMPO" property="pkTipoCampo" javaType="Long" jdbcType="NUMERIC"/>
+        <result column="DSTIPOCAMPO" property="tipo" javaType="String" jdbcType="VARCHAR"/>
+        <result column="DSLEYENDA" property="leyenda" javaType="String" jdbcType="VARCHAR"/>
+        <result column="DSTEXTOAYUDA" property="maxChars" javaType="String" jdbcType="VARCHAR"/>
+        <result column="BOACEPTADEC" property="aceptaDecimales" javaType="Boolean" jdbcType="CHAR"/>
+        <result column="BOACEPTACOMAS" property="aceptaComas" javaType="Boolean" jdbcType="CHAR"/>
+        <result column="NOMINIMO" property="noMinimo" javaType="Integer" jdbcType="NUMERIC"/>
+        <result column="NOMAXIMO" property="noMaximo" javaType="Integer" jdbcType="NUMERIC"/>
+        <result column="NOMAXCARACTERES" property="maxChars" javaType="Integer" jdbcType="NUMERIC"/>
+        <result column="DSVERDADERO" property="verdadero" javaType="String" jdbcType="VARCHAR"/>
+        <result column="DSFALSO" property="falso" javaType="String" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="consultarCampo" resultMap="listaCamposFrmCod" parameterType="elementoFormaPreCodificada" >
+        SELECT A.LLTIPOCAMPO, B.DSTIPOCAMPO,A.NOMAXCARACTERES,A.BOACEPTACOMAS,A.BOACEPTADEC,A.NOMINIMO, A.NOMAXIMO, A.DSVERDADERO, A.DSFALSO,A.DSLEYENDA
+        FROM CFCAMPOS A, CTTIPOSCAMPOS B
+        WHERE B.LLTIPOCAMPO = A.LLTIPOCAMPO 
+        AND A.LLELEMENTO = #{pkElementoPreCodificado}
+    </select>
+    <resultMap type="columnaFormaPreCodificada" id="listaColumnaFrmCod">    
+        <result column="LLELEMENTO" property="elemento.pkElementoPreCodificado" javaType="Long" jdbcType="NUMERIC"/>
+        <result column="DSCLAVE" property="elemento.id" javaType="String" jdbcType="VARCHAR"/>
+        <result column="DSNOMBRE" property="elemento.nombre" javaType="String" jdbcType="VARCHAR"/>
+        <result column="DSTEXTOAYUDA" property="elemento.tooltip" javaType="String" jdbcType="VARCHAR"/>
+        <result column="LLTIPOELEMENTO" property="elemento.tipo" javaType="Long" jdbcType="NUMERIC"/>
+        <result column="DSTITULO" property="titulo" javaType="String" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="consultarColumnas" resultMap="listaColumnaFrmCod" parameterType="elementoFormaPreCodificada" >
+        SELECT A.LLELEMENTO,B.DSNOMBRE as DSTITULO, B.DSCLAVE, B.DSNOMBRE, B.DSTEXTOAYUDA,C.LLTIPOELEMENTO
+        FROM CFDEFCOLUMNAS A, CFELEMENTOS B,CTTIPOELEMENTOS C
+        WHERE B.LLELEMENTO = A.LLELEMENTO
+        AND C.LLTIPOELEMENTO = B.LLTIPOELEMENTO
+        AND A.LLELEMENTOTABLA = #{pkElementoPreCodificado}
+        ORDER BY B.NOPOSICION
+    </select>
+    <select id="consultarVersionesPorNombre" resultMap="listaDefinicionFormaPrecodificada"> 
+         SELECT  CTFP.LLCTFRMPRE, CTFP.DSFRMPRECOD, CTFP.DSFRMPRECLAVE,  DEFFP.LLDEFFRMPRE, DEFFP.NOVERSION, DEFFP.LLCATFRMPRE, DEFFP.FCMODIFICACION, DEFFP.FCINICIO,DEFFP.FCFIN,DEFFP.BOACTIVO, DEFFP.DSINSTRUCCION
+               FROM CTFRMPRE CTFP, CFDEFFRMPRE DEFFP
+                    WHERE CTFP.LLCTFRMPRE = DEFFP.LLCATFRMPRE
+                          AND ( LOWER(CTFP.DSFRMPRECOD) LIKE LOWER('%' || #{value} || '%')  OR LOWER(CTFP.dsfrmpreclave) LIKE LOWER('%' || #{value} || '%'))
+                          ORDER BY DSFRMPRECLAVE, NOVERSION ASC  
+    </select>
+	<select id="consultarFormasActosFunciones" resultMap="listaFormasCodificadas" parameterType="formaPreCodificada">
+		SELECT 
+		ctfp.LLCTFRMPRE, ctfp.DSFRMPRECOD, ctfp.DSFRMPRECLAVE, ctfp.DSNOMFRMPRECOD, ctfp.BOACTIVO,
+		cta.LLACTO, cta.DSACTO, cta.DSACTOCORTA, cta.BOACTIVO BOACTIVOACTO,
+		ctta.LLTIPOACTO, ctta.DSACTO DSTIPOACTO,
+		ctf.LLFUNCION, ctf.DSNOMBRE
+		FROM CTFRMPRE ctfp
+		LEFT JOIN CTACTOS cta ON ctfp.LLCTFRMPRE = cta.LLCTFRMPRE
+		LEFT JOIN CTTIPOACTO  ctta ON cta.LLTIPOACTO = ctta.LLTIPOACTO
+		LEFT JOIN CTACTOS_CTFUNC af ON cta.LLACTO = af.LLACTO
+		LEFT JOIN CTFUNCIONES ctf ON af.LLFUNCION = ctf.LLFUNCION
+		WHERE ctfp.DSFRMPRECOD LIKE '%' || #{titulo} || '%'
+		ORDER BY cta.LLACTO
+	</select>
+    <resultMap type="ctacto" id="actoMap">
+		<id column="LLACTO" property="id" javaType="Long" jdbcType="NUMERIC" />
+		<result column="DSACTO" property="nombre" javaType="String" jdbcType="VARCHAR" />
+		<result column="DSACTOCORTA" property="nombreCorto" javaType="String" jdbcType="VARCHAR" />
+		<result column="BOACTIVOACTO" property="activo" javaType="Boolean" jdbcType="CHAR" />
+		<result column="LLTIPOACTO" property="tipo.id" javaType="Integer" jdbcType="NUMERIC" />
+		<result column="DSTIPOACTO" property="tipo.descripcion" javaType="String" jdbcType="VARCHAR" />
+		<collection property="funciones" column="LLFUNCION" ofType="funcion" javaType="ArrayList" resultMap="funcionMap"/>
+	</resultMap>
+	<resultMap type="funcion" id="funcionMap">
+		<id column="LLFUNCION" property="id" javaType="Integer" jdbcType="NUMERIC" />
+		<result column="DSNOMBRE" property="nombre" javaType="String" jdbcType="VARCHAR" />
+	</resultMap>
+<!-- 	<resultMap type="variable" id="variableMap"> -->
+<!-- 		<id column=LLVARIABLE property="id" javaType="Integer" jdbcType="NUMERIC" /> -->
+<!-- 		<result column="DSNOMBREVARIABLE" property="nombre" javaType="String" jdbcType="VARCHAR" /> -->
+<!-- 		<result column="DSDESCRIPCION" property="descripcion" javaType="String" jdbcType="VARCHAR" /> -->
+<!-- 		<result column="BOVARIABLERANGO" property="variableRango" javaType="Boolean" jdbcType="CHAR" /> -->
+<!-- 		<result column="DSCODIGO" property="codigo" javaType="String" jdbcType="VARCHAR" /> -->
+<!-- 	</resultMap> -->
+	<select id="consultarFormaActiva" resultType="java.lang.Boolean" parameterType="formaPreCodificada">
+		SELECT COUNT(*)
+		FROM CTFRMPRE
+		WHERE LLCTFRMPRE != #{pkFormaPreCodificada} 
+		AND DSFRMPRECLAVE = #{clave} 
+		AND BOACTIVO = 1
+	</select>
+	<update id="modificarForma" parameterType="formaPreCodificada">
+		UPDATE CTFRMPRE SET
+		DSFRMPRECOD = #{titulo},
+		DSFRMPRECLAVE = #{clave},
+		BOACTIVO = #{estatus},
+		DSNOMFRMPRECOD = #{descripcion}
+		WHERE LLCTFRMPRE = #{pkFormaPreCodificada}
+	</update>
+	<update id="modificarEncabezadoDeVersion"  parameterType="deffrmpre">
+       UPDATE CFDEFFRMPRE SET dsinstruccion = #{instruccion jdbcType=CLOB}, FCINICIO = #{fcInicio}, fcmodificacion=SYSDATE
+                          WHERE LLDEFFRMPRE = #{id}
+    </update>
+	<insert id="crearForma" parameterType="formaPreCodificada" useGeneratedKeys="true" keyColumn="LLCTFRMPRE" keyProperty="pkFormaPreCodificada">
+	    INSERT INTO CTFRMPRE (LLCTFRMPRE, DSFRMPRECOD, DSFRMPRECLAVE, BOACTIVO, DSNOMFRMPRECOD)
+	    VALUES(CTFRMPRE_SEQ.NEXTVAL, #{titulo}, #{clave}, #{estatus}, #{descripcion})
+	</insert>
+    <resultMap type="seccionFormaPreCodificada" id="listaSeccionFrmCod">
+        <result column="LLELEMENTOSECCION" property="pkSeccionPreCodificado" javaType="Long" jdbcType="NUMERIC"/>    
+        <result column="BOACTIVABLE" property="activable" javaType="Boolean" jdbcType="BOOLEAN"/>
+    </resultMap>
+    <select id="consultarSeccion" resultMap="listaSeccionFrmCod" parameterType="elementoFormaPreCodificada" >
+        SELECT LLELEMENTOSECCION, BOACTIVABLE 
+        FROM CFSECCIONELEM 
+        WHERE LLELEMENTOSECCION = #{pkElementoPreCodificado}
+    </select>
+    <select id="consultarElementosDeSeccion" resultMap="listaElementosFrmCod" parameterType="seccionFormaPreCodificada" >
+        SELECT A.LLELEMENTO, B.DSCLAVE, B.DSNOMBRE, B.DSTEXTOAYUDA, C.LLTIPOELEMENTO
+        FROM SECCIONES_ELEMENTOS A, CFELEMENTOS B, CTTIPOELEMENTOS C
+        WHERE LLELEMENTOSECCION = #{pkSeccionPreCodificado}
+        AND B.LLELEMENTO = A.LLELEMENTO
+        AND C.LLTIPOELEMENTO = B.LLTIPOELEMENTO
+    </select>
+    <resultMap type="componenteFormaPreCodificada" id="listaComponenteFrmCod">
+        <result column="LLCAMPOCOMP" property="pkComponentePreCodificado" javaType="Long" jdbcType="NUMERIC"/>    
+        <result column="DSNOMBRE" property="nombre" javaType="String" jdbcType="VARCHAR"/>
+        <result column="LLCOMPONENTE" property="idComponete" javaType="Long" jdbcType="NUMERIC"/>
+        <result column="LLCAMPOCOMPO" property="idCfCampoComp" javaType="Long" jdbcType="NUMERIC"/>
+    </resultMap>
+    <select id="consultarComponente" resultMap="listaComponenteFrmCod" parameterType="elementoFormaPreCodificada" >
+        SELECT B.LLCOMPONENTE,C.LLCAMPOCOMPO, C.DSNOMBRE,D.LLCAMPOCOMP
+        FROM COMP_ELEM A, CTCOMPONENTES B, CTCAMPOCOMP C, CFCAMPOCOMP D
+        WHERE B.LLCOMPONENTE = A.LLCOMPONENTE
+        AND   D.LLCOMPONENTE = A.LLCOMPONENTE
+        AND   D.LLCAMPOCOMPO = C.LLCAMPOCOMPO
+        AND   C.LLCOMPONENTE = B.LLCOMPONENTE
+        AND   A.LLELEMENTO = D.LLELEMENTO
+        AND   A.LLELEMENTO = #{pkElementoPreCodificado}
+    </select>
+    <resultMap type="componenteElemento" id="listaComponenteElementoFrmCod">
+        <result column="LLCOMPONENTE" property="idComponente"/>
+        <result column="LLELEMENTO" property="idElemento"/>
+    </resultMap>
+    <select id="consultaTipoDeComponente" resultMap="listaComponenteElementoFrmCod" parameterType="elementoFormaPreCodificada" >
+        SELECT LLELEMENTO, LLCOMPONENTE FROM COMP_ELEM WHERE LLELEMENTO = #{pkElementoPreCodificado}
+    </select>
+    <select id="consultarFormasPorTipoCaptura" resultMap="listaDefinicionFormaPrecodificada"
+		parameterType="java.util.Map">
+		SELECT
+		CFDEFFRMPRE.LLDEFFRMPRE, CFDEFFRMPRE.NOVERSION, CFDEFFRMPRE.FCMODIFICACION,
+		CFDEFFRMPRE.FCINICIO, CFDEFFRMPRE.FCFIN, CFDEFFRMPRE.BOACTIVO BOACTIVOFORMA,
+		CTFRMPRE.LLCTFRMPRE, CTFRMPRE.DSFRMPRECOD, CTFRMPRE.DSFRMPRECLAVE, CTFRMPRE.BOACTIVO, CTFRMPRE.DSNOMFRMPRECOD,
+		CTACTOS.LLACTO, CTACTOS.DSACTO, CTACTOS.DSACTOCORTA, CTACTOS.BOACTIVO BOACTIVOACTO
+		FROM CFDEFFRMPRE
+		JOIN CTFRMPRE ON CFDEFFRMPRE.LLCATFRMPRE = CTFRMPRE.LLCTFRMPRE
+		LEFT JOIN PAGODERECHO_FORMA ON CTFRMPRE.LLCTFRMPRE = PAGODERECHO_FORMA.LLCTFRMPRE
+		LEFT JOIN CFPAGODERECHOS ON PAGODERECHO_FORMA.LLPAGODERECHO = CFPAGODERECHOS.LLPAGODERECHO AND CFPAGODERECHOS.LLOFICINA = #{oficina}
+		JOIN FORMAS_ACTOS ON CFDEFFRMPRE.LLDEFFRMPRE = FORMAS_ACTOS.LLDEFFRMPRE
+		LEFT JOIN CTACTOS ON FORMAS_ACTOS.LLACTO = CTACTOS.LLACTO
+		LEFT JOIN PAGODERECHO_ACTO ON CTACTOS.LLACTO = PAGODERECHO_ACTO.LLACTO
+		LEFT JOIN CFPAGODERECHOS cfp ON PAGODERECHO_ACTO.LLPAGODERECHO = cfp.LLPAGODERECHO AND cfp.LLOFICINA = #{oficina}
+		<if test="estatus">
+			WHERE CFDEFFRMPRE.BOACTIVO = '1'
+		</if>
+	</select>
+    <resultMap type="ctCatalogo" id="listaCtCatalogoFormaPrecodificada">
+        <result column="LLCATALOGO" property="id" javaType="Long" jdbcType="NUMERIC" />
+        <result column="DSNOMBRE" property="nombre" javaType="String" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap type="elementoCatalogoFormaPreCodificada" id="listaElementoCatalogoFormaPrecodificada">
+        <result column="LLELEMENTO" property="id" javaType="Long" jdbcType="NUMERIC" />
+        <result column="BOMULTIPLE" property="multiple" javaType="Boolean" jdbcType="BOOLEAN"/>                
+        
+        <association property="ctCatalogo" javaType="ctCatalogo" column="LLCATALOGO" resultMap="listaCtCatalogoFormaPrecodificada" />
+    </resultMap>
+    
+    <select id="consultarTipoCatalogoFrmCodificada" resultMap="listaElementoCatalogoFormaPrecodificada" parameterType="elementoFormaPreCodificada" >
+		SELECT B.LLELEMENTO,A.LLCATALOGO,A.DSNOMBRE,B.BOMULTIPLE
+		FROM CTCATALOGOS A, ELEMENTOS_CATALOGOS B
+		WHERE A.LLCATALOGO = B.LLCATALOGO
+		AND B.LLELEMENTO = #{pkElementoPreCodificado}
+		AND A.BOACTIVO = 1
+		AND ROWNUM = 1
+    </select>
+    <resultMap type="catalogoVO" id="giroMap">
+        <result column="LLGIRO"       property="id" javaType="Long"  jdbcType="NUMERIC"/>
+        <result column="DSCLAVEGIRO"  property="clave"               javaType="String"   jdbcType="VARCHAR"/>
+        <result column="DSGIRO"       property="nombre"              javaType="String"   jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="getGiros" resultMap="giroMap">
+		SELECT LLGIRO,DSCLAVEGIRO,DSGIRO
+		FROM CTGIROS
+		ORDER BY DSGIRO ASC
+    </select>
+    <resultMap type="catalogoVO" id="nacionalidadMap">
+        <result column="LLNACIONALIDAD"  property="id"     javaType="Long"  jdbcType="NUMERIC"/>
+        <result column="LLNACIONALIDAD"  property="clave"  javaType="String"   jdbcType="VARCHAR"/>
+        <result column="DSNACIONALIDAD"  property="nombre" javaType="String"   jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="getNacionalidades" resultMap="nacionalidadMap">
+        SELECT LLNACIONALIDAD,DSNACIONALIDAD 
+        FROM CTNACIONALIDADES 
+        ORDER BY DSNACIONALIDAD ASC
+    </select>
+    <resultMap type="catalogoVO" id="estatusCaratulaMap">
+        <result column="LLESTATUSCARATULA"  property="id"     javaType="Long"  jdbcType="NUMERIC"/>
+        <result column="LLESTATUSCARATULA"  property="clave"  javaType="String"   jdbcType="VARCHAR"/>
+        <result column="DSESTATUS"  property="nombre" javaType="String"   jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="getEstatusCaratula" resultMap="estatusCaratulaMap">
+		SELECT LLESTATUSCARATULA,DSESTATUS 
+		FROM CTESTATUSCARATULA 
+		ORDER BY DSESTATUS ASC
+    </select>
+    <resultMap type="catalogoVO" id="socialesMap">
+        <result column="LLTIPOSOCIEDAD"  property="id"     javaType="Long"    jdbcType="NUMERIC"/>
+        <result column="LLTIPOSOCIEDAD"  property="clave"  javaType="String"  jdbcType="VARCHAR"/>
+        <result column="DSTIPOSOCIEDAD"  property="nombre" javaType="String"  jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="getSociales" resultMap="socialesMap">
+		SELECT DISTINCT LLTIPOSOCIEDAD, DSTIPOSOCIEDAD
+		FROM CTTIPOSOCIEDAD
+		WHERE BOACTIVO = 1
+		AND CONNECT_BY_ISLEAF = 0
+		CONNECT BY PRIOR LLTIPOSOCIEDAD = LLPADRETIPSOC
+		ORDER BY DSTIPOSOCIEDAD
+    </select>
+    <resultMap type="catalogoVO" id="estadosMap">
+        <result column="LLESTADO"       property="id" javaType="Long"  jdbcType="NUMERIC"/>
+        <result column="LLESTADO"       property="clave"               javaType="String"   jdbcType="VARCHAR"/>
+        <result column="DSESTADO"       property="nombre"              javaType="String"   jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="getEstados" resultMap="estadosMap">
+		SELECT LLESTADO,DSESTADO
+		FROM CTESTADOS
+        ORDER BY DSESTADO ASC
+    </select>
+    <resultMap type="catalogoVO" id="municipiosMap">
+        <result column="LLMUNICIPIO"  property="id"     javaType="Long"  jdbcType="NUMERIC"/>
+        <result column="LLMUNICIPIO"  property="clave"  javaType="String"   jdbcType="VARCHAR"/>
+        <result column="DSMUNICIPIO"  property="nombre" javaType="String"   jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="getMunicipios" resultMap="municipiosMap" parameterType="catalogoVO">
+		SELECT LLMUNICIPIO, DSMUNICIPIO
+		FROM CTMUNICIPIOS
+		WHERE LLESTADO = #{id}
+		ORDER BY DSMUNICIPIO ASC
+    </select>
+    <resultMap type="encabezadoFormaPrecodificada" id="listaEncabezadoFormaPrecodificada">
+        <result column="LLINFFRMPRE"  property="id" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLELEMENTO"  property="elemento.pkElementoPreCodificado"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLSOLFRMPRE"   property="mvsolicitud.id"       javaType="Long"   jdbcType="NUMERIC"/>
+    </resultMap>
+    <insert id="crearEncabezado" parameterType="encabezadoFormaPrecodificada" useGeneratedKeys="true" keyColumn="LLINFFRMPRE" keyProperty="id">
+        INSERT INTO ENINFFRMPRE (LLINFFRMPRE, LLELEMENTO, LLSOLFRMPRE) 
+        VALUES (ENINFFRMPRE_SEQ.NEXTVAL, #{elemento.pkElementoPreCodificado},#{mvsolicitud.id})
+    </insert>
+    <resultMap type="datoTabla" id="listaDatoTabla">
+        <result column="LLDATOTABLA"  property="id" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLINFFRMPRE"  property="enInfFormaPrecodificada.id"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="NOPOSICION"   property="posicion"       javaType="Long"   jdbcType="NUMERIC"/>
+    </resultMap>
+    <insert id="guardarDatoTabla" parameterType="datoTabla" useGeneratedKeys="true" keyColumn="LLDATOTABLA" keyProperty="id">
+        INSERT INTO DTDATOSTABLA (LLDATOTABLA, NOPOSICION, LLINFFRMPRE) 
+        VALUES (DTDATOSTABLA_SEQ.NEXTVAL, #{posicion},#{enInfFormaPrecodificada.id})
+    </insert>
+    <delete id="borrarDatoTabla" parameterType="elementoFormaPreCodificada">
+        DELETE DTDATOSTABLA WHERE LLINFFRMPRE = #{encabezadoId}
+    </delete>
+    <select id="existeDatoTabla" resultMap="listaDatoTabla" parameterType="datoCadena">
+        SELECT LLDATOTABLA, NOPOSICION, LLINFFRMPRE 
+        FROM DTDATOSTABLA
+        WHERE LLINFFRMPRE = #{enInfFormaPrecodificada.id}
+        AND NOPOSICION = #{posicion}
+        AND ROWNUM = 1
+    </select>
+    <select id="consultarDatoTabla" resultMap="listaDatoTabla" parameterType="elementoFormaPreCodificada">
+        SELECT LLDATOTABLA, NOPOSICION, LLINFFRMPRE 
+        FROM DTDATOSTABLA
+        WHERE LLINFFRMPRE = #{encabezadoId}
+        AND ROWNUM = 1
+    </select>
+    <resultMap type="datoDireccion" id="listaDatoDireccion">
+        <result column="LLDIRECCION"  property="id" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLINFFRMPRE"  property="enInfFormaPrecodificada.id"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLMUNICIPIO"   property="idMunicipio"       javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLESTADO"   property="idEstado"       javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="DSDIRECCION"   property="dsDireccion"    javaType="String" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="insertaDatoDireccion" parameterType="datoDireccion" useGeneratedKeys="true" keyColumn="LLDIRECCION" keyProperty="id">
+        INSERT INTO DTDIRECCIONES (LLDIRECCION, LLINFFRMPRE, LLMUNICIPIO,LLESTADO,DSDIRECCION) 
+        VALUES (DTDIRECCIONES_SEQ.NEXTVAL, #{enInfFormaPrecodificada.id},#{idMunicipio},#{idEstado},#{dsDireccion})
+    </insert>
+    <select id="consultaDatoDireccion" resultMap="listaDatoDireccion" parameterType="encabezadoFormaPrecodificada">
+        SELECT LLDIRECCION, LLINFFRMPRE, LLMUNICIPIO, LLESTADO, DSDIRECCION
+        FROM DTDIRECCIONES
+        WHERE LLINFFRMPRE = #{id}
+    </select>
+    <update id="actualizaDatoDireccion" parameterType="datoDireccion">
+        UPDATE DTDIRECCIONES 
+        SET LLMUNICIPIO =  #{idMunicipio}, 
+             LLESTADO = #{idEstado}, 
+             DSDIRECCION = #{dsDireccion}
+        WHERE LLDIRECCION = #{id}
+        AND LLINFFRMPRE = #{enInfFormaPrecodificada.id}
+    </update>
+    <resultMap type="datoCadena" id="listaDatoCadena">
+        <result column="LLDATOCADENA"  property="id" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLINFFRMPRE"  property="enInfFormaPrecodificada.id"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="DSDATOCADENA"   property="valor"       javaType="String"   jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="guardarDatoCadena" parameterType="datoCadena">
+        INSERT INTO DTDATOSCADENA (LLDATOCADENA, DSDATOCADENA, LLINFFRMPRE) 
+        VALUES (DTDATOSCADENA_SEQ.NEXTVAL, #{valor},#{enInfFormaPrecodificada.id})
+    </insert>
+    <update id="actualizarDatoCadena" parameterType="datoCadena">
+        UPDATE DTDATOSCADENA SET DSDATOCADENA = #{valor}  
+        WHERE  LLINFFRMPRE = #{enInfFormaPrecodificada.id}
+        AND    LLDATOCADENA = #{id}
+    </update>
+    <resultMap type="datoNumerico" id="listaDatoNumerico">
+        <result column="LLDATONUMERICO"  property="id" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLINFFRMPRE"  property="enInfFormaPrecodificada.id"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="NODATONUMERICO"   property="valor"       javaType="Long"   jdbcType="NUMERIC"/>
+    </resultMap>
+    <insert id="guardarDatoNumerico" parameterType="datoNumerico">
+        INSERT INTO DTDATOSNUMERICOS (LLDATONUMERICO, NODATONUMERICO, LLINFFRMPRE) 
+        VALUES (DTDATOSNUMERICO_LLDATONUMERICO.NEXTVAL, #{valor},#{enInfFormaPrecodificada.id})
+    </insert>
+    <update id="actualizarDatoNumerico" parameterType="datoNumerico">
+        UPDATE DTDATOSNUMERICOS SET NODATONUMERICO = #{valor}  
+        WHERE  LLINFFRMPRE = #{enInfFormaPrecodificada.id}
+        AND    LLDATONUMERICO = #{id}
+    </update>
+    <resultMap type="datoFecha" id="listaDatoFecha">
+        <result column="LLDATOFECHA"  property="id" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLINFFRMPRE"  property="enInfFormaPrecodificada.id"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="FCDATOFECHA"   property="valor"       javaType="Date"   jdbcType="DATE"/>
+    </resultMap>
+    <insert id="guardarDatoFecha" parameterType="datoFecha">
+        INSERT INTO DTDATOSFECHA (LLDATOFECHA, FCDATOFECHA, LLINFFRMPRE) 
+        VALUES (DTDATOSFECHA_SEQ.NEXTVAL, #{valor},#{enInfFormaPrecodificada.id})
+    </insert>
+    <update id="actualizarDatoFecha" parameterType="datoFecha">
+        UPDATE DTDATOSFECHA SET FCDATOFECHA = #{valor}  
+        WHERE  LLINFFRMPRE = #{enInfFormaPrecodificada.id}
+        AND    LLDATOFECHA = #{id}
+    </update>
+    <resultMap type="datoDecimal" id="listaDatoDecimal">
+        <result column="LLDATODECIMAL"  property="id" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLINFFRMPRE"  property="enInfFormaPrecodificada.id"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="NODATODECIMAL"   property="valor"       javaType="Double"   jdbcType="NUMERIC"/>
+    </resultMap>
+    <insert id="guardarDatoDecimal" parameterType="datoDecimal">
+        INSERT INTO DTDATOSDECIMAL (LLDATODECIMAL, NODATODECIMAL, LLINFFRMPRE) 
+        VALUES (DTDATOSDECIMAL_LLDATODECIMAL_S.NEXTVAL, #{valor},#{enInfFormaPrecodificada.id})
+    </insert>
+    <update id="actualizarDatoDecimal" parameterType="datoDecimal">
+        UPDATE DTDATOSDECIMAL SET NODATODECIMAL = #{valor}  
+        WHERE  LLINFFRMPRE = #{enInfFormaPrecodificada.id}
+        AND    LLDATODECIMAL = #{id}
+    </update>
+    <resultMap type="datoBooleano" id="listaDatoBooleano">
+        <result column="LLDATOBOOL"  property="id" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLINFFRMPRE"  property="enInfFormaPrecodificada.id"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="BODATOBOOL"   property="valor"       javaType="Boolean"  jdbcType="CHAR"/>
+    </resultMap>
+    <insert id="guardarDatoBool" parameterType="datoBooleano">
+        INSERT INTO DTDATOSBOOL (LLDATOBOOL, BODATOBOOL, LLINFFRMPRE) 
+        VALUES (DTDATOSBOOL_SEQ.NEXTVAL, #{valor},#{enInfFormaPrecodificada.id})
+    </insert>
+    <update id="actualizarDatoBool" parameterType="datoBooleano">
+        UPDATE DTDATOSBOOL SET BODATOBOOL = #{valor}  
+        WHERE  LLINFFRMPRE = #{enInfFormaPrecodificada.id}
+        AND    LLDATOBOOL = #{id}
+    </update>
+    <resultMap type="datoClob" id="listaDatoClob">
+        <result column="LLDATOCLOB"  property="id" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLINFFRMPRE"  property="enInfFormaPrecodificada.id"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="DSDATOCLOB"   property="valor"       javaType="String"  jdbcType="CLOB"/>
+    </resultMap>
+    <insert id="guardarDatoClob" parameterType="datoClob">
+        INSERT INTO DTDATOSCLOB (LLDATOCLOB, DSDATOCLOB, LLINFFRMPRE) 
+        VALUES (DTDATOSCLOB_SEQ.NEXTVAL, #{valor},#{enInfFormaPrecodificada.id})
+    </insert>
+    <update id="actualizarDatoClob" parameterType="datoClob">
+        UPDATE DTDATOSCLOB SET DSDATOCLOB = #{valor}  
+        WHERE  LLINFFRMPRE = #{enInfFormaPrecodificada.id}
+        AND    LLDATOCLOB = #{id}
+    </update>
+    <select id="cuantosRenglonesEnTabla" resultType="java.lang.Integer" parameterType="elementoFormaPreCodificada">
+        SELECT DISTINCT(COUNT(*))
+        FROM CFDEFCOLUMNAS A, CFELEMENTOS B,CTTIPOELEMENTOS C, ENINFFRMPRE D
+        WHERE B.LLELEMENTO = A.LLELEMENTO
+        AND C.LLTIPOELEMENTO = B.LLTIPOELEMENTO
+        AND A.LLELEMENTO = D.LLELEMENTO
+        AND A.LLELEMENTOTABLA = #{pkElementoPreCodificado}
+        group by A.LLELEMENTO
+    </select>
+    <select id="getEncabezadoTabla" resultMap="listaEncabezadoFormaPrecodificada"  parameterType="elementoFormaPreCodificada">
+        SELECT LLINFFRMPRE, LLELEMENTO, LLSOLFRMPRE
+        FROM ENINFFRMPRE
+        WHERE LLELEMENTO = #{pkElementoPreCodificado}
+        AND   LLSOLFRMPRE = #{solicitudId}
+        ORDER BY LLINFFRMPRE
+    </select>
+    <delete id="borrarEncabezadoTabla" parameterType="elementoFormaPreCodificada">
+        DELETE ENINFFRMPRE WHERE LLINFFRMPRE = #{encabezadoId}
+    </delete>
+    <select id="getEncabezado" resultMap="listaEncabezadoFormaPrecodificada"  parameterType="elementoFormaPreCodificada">
+        SELECT LLINFFRMPRE, LLELEMENTO, LLSOLFRMPRE
+        FROM ENINFFRMPRE
+        WHERE LLELEMENTO = #{pkElementoPreCodificado}
+        AND   LLSOLFRMPRE = #{solicitudId}
+        ORDER BY LLINFFRMPRE
+    </select>
+    <select id="leerDatoCadena" resultMap="listaDatoCadena"  parameterType="elementoFormaPreCodificada">
+        SELECT LLDATOCADENA, DSDATOCADENA, LLINFFRMPRE
+        FROM DTDATOSCADENA
+        WHERE LLINFFRMPRE = #{encabezadoId}
+        ORDER BY LLDATOCADENA
+    </select>
+    <delete id="borrarDatoCadena" parameterType="elementoFormaPreCodificada">
+        DELETE DTDATOSCADENA WHERE LLINFFRMPRE = #{encabezadoId}
+    </delete>
+    <select id="leerDatoNumerico" resultMap="listaDatoNumerico"  parameterType="elementoFormaPreCodificada">
+        SELECT LLDATONUMERICO, NODATONUMERICO, LLINFFRMPRE
+        FROM DTDATOSNUMERICOS
+        WHERE LLINFFRMPRE = #{encabezadoId}
+        ORDER BY LLDATONUMERICO
+    </select>
+    <delete id="borrarDatoNumerico" parameterType="elementoFormaPreCodificada">
+        DELETE DTDATOSNUMERICOS WHERE LLINFFRMPRE = #{encabezadoId}
+    </delete>
+    <select id="leerDatoFecha" resultMap="listaDatoFecha"  parameterType="elementoFormaPreCodificada">
+        SELECT LLDATOFECHA, FCDATOFECHA, LLINFFRMPRE
+        FROM DTDATOSFECHA
+        WHERE LLINFFRMPRE = #{encabezadoId}
+        ORDER BY LLDATOFECHA
+    </select>
+    <delete id="borrarDatoFecha" parameterType="elementoFormaPreCodificada">
+        DELETE DTDATOSFECHA WHERE LLINFFRMPRE = #{encabezadoId}
+    </delete>
+    <select id="leerDatoDecimal" resultMap="listaDatoDecimal"  parameterType="elementoFormaPreCodificada">
+        SELECT LLDATODECIMAL, NODATODECIMAL, LLINFFRMPRE
+        FROM DTDATOSDECIMAL
+        WHERE LLINFFRMPRE = #{encabezadoId}
+        ORDER BY LLDATODECIMAL
+    </select>
+    <delete id="borrarDatoDecimal" parameterType="elementoFormaPreCodificada">
+        DELETE DTDATOSDECIMAL WHERE LLINFFRMPRE = #{encabezadoId}
+    </delete>
+    <select id="leerDatoBool" resultMap="listaDatoBooleano"  parameterType="elementoFormaPreCodificada">
+        SELECT LLDATOBOOL, BODATOBOOL, LLINFFRMPRE
+        FROM DTDATOSBOOL
+        WHERE LLINFFRMPRE = #{encabezadoId}
+        ORDER BY LLDATOBOOL
+    </select>
+    <delete id="borrarDatoBool" parameterType="elementoFormaPreCodificada">
+        DELETE DTDATOSBOOL WHERE LLINFFRMPRE = #{encabezadoId}
+    </delete>
+    <select id="leerDatoClob" resultMap="listaDatoClob"  parameterType="elementoFormaPreCodificada">
+        SELECT LLDATOCLOB, DSDATOCLOB, LLINFFRMPRE
+        FROM DTDATOSCLOB
+        WHERE LLINFFRMPRE = #{encabezadoId}
+        ORDER BY LLDATOCLOB
+    </select>
+    <delete id="borrarDatoClob" parameterType="elementoFormaPreCodificada">
+        DELETE DTDATOSCLOB WHERE LLINFFRMPRE = #{encabezadoId}
+    </delete>
+    <resultMap type="datoComponenteFedatario" id="listaDatoCompFeda">
+        <result column="DSNOMBRE"  property="nombre"  javaType="String"   jdbcType="VARCHAR"/>
+        <result column="LLCAMPOCOMP"  property="idCfCampoComp" javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLINFFRMPRE"  property="idComponete"  javaType="Long"   jdbcType="NUMERIC"/>
+        <result column="LLTIPOFEDATARIO"  property="ctFedatarioPublico.ctTipoFedatario.id" javaType="Long"   jdbcType="NUMERIC"/>
+    </resultMap>
+    <select id="consultaDatoComponente" resultMap="listaDatoCompFeda" parameterType="componenteFormaPreCodificada" >
+        SELECT DSNOMBRE, LLCAMPOCOMP,LLINFFRMPRE, LLTIPOFEDATARIO  
+        FROM DTCOMPFEDA 
+        WHERE LLCAMPOCOMP = #{idCfCampoComp} 
+        AND LLINFFRMPRE =   #{encabezadoId}
+        AND LLTIPOFEDATARIO = #{idComponete} 
+        AND ROWNUM = 1
+    </select>
+    <select id="consultaDatoComponenteAntesDeActualizar" resultMap="listaDatoCompFeda" parameterType="componenteFormaPreCodificada" >
+        SELECT DSNOMBRE, LLCAMPOCOMP,LLINFFRMPRE, LLTIPOFEDATARIO  
+        FROM DTCOMPFEDA 
+        WHERE LLINFFRMPRE =   #{encabezadoId}
+        AND LLTIPOFEDATARIO = #{idComponete} 
+        AND ROWNUM = 1
+    </select>
+    <insert id="insertaDatoComponente" parameterType="componenteFormaPreCodificada">
+        INSERT INTO DTCOMPFEDA (LLCOMPFEDA,LLTIPOFEDATARIO,LLFEDPUBLICO,
+				                 BOACTUANDOBAJO,LLACTUANDOBAJO,BOSUSTITUYENDO,
+				                 LLSUSTITUYENDO,BOAUTOADMIN,LLESTADO,
+				                 LLMUNICIPIO,LLINFFRMPRE,LLCAMPOCOMP,DSNOMBRE) 
+        VALUES (CFCAMPOCOMP_SEQ.NEXTVAL,#{idComponete},1,0,1,0,1,0,1,1,#{encabezadoId},#{idCfCampoComp},#{valor})
+    </insert>
+    <update id="actualizaDatoComponente" parameterType="componenteFormaPreCodificada">
+        UPDATE DTCOMPFEDA 
+        SET DSNOMBRE = #{valor}, LLCAMPOCOMP = #{idCfCampoComp}
+        WHERE LLINFFRMPRE = #{encabezadoId} 
+        AND LLTIPOFEDATARIO = #{idComponete}
+    </update>
+    <insert id="crearVersion" parameterType="deffrmpre" keyColumn="LLDEFFRMPRE"  keyProperty="id"  useGeneratedKeys="true">
+        INSERT INTO CFDEFFRMPRE(LLDEFFRMPRE,NOVERSION,llcatfrmpre,FCINICIO,FCMODIFICACION,DSINSTRUCCION,BOACTIVO, BLCOPIACERT, BLCOPIASIMPLE, BLCERTEXIST)
+        VALUES (cfdeffrmpre_SEQ.nextval,(SELECT (MAX(NVL(NOVERSION,0))+1)  FROM CFDEFFRMPRE WHERE LLCATFRMPRE = #{formaPrecodificada.pkFormaPreCodificada}),#{formaPrecodificada.pkFormaPreCodificada},#{fcInicio},SYSDATE,#{instruccion jdbcType=CLOB},0, #{plantillaCopiaCertificada}, #{plantillaCopiaSimple}, #{plantillaExistenciaInexistenciaGravamen})
+    </insert>
+    <select id="consultarVersion" resultType="java.lang.Long">
+        SELECT NOVERSION FROM CFDEFFRMPRE WHERE  LLDEFFRMPRE = #{value}
+    </select>
+    <resultMap type="datoBuscaActos" id="listaDatoBuscaActos">
+        <id property="solicitudId" column="LLSOLICITUD" javaType="Long"   jdbcType="NUMERIC"/>
+        <id property="frmActoId" column="LLMVFRMACTO" javaType="Long"   jdbcType="NUMERIC"/>
+        <id property="dsActoCorta" column="DSACTOCORTA" javaType="String"   jdbcType="VARCHAR"/>
+        <id property="dsActo" column="DSACTO" javaType="String"   jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="busquedaActos" resultMap="listaDatoBuscaActos" parameterType="datoBuscaActos">
+        SELECT DISTINCT SOL.LLSOLICITUD, FRMACTO.LLMVFRMACTO,ACTO.DSACTOCORTA, ACTO.DSACTO 
+        FROM MVSOLICITUDES SOL
+        JOIN MVSOLFRMPRE FP ON FP.LLSOLICITUD = SOL.LLSOLICITUD
+        JOIN MVFRMACTO FRMACTO ON FRMACTO.LLSOLFRMPRE = FP.LLSOLFRMPRE
+        JOIN FORMAS_ACTOS FRMACTODEF ON FRMACTODEF.LLFORMAACTO = FRMACTO.LLFORMAACTO
+        JOIN CTACTOS ACTO ON ACTO.LLACTO = FRMACTODEF.LLACTO
+        WHERE SOL.LLSOLICITUD IN (
+                SELECT SOL.LLSOLICITUD FROM SOLICITUD_CARATULAFME SOLCAR
+                JOIN MVSOLICITUDES SOL ON SOL.LLSOLICITUD  = SOLCAR.LLSOLICITUD
+                WHERE SOLCAR.LLCARATULA IN (SELECT LLCARATULA FROM SOLICITUD_CARATULAFME WHERE LLSOLICITUD = #{solicitudId})
+                ) 
+        AND SOL.LLSOLICITUD != #{solicitudId}
+        AND (UPPER(ACTO.DSACTOCORTA) LIKE UPPER('%' || #{dsActo} || '%') OR UPPER(ACTO.DSACTO) LIKE UPPER('%' || #{dsActo} || '%'))
+        ORDER BY  ACTO.DSACTOCORTA
+    </select>
+    <select id="insertaDatoBuscaActo"  parameterType="datoBuscaActos">
+        INSERT INTO DTCOMPACTO(LLINFFRMPRE,LLMVFRMACTO) 
+        VALUES (#{encabezadoId},#{frmActoId})
+    </select>
+    <select id="getListaDtCompActo" resultMap="listaDatoBuscaActos" parameterType="encabezadoFormaPrecodificada">
+        SELECT LLMVFRMACTO from DTCOMPACTO WHERE LLINFFRMPRE = #{id}
+    </select>
+    <select id="getDtBuscaActo" resultMap="listaDatoBuscaActos" parameterType="datoBuscaActos">
+               SELECT DISTINCT SOL.LLSOLICITUD, FRMACTO.LLMVFRMACTO,ACTO.DSACTOCORTA, ACTO.DSACTO FROM MVSOLICITUDES SOL
+        JOIN MVSOLFRMPRE FP ON FP.LLSOLICITUD = SOL.LLSOLICITUD
+        JOIN MVFRMACTO FRMACTO ON FRMACTO.LLSOLFRMPRE = FP.LLSOLFRMPRE
+        JOIN FORMAS_ACTOS FRMACTODEF ON FRMACTODEF.LLFORMAACTO = FRMACTO.LLFORMAACTO
+        JOIN CTACTOS ACTO ON ACTO.LLACTO = FRMACTODEF.LLACTO
+        WHERE SOL.LLSOLICITUD IN (
+                SELECT SOL.LLSOLICITUD FROM SOLICITUD_CARATULAFME SOLCAR
+                JOIN MVSOLICITUDES SOL ON SOL.LLSOLICITUD  = SOLCAR.LLSOLICITUD
+                WHERE SOLCAR.LLCARATULA IN (SELECT LLCARATULA FROM SOLICITUD_CARATULAFME WHERE LLSOLICITUD = #{solicitudId})
+                ) 
+        AND SOL.LLSOLICITUD != #{solicitudId}
+      AND FRMACTO.LLMVFRMACTO = #{frmActoId}
+    </select>
+    <delete id="deleteDatoCompActo" parameterType="encabezadoFormaPrecodificada">
+        DELETE DTCOMPACTO WHERE LLINFFRMPRE = #{id}
+    </delete>
+    <resultMap type="componenteCaratula" id="listaComponenteCaratula">
+        <id property="idCompCaratula" column="LLCAMPOCOMPO" javaType="Long"   jdbcType="NUMERIC"/>
+        <id property="tipoDeComponente" column="LLCOMPONENTE" javaType="Long"   jdbcType="NUMERIC"/>
+        <id property="nombreComponente" column="DSNOMBRE" javaType="String"   jdbcType="VARCHAR"/>
+        <id property="boPoblarCaratula" column="BOPOBLARCAR" javaType="Boolean" jdbcType="CHAR"/>
+        <id property="boActualizarCaratula" column="BOACTUALIZACAR" javaType="Boolean" jdbcType="CHAR"/>
+    </resultMap>
+    <select id="getComponenteCaratula" resultMap="listaComponenteCaratula" parameterType="elementoFormaPreCodificada">
+	    SELECT A.LLCAMPOCOMPO,A.LLCOMPONENTE, B.DSNOMBRE, A.BOPOBLARCAR, A.BOACTUALIZACAR 
+	    FROM CFCOMPCARATULA A, CTCAMPOCOMP B
+	    WHERE A.LLCAMPOCOMPO = B.LLCAMPOCOMPO
+	    AND A.LLELEMENTO = #{pkElementoPreCodificado}
+    </select>
+    
+    <update id="actualizarCopiaCertificada" parameterType="deffrmpre">
+        UPDATE CFDEFFRMPRE SET BLCOPIACERT = #{plantillaCopiaCertificada} WHERE LLDEFFRMPRE = #{id}
+    </update>
+    <update id="actualizarCopiaSimple" parameterType="deffrmpre">
+        UPDATE CFDEFFRMPRE SET BLCOPIASIMPLE = #{plantillaCopiaSimple} WHERE LLDEFFRMPRE = #{id}
+    </update>
+    <update id="actualizarExistInexistGravamen" parameterType="deffrmpre">
+        UPDATE CFDEFFRMPRE SET BLCERTEXIST = #{plantillaExistenciaInexistenciaGravamen} WHERE LLDEFFRMPRE = #{id}
+    </update>
+    
+    <resultMap type="ctAccion" id="ctAccionResultMap">
+    	<id property="id" column="LLACCION" javaType="Long" jdbcType="NUMERIC"/>
+    	<result property="accion" column="LLACCION" javaType="String" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <resultMap type="ctOperacion" id="ctOperacionResultMap">
+    	<id property="id" column="LLOPERACION" javaType="Long" jdbcType="NUMERIC"/>
+    	<result property="operacion" column="DSOPERACION" javaType="String" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <resultMap type="elemento" id="cfElementoResultMap">
+        <id column="LLELEMENTO" property="id" javaType="Long" jdbcType="NUMERIC"/>
+        <result column="DSCLAVE"  property="clave" javaType="String" jdbcType="VARCHAR"/>
+        <result column="DSNOMBRE"  property="nombre" javaType="String" jdbcType="VARCHAR"/>
+        <result column="DSTEXTOAYUDA"  property="textoAyuda"  javaType="String" jdbcType="VARCHAR"/>
+    </resultMap>
+     
+    <resultMap type="cfValor" id="cfValorResultMap">
+    	<id column="LLREGLA" property="id" javaType="Long" jdbcType="NUMERIC"/>
+    	<result column="BOCAMPO" property="campo" javaType="String" jdbcType="VARCHAR"/>
+    	<result column="DSVALOR" property="valor" javaType="String" jdbcType="VARCHAR"/>
+    	<result column="LLELEMENTO" property="elemento.id" javaType="Long" jdbcType="NUMERIC"/>
+    </resultMap>
+    
+    <resultMap type="ctOptionAccion" id="ctOptionAccionResultMap">
+    	<id column="LLREGLA" property="idRegla" javaType="Long" jdbcType="NUMERIC"/>
+    	<result column="BOOBLIGATORIA" property="obligatoria" javaType="String" jdbcType="VARCHAR"/>
+    	<result column="BOPORSELLOTIEMPO" property="porSelloTiempo" javaType="String" jdbcType="VARCHAR"/>
+    	<result column="BOPORFECHA" property="porFecha" javaType="String" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <resultMap type="ctRegla" id="ctReglaResultMap">
+    	<id property="id" column="LLREGLA" javaType="Long" jdbcType="NUMERIC"/>
+    	<result property="formula" column="DSFORMULA" javaType="String" jdbcType="VARCHAR"/>
+    	<result property="mensajeError" column="DSMENSAJEERROR" javaType="String" jdbcType="VARCHAR"/>
+    	<result property="origen.id" column="LLELEMOORIGEN" javaType="Long" />
+    	<result property="destino.id" column="LLELEMDESTINO" javaType="Long"/>
+    	<association property="accion" column="LLACCION" javaType="ctAccion" resultMap="ctAccionResultMap"/>
+    	<association property="operacion" column="LLOPERACION" javaType="ctOperacion" resultMap="ctOperacionResultMap"/>
+    	<association property="valor" column="LLREGLA" javaType="cfValor" resultMap="cfValorResultMap"/>
+    	<association property="opcionAccion" column="LLREGLA" javaType="ctOptionAccion" resultMap="ctOptionAccionResultMap"/>
+    </resultMap>
+    
+    <select id="consultarReglas" resultMap="ctReglaResultMap">
+    	SELECT * 
+		FROM ctreglas
+		WHERE llelemoorigen = #{origenId}
+    </select>
+    
+    <select id="consultarValorRegla" resultMap="cfValorResultMap" >
+    	SELECT *
+    	FROM cfvalor
+    	WHERE llregla = #{reglaId}
+    </select>
+    
+    <select id="consultarOpcionAccionRegla" resultMap="ctOptionAccionResultMap">
+    	SELECT *
+    	FROM ctopcionaccion
+    	WHERE llregla = #{reglaId}
+    </select>
+</mapper>

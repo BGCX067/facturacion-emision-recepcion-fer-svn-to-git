@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.usuariogrupotrabajo.UsuarioGrupoTrabajoDAO">
+	
+	<select id="consultaPorGrupoTrabajo" parameterType="grupoTrabajo" resultMap="usuarioGpoTrabajoMap">
+		SELECT ctu.*, 
+				ctgpotjo.*, 
+				cte.*
+		FROM ctusuarios ctu JOIN usuario_grupotrabajo ugpotjo
+		ON ctu.llusuario = ugpotjo.llusuario JOIN ctgrupostrabajo ctgpotjo 
+		ON ugpotjo.llgrupotrabajo = ctgpotjo.llgrupotrabajo JOIN ctetapas cte
+		ON cte.lletapa = ctgpotjo.lletapa
+		WHERE ctgpotjo.llgrupotrabajo = #{llgrupotrabajo}
+		ORDER BY ctu.dsnombre
+	</select>
+	
+	<select id="consultaSolPorUsuarioGrupoTrabajo" parameterType="java.lang.Long" resultType="map">
+        SELECT usuario_grupotrabajo.llusuario AS idUsuario, count(llsolicitud) AS cantSolicitudes,
+        usuario_grupotrabajo.fcultimaasgncn AS fechaultimaasgncn
+        FROM usuario_grupotrabajo 
+        JOIN ctusuarios ON ctusuarios.llusuario = usuario_grupotrabajo.llusuario
+        LEFT JOIN mvsolicitudes ON mvsolicitudes.llusuario = ctusuarios.llusuario AND (mvsolicitudes.llestatus = 1 OR mvsolicitudes.llestatus = 2)
+        WHERE usuario_grupotrabajo.llgrupotrabajo= #{idGrupoTrabajo}    
+        AND ctusuarios.llestatususua = 1  
+        AND usuario_grupotrabajo.boactivo = 1
+        GROUP BY usuario_grupotrabajo.llusuario, usuario_grupotrabajo.fcultimaasgncn
+	</select>
+	
+	<update id="actualizarFechaUltAsgncn" parameterType="map">
+	   UPDATE usuario_grupotrabajo SET fcultimaasgncn = #{fechaHoy}
+	   WHERE llusuario = #{idUsuario} AND llgrupotrabajo = #{idGrupoTrabajo}
+	</update>
+	
+	<resultMap type="usuarioGpoTrabajo" id="usuarioGpoTrabajoMap">
+		<association property="ctgrupostrabajo" javaType="grupoTrabajo" column="llgrupotrabajo" resultMap="grupoTrabajoMap" />
+		<association property="ctusuarios" javaType="usuarios" column="llusuario" resultMap="usuariosMap" />
+	</resultMap>
+	
+	<resultMap type="grupoTrabajo" id="grupoTrabajoMap">
+		<id property="llgrupotrabajo" column="llgrupotrabajo"/>
+		<result property="dsgrupotrabajo" column="dsgrupotrabajo"/>
+		<association property="ctetapas" javaType="etapa" column="lletapa" resultMap="etapaMap" />
+	</resultMap>
+	
+	<resultMap type="usuarios" id="usuariosMap">
+		<id property="llusuario" column="llusuario"/>
+		<result property="dsnombre" column="dsnombre"/>
+		<result property="dsapellidopaterno" column="dsapellidopaterno"/>
+		<result property="dsapellidomaterno" column="dsapellidomaterno"/>
+	</resultMap>
+	
+	<resultMap type="etapa" id="etapaMap">
+		<id property="id" column="lletapa" />
+		<result property="nombre" column="dsnombreetapa."/>		
+	</resultMap>
+	
+</mapper>

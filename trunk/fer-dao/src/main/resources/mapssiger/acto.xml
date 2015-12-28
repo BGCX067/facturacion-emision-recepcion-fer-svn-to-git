@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.acto.ActoDAO">
+
+	<select id="consultaActos" resultMap="actoMap" >
+		SELECT cta.*
+		FROM ctactos cta
+		ORDER BY cta.dsacto
+	</select>
+	
+	<resultMap type="ctacto" id="actoMap">
+		<id property="id" column="LLACTO"/>
+		<result property="nombre" column="DSACTO"/>
+		<result property="nombreCorto" column="DSACTOCORTA"/>
+		<result property="fcModificacion" column="FCMODIFICACION"/>
+		<result property="activo" column="BOACTIVO"/>
+	</resultMap>
+
+	<select id="consultaTiposActos" resultType="tipoActo">
+		SELECT CTTIPOACTO.LLTIPOACTO as id, CTTIPOACTO.DSACTO as descripcion FROM CTTIPOACTO
+	</select>
+
+	<select id="consultarGravamenAsignado" resultType="ctacto" parameterType="ctacto">
+	    SELECT CTACTOS.LLACTO as id,
+	           CTACTOS.DSACTO as nombre,
+	           CTACTOS.DSACTOCORTA as nombreCorto,
+	           CTACTOS.FCMODIFICACION as fcModificacion,
+	           CTACTOS.BOACTIVO as activo
+	    FROM CTACTOS
+	    JOIN GRAVAMEN_CANCELACION ON CTACTOS.LLACTO = GRAVAMEN_CANCELACION.LLACTOGRAVAMEN
+	    WHERE GRAVAMEN_CANCELACION.LLACTOCANCELACION = #{id}
+	    ORDER BY id
+	</select>
+
+	<select id="consultarGravamen" resultType="ctacto">
+	    SELECT CTACTOS.LLACTO as id,
+	           CTACTOS.DSACTO as nombre,
+	           CTACTOS.DSACTOCORTA as nombreCorto,
+	           CTACTOS.FCMODIFICACION as fcModificacion,
+	           CTACTOS.BOACTIVO as activo
+	    FROM CTACTOS
+	    WHERE CTACTOS.LLTIPOACTO = 1
+	    ORDER BY id
+	</select>
+	<select id="consultarPorFormaPrecodificada" resultMap="actoMap">
+	   SELECT * FROM CTACTOS 
+	            WHERE LLCTFRMPRE = #{value} ORDER BY LLACTO
+	</select>
+
+	<select id="consultarCancelar" resultType="ctacto" parameterType="formaPreCodificada">
+	    SELECT CTACTOS.LLACTO as id,
+	           CTACTOS.DSACTO as nombre,
+	           CTACTOS.DSACTOCORTA as nombreCorto,
+	           CTACTOS.FCMODIFICACION as fcModificacion,
+	           CTACTOS.BOACTIVO as activo
+	    FROM CTACTOS
+	    WHERE CTACTOS.LLTIPOACTO = 2 and CTACTOS.LLCTFRMPRE = #{pkFormaPreCodificada}
+	    ORDER BY id
+	</select> 
+	<select id="consultarIdDefFrmPreActo" resultType="java.lang.Long">
+	   SELECT LLFORMAACTO FROM FORMAS_ACTOS 
+		      WHERE LLDEFFRMPRE = #{idDefFormaPrecodificada}
+		            AND LLACTO = #{idActo}
+	</select>
+	<select id="consultarIdFormaActo" resultType="java.lang.Long">
+       SELECT LLFORMAACTO FROM  FRM_ACTO_ELEM WHERE LLELEMENTO = #{value}
+    </select>
+	<select id="consultarNumeroDeElementosAsociados" resultType="java.lang.Integer">
+	   SELECT count(*) FROM  FRM_ACTO_ELEM WHERE LLFORMAACTO = #{value}
+	</select>
+	<select id="consultarPorElemento" resultMap="actoMap">
+       SELECT acto.* FROM FRM_ACTO_ELEM frmactoelem
+						   LEFT JOIN FORMAS_ACTOS formacto       ON formacto.LLFORMAACTO   = frmactoelem.LLFORMAACTO
+						   LEFT JOIN CTACTOS acto                ON acto.LLACTO            = formacto.LLACTO
+				      WHERE frmactoelem.LLELEMENTO = #{value}
+    </select>
+	<update id="modificarActo" parameterType="ctacto">
+		UPDATE CTACTOS SET
+		DSACTO = #{nombre},
+		DSACTOCORTA = #{nombreCorto},
+		FCMODIFICACION = #{fcModificacion},
+		BOACTIVO = #{activo},
+		LLTIPOACTO = #{tipo.id}
+		WHERE LLACTO = #{id}
+	</update>
+
+	<insert id="crearActo" parameterType="java.util.Map" useGeneratedKeys="true" keyColumn="LLACTO" keyProperty="id" >
+        INSERT INTO CTACTOS (LLACTO, DSACTO, DSACTOCORTA, FCMODIFICACION, BOACTIVO, LLCTFRMPRE, LLTIPOACTO)
+        VALUES (CTACTOS_LLACTO_SEQ.NEXTVAL, #{acto.nombre}, #{acto.nombreCorto}, #{acto.fcModificacion}, #{acto.activo}, #{forma.pkFormaPreCodificada}, #{acto.tipo.id})
+	</insert>
+
+	<insert id="insertActosGravamen" parameterType="java.util.Map">
+        INSERT ALL
+	    <foreach item="item" collection="actosGravamen" >
+	    INTO GRAVAMEN_CANCELACION (LLACTOCANCELACION, LLACTOGRAVAMEN) VALUES (#{actoCancelacion.id, jdbcType=NUMERIC},#{item.id, jdbcType=NUMERIC})
+        </foreach>
+	</insert>
+    <insert id="crearDefFormaActo" parameterType="formasactos" keyColumn="LLFORMAACTO" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO FORMAS_ACTOS (LLFORMAACTO,LLDEFFRMPRE, LLACTO) 
+                VALUES(FORMAS_ACTOS_SEQ.nextval,#{defFormaPrecodificada.id},#{acto.id})
+    </insert>
+    <insert id="crearDefFormaActoElemento">
+        INSERT INTO FRM_ACTO_ELEM (LLELEMENTO, LLFORMAACTO)
+                    VALUES(#{idElemento},#{idFormaActo})
+    </insert>
+	<delete id="deleteActosGravamen" parameterType="ctacto">
+	    DELETE FROM GRAVAMEN_CANCELACION WHERE LLACTOCANCELACION = #{id}
+	</delete>
+	<delete id="eliminarFormaActo" >
+	    DELETE FORMAS_ACTOS WHERE LLFORMAACTO = #{value}
+	</delete>
+</mapper>

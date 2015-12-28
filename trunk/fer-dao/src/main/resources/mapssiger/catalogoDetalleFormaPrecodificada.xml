@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.catalogosfp.CatalogoDetalleFormaPrecodificadaDAO">
+
+	<resultMap id="resultDetalleFormaPrecodificada" type="catalogoDetalleFormaPrecodificada">
+		<result property="llcatalogo" column="LLCATALOGO"/>
+		<result property="llcatalogoFk" column="LLCATALOGOFK"/>
+        <result property="noposicion" column="NOPOSICION"/>
+        <result property="noidcatalogo" column="NOIDCATALOGO"/>
+        <result property="dsmvcatalogo" column="DSMVCATALOGO"/>
+        <result property="boactivo" column="BOACTIVO"/>
+    </resultMap>
+
+	<select id="getListByIdCatalogo" 
+    	resultMap="resultDetalleFormaPrecodificada" 
+    	parameterType="catalogoFormaPrecodificada">
+    		select 
+    			LLCATALOGO, 
+    			LLCATALOGOFK,
+    			NOPOSICION,
+    			NOIDCATALOGO,
+    			DSMVCATALOGO,
+    			BOACTIVO
+    		FROM 
+    			DTCATALOGOS
+    		where 
+    			LLCATALOGO = #{llcatalogo}
+    </select>
+    
+    <insert id="insertaRegistro" parameterType="catalogoDetalleFormaPrecodificada" useGeneratedKeys="true" keyProperty="catalogoDetalleFormaPrecodificada.llcatalogo" keyColumn="LLCATALOGO">
+    	<selectKey keyProperty="llcatalogo" resultType="java.lang.Integer" order="BEFORE">
+		 	SELECT NVL(MAX(LLCATALOGO),0)+1 FROM DTCATALOGOS
+		 </selectKey>
+		INSERT INTO DTCATALOGOS 
+			(LLCATALOGO,
+			 LLCATALOGOFK,
+			 NOPOSICION,
+			 NOIDCATALOGO,
+			 DSMVCATALOGO, 
+			 BOACTIVO)
+		VALUES 
+			#{llcatalogo}, 
+			#{llcatalogoFk},
+			#{noposicion},
+			#{noidcatalogo},
+			#{dsmvcatalogo},
+			#{boactivo})
+	</insert>
+    
+   	<update id="actualizaRegistro" parameterType="catalogoDetalleFormaPrecodificada"> 
+		UPDATE DTCATALOGOS
+  		SET
+  			NOPOSICION = #{noposicion},
+  			NOIDCATALOGO = #{noidcatalogo},
+  			DSMVCATALOGO = #{dsmvcatalogo},
+  			BOACTIVO = #{boactivo} 
+  		where LLCATALOGO = #{llcatalogo} 
+	</update>
+	
+    <delete id="borraRegistro" parameterType="catalogoDetalleFormaPrecodificada">
+    	DELETE FROM DTCATALOGOS
+			WHERE LLCATALOGO = #{llcatalogo}
+    </delete>
+    
+</mapper>

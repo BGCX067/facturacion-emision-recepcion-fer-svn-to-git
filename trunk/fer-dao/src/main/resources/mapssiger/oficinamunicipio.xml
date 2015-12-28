@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.administracion.OficinaMunicipioDAO">
+	<resultMap type="oficinaMunicipio" id="oficinaMunicipioMap">
+		<result column="FCINICIO" property="fcInicio" javaType="java.util.Date" />
+		<result column="FCFIN" property="fcFin" javaType="java.util.Date" />
+		<result column="LLOFICINAMUNICIPIO" property="id" javaType="Long" jdbcType="NUMERIC"/>
+		<association property="municipio" column="LLMUNICIPIO" javaType="ctMunicipio" select="consultaMunicipio"/>
+		<association property="oficina" column="LLOFICINA" javaType="oficinas" select="consultaOficina"/>
+		<association property="estado" column="LLESTADO" javaType="ctEstados" select="consultaEstado"/>
+	</resultMap>
+	
+	<resultMap type="oficinaMunicipio" id="oficinaMunicipioC">
+		<result column="LLOFICINAMUNICIPIO" property="id" javaType="Long" jdbcType="NUMERIC"/>
+	</resultMap>
+	
+	<select id="consultaMunicipio" parameterType="java.lang.Integer" resultType="municipio">
+		SELECT *
+		FROM CTMUNICIPIOS
+		WHERE LLMUNICIPIO = #{LLMUNICIPIO}
+	</select>
+	
+	<select id="consultaOficina" parameterType="java.lang.Integer" resultType="oficina">
+		SELECT *
+		FROM CTOFICINAS
+		WHERE LLOFICINA = #{LLOFICINA}
+	</select>
+	
+	<select id="consultaEstado" parameterType="java.lang.Integer" resultType="estado">
+		SELECT *
+		FROM CTESTADOS
+		WHERE LLESTADO = #{LLESTADO}
+	</select>
+	
+	<select id="oficinasMunicipios" parameterType="java.lang.Long" resultMap="oficinaMunicipioMap">
+		SELECT * FROM OFICINA_MUNICIPIO
+		WHERE LLOFICINA = #{id}
+	</select>
+	
+	<select id="consulta" parameterType="java.lang.Long" resultMap="oficinaMunicipioC">
+		SELECT LLOFICINAMUNICIPIO
+		FROM OFICINA_MUNICIPIO
+		WHERE LLOFICINAMUNICIPIO=#{id}
+	</select>
+	
+	<insert id="insertaRegistro" parameterType="oficinaMunicipio">
+		INSERT INTO OFICINA_MUNICIPIO (LLOFICINA, LLMUNICIPIO, LLESTADO, FCINICIO, FCFIN, LLOFICINAMUNICIPIO)
+		VALUES(
+			#{ctOficina.id},
+			#{id.idMunicipio},
+			#{id.idEstado},
+			#{fcInicio},
+			#{fcFin},
+			#{oficinaMunicipio}
+		)
+	</insert>
+	
+	<update id="actualizaRegistro" parameterType="oficinaMunicipio">
+		UPDATE OFICINA_MUNICIPIO
+		SET
+		FCINICIO = #{fcInicio}, 
+		FCFIN = #{fcFin}
+		WHERE LLOFICINAMUNICIPIO = #{oficinaMunicipio}
+	</update>
+	
+	<delete id="eliminaRegistro" parameterType="oficinaMunicipio">
+		DELETE FROM OFICINA_MUNICIPIO
+		WHERE LLOFICINAMUNICIPIO = #{idOficinaMunicipio}
+	</delete>
+	
+</mapper>

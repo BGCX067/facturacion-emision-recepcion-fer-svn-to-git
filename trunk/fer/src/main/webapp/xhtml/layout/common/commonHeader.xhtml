@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"	
+      >
+    <body>
+	    <ui:composition>
+				
+			<div class="top">
+		        <h1 id="site-logo"><a href="#">Site Demo</a></h1>
+				
+		        <div id="site-sec-nav" class="col3 m">
+		            <ul>
+			            <h:form id="formMenu">
+			                <li><a href="#">Inicio</a></li>
+			                <li><a href="#">Ayuda</a></li>
+			                <li><a href="#">Contacto</a></li>
+			                <li><h:commandLink action="#{logoutMB.logout}" value="Cerrar Sesión" /> </li>
+		                </h:form>
+		            </ul>
+	            <div id="indicador-usuario">
+					<h:form id="form"> 	
+						<img  alt="" src="#{resource['img/icono_Usuario.png']}" />
+<!-- 						<h:commandLink action="#{usuarioMB.iniciarModificacionIdentificacion}" value="#{usuario.nombre} #{usuario.apellidoPaterno} #{usuario.apellidoMaterno}"/>				  -->
+					</h:form>	      
+				</div>
+		        </div>		        
+		    </div>
+    
+	    </ui:composition>
+    </body>
+</html>

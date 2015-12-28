@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.solicitud.SolicitudProcesoDAO">
+
+	<!-- <resultMap type="solicitudProcesoVO" id="SolicitudProcesoMap">
+		<id property="idSolicitud" column="idSolicitud"/>
+		<result property="nci" column="nci"/>
+		<result property="fechaIngreso" column="fechaIngreso"/>
+		<association property="fedatario" column="idFedatario" javaType="Fedatario" select="consultaFedatario" />
+		<association property="tipoSolicitud" column="idTipoSolicitud" javaType="TipoSolicitud" select="consultaTipoSolicitud" />					
+		<association property="estatus" column="idEstatus" javaType="Estatus" select="consultaEstatus" />	
+		<association property="acto" column="idActo" javaType="Acto" select="consultaActo" />
+		<collection property="listFormaPrecodificadaVO" column="idsolfrmpre" javaType="ArrayList" ofType="FormaPrecodificadaVO" resultMap="frmPreVO"/>		
+		<collection property="listDocumentoVO" column="idDocSolicitud" javaType="ArrayList" ofType="DocumentoVO" resultMap="docVO"  />
+	</resultMap>
+
+	<resultMap type="formaPrecodificadaVO" id="frmPreVO">
+		<id property="defFormaPrecodificada" column="iddeffrmpre" />		
+		<result property="fechaModificacion" column="fechamodificacion"/>
+		<result property="dsInstruccion" column="instruccion"/>
+		<result property="fechaInicio" column="fechaInicio"/>
+		<result property="fechaFin" column="fechafin"/>
+		association property="formaPrecodificada" column="idfrmpre" javaType="FormaPreCodificada" select="consultaFrmPre" /
+	</resultMap>
+	
+	<resultMap type="documentoVO" id="docVO">
+		<id property="idDocumentoVO" column="idDocumento"/>
+		<result property="noFolio" column="noFolio"/>
+		<result property="idSolicitud" column="idDocSolicitud"/>
+		<association property="tipoDocumento" column="idTipoDocumento" javaType="TipoDocumento" select="consultaTipoDocumento" />
+	</resultMap>
+
+	<select id="consultaSolicitudProceso" parameterType="solicitudProcesoVO" resultMap="SolicitudProcesoMap">
+		select mvsol.llsolicitud as idSolicitud,
+	        mvsol.dsnci as nci,
+	        mvsol.fcingreso as fechaIngreso,
+	        mvsol.llfedatario as idFedatario,
+	        mvsol.lltiposolicitud as idTipoSolicitud,
+	        mvsol.llestatus as idEstatus,   
+	        mvfrmpre.llsolfrmpre as idsolfrmpre,  
+	        frmpre.lldeffrmpre as iddeffrmpre,
+	        frmpre.llcatfrmpre as idfrmpre,
+	        frmpre.fcmodificacion as fechamodificacion,
+	        frmpre.dsinstruccion as instruccion,
+	        frmpre.fcinicio as fechaInicio,
+	        frmpre.fcfin as fechafin,
+	        dtdoc.lldocumento as idDocumento,
+	        dtdoc.nofolio as noFolio,
+	        dtdoc.llsolicitud as idDocSolicitud,
+	        dtdoc.lltipodocumento as idTipoDocumento,
+	        ctac.llacto as idActo	        
+		from mvsolicitudes mvsol 
+	    join mvsolfrmpre mvfrmpre on mvsol.llsolicitud = mvfrmpre.llsolicitud
+	    join cfdeffrmpre frmpre on mvfrmpre.lldeffrmpre = frmpre.lldeffrmpre
+	    join dtdocumentos dtdoc on mvsol.llsolicitud = dtdoc.llsolicitud
+	    join frmacto frmac on mvfrmpre.llsolfrmpre = frmac.llsolfrmpre
+	    join ctactos ctac on frmac.llacto = ctac.llacto	 
+	    <if test="nci != null and nci != '' ">
+	    	AND mvsol.dsnci LIKE ('%' || #{nci} || '%')
+	    </if>   	
+   		<if test="fedatario.id != 0">
+	    	AND mvsol.llfedatario = #{fedatario.id}
+	    </if>
+	    <if test="listDocumentoVO != null and !listDocumentoVO.equals('') ">
+	    	<if test="listDocumentoVO.size() > 0">
+		    	AND dtdoc.nofolio IN
+		    		<foreach collection="listDocumentoVO" item="documento" open="(" separator="," close=")">
+		    			#{documento.noFolio}
+		    		</foreach>
+		    </if>
+	    </if>
+	    <if test="acto != null">
+	    	AND ctac.llacto = #{acto.id}
+	    </if>			        	        
+	</select>
+	
+	<select id="consultaTipoSolicitud" parameterType="java.lang.Integer" resultType="tipoSolicitud">
+		SELECT cttiposol.lltiposolicitud as idTipoSolicitud,
+		       cttiposol.dstiposolicitud as dsTipoSolicitud,
+		       cttiposol.boactivo as activoinactivo
+		FROM CTTIPOSOLICITUDES cttiposol
+		WHERE cttiposol.lltiposolicitud = #{idSolictud}		
+	</select>
+	
+	<select id="consultaFedatario" parameterType="java.lang.Integer" resultType="fedatario">
+		SELECT ctfed.llfedatario as id,
+				ctfed.crnumero as numero,
+				ctfed.dsnombre as nombre,
+				ctfed.dsapellidopaterno as apellidoPaterno,
+				ctfed.dsapellidomaterno as apellidoMaterno,
+				ctfed.dspais as pais
+		FROM ctfedatarios ctfed 
+		WHERE llfedatario = #{idFedatario}
+	</select>
+	
+	<select id="consultaEstatus" parameterType="java.lang.Integer" resultType="estatus">
+		SELECT cte.llestatus as idEstatus,
+			   cte.dsestatus as dsEstatus,
+			   cte.boactivo as activoinactivo
+		FROM ctestatus cte
+		WHERE cte.llestatus = #{idEstatus}
+	</select>
+
+	<select id="consultaFrmPre" parameterType="java.lang.Integer" resultType="formaPreCodificada">
+		SELECT frmpre.llctfrmpre as pkFormaPreCodificada,
+				frmpre.dsfrmprecod as titulo,
+				frmpre.dsfrmpreclave as clave
+		FROM ctfrmpre frmpre
+		WHERE frmpre.llctfrmpre = #{idfrmpre}
+	</select>
+	
+	<select id="consultaTipoDocumento" parameterType="java.lang.Integer" resultType="TipoDocumento">
+		SELECT cttipdoc.lltipodocumento as lltipodocumento,
+				cttipdoc.dstipodocumento as dstipodocumento,
+				cttipdoc.noorden as noorden,
+				cttipdoc.fcmodificacion as fcmodificacion,
+				cttipdoc.boactivo as boactivo
+		FROM cttipodocumento cttipdoc
+		WHERE cttipdoc.lltipodocumento = #{idTipoDocumento}
+	</select>
+	
+	<select id="consultaActo" parameterType="java.lang.Integer" resultType="Acto">
+		SELECT ctact.llacto as id,
+			ctact.dsacto as descActo,
+			ctact.dsactocorta as descCortaActo,
+			ctact.fcmodificacion as fModificacion,
+			ctact.boactivo as activoinactivo			
+		FROM CTACTOS ctact
+		WHERE ctact.llacto = #{idActo}
+	</select> -->
+	
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.solicitud.SolicitudCaratulaDAO">
+
+    <resultMap type="SolicitudCaratula" id="listaSolicitudCaratula">
+		<result column="LLSOLICITUD" property="llsolicitud" />
+		<result column="LLCARATULA" property="llcaratula" />
+		<result column="LLSOLFRMPRE" property="llsolfrmpre" />
+		<result column="BOPRINCIPAL" property="boprincipal" />
+	</resultMap>
+	
+    <select id="consultaSolicitudCaratula" resultMap="listaSolicitudCaratula" parameterType="SolicitudCaratula">	
+	
+	    select LLSOLICITUD, LLCARATULA, LLSOLFRMPRE, BOPRINCIPAL from solicitud_caratulafme
+	    where LLSOLICITUD is not null 
+	    <if test="llsolicitud != 0">
+			and LLSOLICITUD = #{llsolicitud}		
+		</if>
+
+	</select>
+	
+	
+	<insert id="insertarSolicitudCaratula" >
+		INSERT INTO SOLICITUD_CARATULAFME (
+			LLSOLCARFME,
+			LLSOLICITUD,
+			LLCARATULA,
+			BOPRINCIPAL
+		) VALUES (
+			SOLICITUD_CARATULAFME_SEQ.nextval,
+			#{mvSolicitud.id},
+			#{caratula.llcaratula},
+			#{principal}
+		)
+	</insert>
+
+</mapper>

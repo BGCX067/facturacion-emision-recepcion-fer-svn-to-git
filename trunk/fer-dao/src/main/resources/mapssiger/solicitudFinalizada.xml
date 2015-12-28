@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.solicitud.SolicitudFinalizadaDAO">
+
+	<resultMap id="listaSolicitudesFinalizadas" type="solFinalizadaFedetario" >
+		<result column="LLUSUARIO" property="idUsuario" javaType="Integer" jdbcType="NUMERIC"/>
+		<result column="LLFEDATARIO" property="idFedatario" javaType="Long" jdbcType="NUMERIC"/>
+		<result column="LLSOLICITUD" property="idSolicitud" javaType="Long" jdbcType="NUMERIC"/>
+		<result column="LLTIPOSOLICITUD" property="idTiposolicitud" javaType="int" jdbcType="NUMERIC"/>
+		<result column="NCI" property="nci" javaType="String" jdbcType="VARCHAR"/>
+		<result column="FME" property="fme" javaType="String" jdbcType="VARCHAR"/>
+		<result column="DENOMINACION" property="denominacion" javaType="String" jdbcType="VARCHAR"/>
+		<result column="FECHA_INGRESO" property="fechaIngreso" javaType="Date" jdbcType="DATE"/>
+		<result column="TIPO_SOLICITUD" property="tipoSolicitud" javaType="String" jdbcType="VARCHAR"/>
+		<result column="FORMA_PRECODIFICADA" property="formaPrecodificada" javaType="String" jdbcType="VARCHAR"/>
+		<result column="SOLICITANTE" property="solicitante" javaType="String" jdbcType="VARCHAR"/>
+		<result column="FEDATARIO" property="datosFedatario" javaType="String" jdbcType="VARCHAR"/>
+		<result column="ID_ESTATUS_ACTO" property="idEstatusActo" javaType="String" jdbcType="VARCHAR"/>
+		<result column="ESTATUS_ACTO" property="estatusActo" javaType="String" jdbcType="VARCHAR"/>
+	</resultMap>
+	<select id="consultar" resultMap="listaSolicitudesFinalizadas" parameterType="solFinalizadaFedetario" >
+	    SELECT  DISTINCT MS.LLUSUARIO, 
+		        MS.LLFEDATARIO,
+		        MS.LLSOLICITUD,
+		        CT.LLTIPOSOLICITUD,
+		        MS.DSNCI NCI, 
+		        MC.CRFME FME,
+		        MC.DSDENSOCIAL DENOMINACION, 
+		        MS.FCINGRESO FECHA_INGRESO,
+		        CT.DSTIPOSOLICITUD TIPO_SOLICITUD,
+		        CF.DSFRMPRECLAVE FORMA_PRECODIFICADA,
+		        MS.CRSOLICITANTE SOLICITANTE,
+		        CFED.CRNUMERO || ' - '|| CFED.DSNOMBRE || ' '|| CFED.DSAPELLIDOPATERNO || ' '|| CFED.DSAPELLIDOMATERNO FEDATARIO,
+		        CEA.LLESTDOACTO ID_ESTATUS_ACTO,
+		        CEA.DSESTADOACTO ESTATUS_ACTO 
+		FROM MVSOLICITUDES MS, 
+		     CTTIPOSOLICITUDES CT,
+		     SOLICITUD_CARATULAFME SC, 
+		     MVCARATULAS MC,
+		     MVSOLFRMPRE MSF,
+		     MVFRMACTO MFA,
+		     CTESTADOSACTO CEA,
+		     FORMAS_ACTOS FA,
+		     CTACTOS CA,
+		     CFDEFFRMPRE CDF,
+		     CTFRMPRE CF,
+		     CTFEDATARIOS CFED
+		WHERE MS.LLTIPOSOLICITUD = CT.LLTIPOSOLICITUD   -- MVSOLICITUDES Y CTTIPOSOLICITUDES
+		AND MS.LLSOLICITUD = SC.LLSOLICITUD             -- MVSOLICITUDES Y SOLICITUD_CARATULAFME
+		AND SC.LLCARATULA = MC.LLCARATULA               -- SOLICITUD_CARATULAFME Y MVCARATULAS
+		AND MSF.LLSOLICITUD = MS.LLSOLICITUD            -- MVSOLFRMPRE Y MVSOLICITUDES
+		AND MFA.LLSOLFRMPRE = MSF.LLSOLFRMPRE           -- MVFRMACTO Y MVSOLFRMPRE
+		AND MFA.LLESTDOACTO = CEA.LLESTDOACTO           -- MVFRMACTO Y CTESTADOSACTO
+		AND MFA.LLFORMAACTO = FA.LLFORMAACTO            -- MVFRMACTO Y FORMAS_ACTOS
+		AND FA.LLACTO = CA.LLACTO                       -- FORMAS_ACTOS Y CTACTOS
+		AND MSF.LLDEFFRMPRE = CDF.LLDEFFRMPRE           -- MVSOLFRMPRE Y CFDEFFRMPRE
+		AND CDF.LLCATFRMPRE = CF.LLCTFRMPRE             -- CFDEFFRMPRE Y CTFRMPRE
+		AND FA.LLDEFFRMPRE = CDF.LLDEFFRMPRE            -- FORMAS_ACTOS Y CFDEFFRMPRE      
+		--AND CA.LLCTFRMPRE = CF.LLCTFRMPRE               -- CTACTOS  Y CTFRMPRE
+		AND MS.LLFEDATARIO = CFED.LLFEDATARIO           -- MVSOLICITUDES Y CTFEDATARIOS
+		AND MS.LLUSUARIO =  #{idUsuario}
+		<if test="nci != null">
+		AND UPPER(MS.DSNCI) LIKE UPPER('%' || #{nci} || '%')
+		</if>
+		<if test="fme != null">
+		AND UPPER(MC.CRFME) LIKE UPPER('%' || #{fme} || '%') 
+		</if>
+		<if test="denominacion != null">
+		AND UPPER(MC.DSDENSOCIAL) LIKE UPPER('%' || #{denominacion} || '%') 
+		</if>
+		<if test="fechaDesdeBD != null">
+			<if test="fechaHastaBD != null">
+		AND MS.FCINGRESO BETWEEN #{fechaDesdeBD} AND #{fechaHastaBD} 
+			</if>
+		</if>
+		AND MS.LLETAPA = 5 -- Calificada / Certificada
+		AND CT.LLTIPOSOLICITUD IN (2,3,5,7) -- Inscripción vía web inmediata | Inscripción vía web ordinaria | Continuidad de inscripción vía web | Certificación vía web
+		AND CEA.LLESTDOACTO = #{idEstatusActo} -- INSCRITO, RECHAZO SUBSANABLE , RECHAZO NO SUBSANABLE
+		ORDER BY MS.LLSOLICITUD
+	</select>
+	
+	
+	<resultMap id="listaActosSolicitudesFinalizadas" type="actoSolFinalizadaFedetario" >
+		<result column="ID_ACTO" property="idActo" javaType="Integer" jdbcType="NUMERIC"/>
+		<result column="DESCRIPCION_ACTO" property="descActo" javaType="String" jdbcType="VARCHAR"/>
+		<result column="FEC_INGRESO_ACTO" property="fecIngresoActo" javaType="Date" jdbcType="DATE"/>
+		<result column="ESTATUS_ACTO" property="estatusActo" javaType="String" jdbcType="VARCHAR"/>
+	</resultMap>
+	<select id="consultarActos" resultMap="listaActosSolicitudesFinalizadas" parameterType="actoSolFinalizadaFedetario" >
+	    SELECT  CA.LLACTO ID_ACTO,
+		        CA.DSACTOCORTA DESCRIPCION_ACTO,
+		        MFA.FCINGRESO FEC_INGRESO_ACTO,
+		        CEA.DSESTADOACTO ESTATUS_ACTO 
+		FROM MVSOLICITUDES MS, 
+		     CTTIPOSOLICITUDES CT,
+		     SOLICITUD_CARATULAFME SC, 
+		     MVCARATULAS MC,
+		     MVSOLFRMPRE MSF,
+		     MVFRMACTO MFA,
+		     CTESTADOSACTO CEA,
+		     FORMAS_ACTOS FA,
+		     CTACTOS CA,
+		     CFDEFFRMPRE CDF,
+		     CTFRMPRE CF,
+		     CTFEDATARIOS CFED
+		WHERE MS.LLTIPOSOLICITUD = CT.LLTIPOSOLICITUD   -- MVSOLICITUDES Y CTTIPOSOLICITUDES
+		AND MS.LLSOLICITUD = SC.LLSOLICITUD             -- MVSOLICITUDES Y SOLICITUD_CARATULAFME
+		AND SC.LLCARATULA = MC.LLCARATULA               -- SOLICITUD_CARATULAFME Y MVCARATULAS
+		AND MSF.LLSOLICITUD = MS.LLSOLICITUD            -- MVSOLFRMPRE Y MVSOLICITUDES
+		AND MFA.LLSOLFRMPRE = MSF.LLSOLFRMPRE           -- MVFRMACTO Y MVSOLFRMPRE
+		AND MFA.LLESTDOACTO = CEA.LLESTDOACTO           -- MVFRMACTO Y CTESTADOSACTO
+		AND MFA.LLFORMAACTO = FA.LLFORMAACTO            -- MVFRMACTO Y FORMAS_ACTOS
+		AND FA.LLACTO = CA.LLACTO                       -- FORMAS_ACTOS Y CTACTOS
+		AND MSF.LLDEFFRMPRE = CDF.LLDEFFRMPRE           -- MVSOLFRMPRE Y CFDEFFRMPRE
+		AND CDF.LLCATFRMPRE = CF.LLCTFRMPRE             -- CFDEFFRMPRE Y CTFRMPRE
+		AND FA.LLDEFFRMPRE = CDF.LLDEFFRMPRE            -- FORMAS_ACTOS Y CFDEFFRMPRE      
+		--AND CA.LLCTFRMPRE = CF.LLCTFRMPRE               -- CTACTOS  Y CTFRMPRE
+		AND MS.LLFEDATARIO = CFED.LLFEDATARIO           -- MVSOLICITUDES Y CTFEDATARIOS
+		AND MS.LLUSUARIO =  #{idUsuario}
+		
+		<if test="nci != null">
+		AND UPPER(MS.DSNCI) = UPPER(#{nci})
+		</if>
+		<if test="fme != null">
+		AND UPPER(MC.CRFME) = UPPER(#{fme}) 
+		</if>
+		<if test="denominacion != null">
+		AND UPPER(MC.DSDENSOCIAL) = UPPER(#{denominacion}) 
+		</if>
+		<if test="fechaIngreso != null">
+		AND MS.FCINGRESO = #{fechaIngreso}
+		</if>
+		
+		AND CT.LLTIPOSOLICITUD = #{idTiposolicitud}
+		AND CEA.LLESTDOACTO = #{idEstatusActo} 
+		AND MS.LLSOLICITUD = #{idSolicitud}
+		AND MS.LLETAPA = 5 -- Calificada / Certificada
+		ORDER BY MS.LLSOLICITUD
+	</select>
+	
+	
+	<resultMap id="boletasSolicitudMap" type="boleta">
+		<id     column="ID_SOLICITUD" 	property="mvSolicitud.id"/>
+		<result column="ID_BOLETA" 		property="id" />
+		<result column="ID_TIPO_BOLETA" property="ctTipoBoleta.id" />
+		<result column="NO_BOLETA" 		property="noBoleta" />
+		<result column="XML_BOLETA" 	property="xmlBoleta" />
+		<result column="TIPO_BOLETA" 	property="ctTipoBoleta.nombre" />
+	</resultMap>
+	<select id="consultarBoletasPorSolicitud" resultMap="boletasSolicitudMap" parameterType="boleta" >
+		SELECT MS.LLSOLICITUD ID_SOLICITUD, 
+			   EB.LLBOLETA ID_BOLETA, 
+			   EB.LLTIPOBOLETA ID_TIPO_BOLETA, 
+			   EB.NOBOLETA NO_BOLETA, 
+			   EB.XMLBOLETA XML_BOLETA, 
+			   CB.DSTIPOBOLETA TIPO_BOLETA
+		FROM MVSOLICITUDES MS, 
+		     ENBOLETAS EB, 
+		     CTTIPOBOLETAS CB
+		WHERE MS.LLSOLICITUD = EB.LLSOLICITUD
+		AND EB.LLTIPOBOLETA = CB.LLTIPOBOLETA
+		AND MS.LLSOLICITUD = #{idSolicitud}
+		
+	</select>
+	
+
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.varfrmepre.VarFrmPreDAO">
+    <!--selects -->
+    <select id="consultarPorVersionFP" resultMap="cfVarFrmPre">
+        SELECT var.*,tipovar.LLTIPOVARIABLE,tipovar.DSNOMBRE DSNOMBRETIPO,univar.LLUNIDADVARIABLE, univar.DSNOMBRE DSNOMBREUNIDAD
+                 FROM CFVARFRMPRE var
+		              JOIN CTTIPOVARIABLE tipovar ON tipovar.LLTIPOVARIABLE = var.LLTIPOVARIABLE
+		              JOIN CTUNIDADVARIABLE univar ON univar.LLUNIDADVARIABLE = var.LLUNIDADVARIABLE
+		         WHERE LLDEFFRMPRE  = #{value}
+		         ORDER BY var.LLVARFRMPRE
+    </select>    
+    <!-- Fin selects -->
+    <!--  inserts -->
+    <insert id="crear" parameterType="cfVarFrmPre" keyColumn="LLVARFRMPRE"  keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO CFVARFRMPRE(LLVARFRMPRE, LLTIPOVARIABLE, LLUNIDADVARIABLE, LLDEFFRMPRE, DSCLAVE, DSNOMBRE, DSVALOR) 
+                    VALUES(CFVARFRMPRE_SEQ.nextval,#{ctTipoVariable.id},#{ctUnidadVariable.id},#{idDefFrmPre},#{clave},#{nombre},#{valor})
+    </insert>
+    <!-- Fin  insert -->
+    <!-- Updates -->
+    <update id="modificar" parameterType="cfVarFrmPre">
+        UPDATE CFVARFRMPRE SET LLTIPOVARIABLE=#{ctTipoVariable.id},LLUNIDADVARIABLE=#{ctUnidadVariable.id},DSCLAVE=#{clave},DSNOMBRE=#{nombre},DSVALOR=#{valor}
+               WHERE LLVARFRMPRE=#{id}
+    </update>
+    <!-- Fin updates -->
+    <!-- Deletes -->
+    <delete id="eliminar">
+        DELETE CFVARFRMPRE WHERE LLVARFRMPRE=#{id}
+    </delete>
+    <!-- Fin de deletes -->
+    <!--  resultMaps -->
+    <resultMap type="cfVarFrmPre" id="cfVarFrmPre">
+        <id     column="LLVARFRMPRE"    property="id"/>
+        <result column="DSCLAVE"        property="clave"/>
+        <result column="DSNOMBRE"       property="nombre"/>
+        <result column="DSVALOR"        property="valor"/>
+        <result column="LLDEFFRMPRE"    property="idDefFrmPre"/>
+        
+        <association property="ctTipoVariable" javaType="ctTipoVariable" column="LLTIPOVARIABLE" resultMap="ctTipoVariable" />
+        <association property="ctUnidadVariable" javaType="ctUnidadVariable" column="LLUNIDADVARIABLE" resultMap="ctUnidadVariable" />
+    </resultMap>
+    <resultMap type="ctTipoVariable" id="ctTipoVariable">
+      <id column="LLTIPOVARIABLE"  property="id"/>
+      <result column="DSNOMBRETIPO" property="nombre"/>   
+    </resultMap>    
+    <resultMap type="ctUnidadVariable" id="ctUnidadVariable">
+      <id column="LLUNIDADVARIABLE"  property="id"/>
+      <result column="DSNOMBREUNIDAD" property="nombre"/>   
+   </resultMap>
+    <!-- fin resultMaps -->
+</mapper>

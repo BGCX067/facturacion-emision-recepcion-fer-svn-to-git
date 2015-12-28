@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.solicitud.EntregaDAO">
+	<resultMap type="entrega" id="listaEntrega">
+		<result column="LLENTREGA" property="pkEntrega" javaType="Long" jdbcType="NUMERIC"/>
+		<result column="LLSOLICITUD" property="pkSolicitud" javaType="Long" jdbcType="NUMERIC"/>
+		<result column="DSNCI" property="nci" javaType="String" jdbcType="VARCHAR"/>
+		<result column="CRFME" property="fme" javaType="String" jdbcType="VARCHAR"/>
+		<result column="DSNOMBREENTREGA" property="usuarioEntrega" javaType="String" jdbcType="VARCHAR"/>
+		<result column="FCENTREGA" property="fechaDesde" javaType="Date" jdbcType="DATE"/>
+		<result column="DSNOMBRERECIBE" property="usuarioRecibe" javaType="String" jdbcType="VARCHAR"/>
+	</resultMap>
+	<select id="consultar" resultMap="listaEntrega" parameterType="entrega" >
+	    SELECT A.LLENTREGA, B.LLSOLICITUD, C.DSNCI, F.CRFME, D.DSNOMBRE || ' ' ||D.DSAPELLIDOPATERNO|| ' '
+	    ||D.DSAPELLIDOMATERNO AS DSNOMBREENTREGA, A.FCENTREGA,A.DSNOMBRERECIBE
+    	FROM DTENTREGAS A, ENTREGA_SOLICITUD B, MVSOLICITUDES C,CTUSUARIOS D, SOLICITUD_CARATULAFME E, MVCARATULAS F
+    	WHERE A.LLENTREGA = B.LLENTREGA
+        AND   B.LLSOLICITUD = C.LLSOLICITUD
+    	AND   C.LLUSUARIO = A.LLUSUARIO
+        AND   D.LLUSUARIO = A.LLUSUARIO
+        AND   C.LLUSUARIO = D.LLUSUARIO
+        AND   E.LLSOLICITUD = B.LLSOLICITUD
+        AND   F.LLCARATULA = E.LLCARATULA
+		AND UPPER(C.DSNCI) LIKE UPPER('%' || #{nci} || '%') 
+		AND UPPER(F.CRFME) LIKE UPPER('%' || #{fme} || '%') 
+		AND UPPER( D.DSNOMBRE || ' ' ||D.DSAPELLIDOPATERNO|| ' '||D.DSAPELLIDOMATERNO) LIKE UPPER('%' || #{usuarioEntrega} || '%')
+		AND TO_CHAR(C.LLFEDATARIO) LIKE '%' || #{fedatario.id} || '%'
+		AND A.FCENTREGA BETWEEN #{fechaDesdeBD} and #{fechaHastaBD}
+		ORDER BY A.FCENTREGA DESC 
+	</select>
+	<select id="consultarSinFedatario" resultMap="listaEntrega" parameterType="entrega" >
+	    SELECT A.LLENTREGA, B.LLSOLICITUD, C.DSNCI, F.CRFME, D.DSNOMBRE || ' ' ||D.DSAPELLIDOPATERNO|| ' '
+	    ||D.DSAPELLIDOMATERNO AS DSNOMBREENTREGA, A.FCENTREGA,A.DSNOMBRERECIBE
+    	FROM DTENTREGAS A, ENTREGA_SOLICITUD B, MVSOLICITUDES C,CTUSUARIOS D,SOLICITUD_CARATULAFME E, MVCARATULAS F
+    	WHERE A.LLENTREGA = B.LLENTREGA
+        AND   B.LLSOLICITUD = C.LLSOLICITUD
+    	AND   C.LLUSUARIO = A.LLUSUARIO
+        AND   D.LLUSUARIO = A.LLUSUARIO
+        AND   C.LLUSUARIO = D.LLUSUARIO
+        AND   E.LLSOLICITUD = B.LLSOLICITUD
+        AND   F.LLCARATULA = E.LLCARATULA
+		AND UPPER(C.DSNCI) LIKE UPPER('%' || #{nci} || '%') 
+		AND UPPER(F.CRFME) LIKE UPPER('%' || #{fme} || '%') 
+		AND UPPER( D.DSNOMBRE || ' ' ||D.DSAPELLIDOPATERNO|| ' '||D.DSAPELLIDOMATERNO) LIKE UPPER('%' || #{usuarioEntrega} || '%')
+		AND A.FCENTREGA BETWEEN #{fechaDesdeBD} and #{fechaHastaBD}
+		ORDER BY A.FCENTREGA DESC 
+	</select>
+	<resultMap type="detEncabezadoEntrega" id="listaDetEncabezadoEntrega">	
+		<result column="DSNOMBREENTREGA" property="usuarioEntrega" javaType="String" jdbcType="VARCHAR"/>
+		<result column="DSNOMBRERECIBE" property="usuarioRecibe" javaType="String" jdbcType="VARCHAR"/>
+		<result column="DSTIPOIDENT" property="tipoIdentificacion" javaType="String" jdbcType="VARCHAR"/>
+		<result column="NOIDENTIFICACION" property="numeroIdentificacion" javaType="String" jdbcType="VARCHAR"/>
+		<result column="FCENTREGA" property="fechaEntrega" javaType="Date" jdbcType="DATE"/>
+	</resultMap>
+	<select id="consultarDetalleEncabezado" resultMap="listaDetEncabezadoEntrega" parameterType="detalleEntrega" >
+      	SELECT A.LLENTREGA, C.LLSOLICITUD, B.DSNOMBRE || ' ' ||B.DSAPELLIDOPATERNO|| ' '||B.DSAPELLIDOMATERNO AS DSNOMBREENTREGA,
+	    A.DSNOMBRERECIBE, A.DSTIPOIDENT ,A.NOIDENTIFICACION,A.FCENTREGA
+	    FROM DTENTREGAS A, CTUSUARIOS B,MVSOLICITUDES C, ENTREGA_SOLICITUD D
+	    WHERE B.LLUSUARIO = A.LLUSUARIO
+	    AND C.LLSOLICITUD = D.LLSOLICITUD
+	    AND C.LLUSUARIO = A.LLUSUARIO
+      	AND D.LLENTREGA = A.LLENTREGA
+	    AND A.LLENTREGA = #{pkEntrega}
+	    AND ROWNUM = 1
+	</select>
+	<resultMap type="detalleEntrega" id="listaDetalleEntrega">
+		<result column="DSNCI" property="nci" javaType="String" jdbcType="VARCHAR"/>
+		<result column="CRFME" property="fme" javaType="String" jdbcType="VARCHAR"/>
+		<result column="FCINGRESO" property="fechaIngreso" javaType="Date" jdbcType="DATE"/>
+		<result column="DSTIPOSOLICITUD" property="tipoSolicitud" javaType="String" jdbcType="VARCHAR"/>
+		<result column="DSESTATUS" property="estatus" javaType="String" jdbcType="VARCHAR"/>
+	</resultMap>
+	<select id="consultarDetalle" resultMap="listaDetalleEntrega" parameterType="detalleEntrega" >
+	    SELECT B.LLENTREGA, C.LLSOLICITUD,C.DSNCI, H.CRFME,C.FCINGRESO, D.DSTIPOSOLICITUD,E.DSESTATUS
+	    from ENTREGA_SOLICITUD A, DTENTREGAS B, MVSOLICITUDES C, CTTIPOSOLICITUDES D, CTESTATUS E, CTUSUARIOS F,SOLICITUD_CARATULAFME G, MVCARATULAS H 
+	    WHERE A.LLENTREGA = B.LLENTREGA
+        AND A.LLSOLICITUD = C.LLSOLICITUD
+	    AND D.LLTIPOSOLICITUD = B.LLTIPODOCUMENTO
+	    AND E.LLESTATUS = C.LLESTATUS
+	    AND F.LLUSUARIO = B.LLUSUARIO
+        AND C.LLUSUARIO = F.LLUSUARIO
+        AND G.LLSOLICITUD = A.LLSOLICITUD
+        AND H.LLCARATULA = G.LLCARATULA
+	    AND A.LLENTREGA = #{pkEntrega}
+	</select>
+</mapper>

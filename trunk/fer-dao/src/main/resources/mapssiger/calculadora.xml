@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.gob.se.siger2.dao.administracion.CalculadoraDAO">
+
+    <resultMap type="ctformaprecod" id="ctFormaPrecodificadaMap"> 
+    	<id column="LLCTFRMPRE" property="id"/>
+    	<result column="DSFRMPRECOD" property="descripcionForma" />
+		<result column="DSFRMPRECLAVE" property="claveForma" />
+    </resultMap>
+    
+    <resultMap type="cttipopagoder" id="ctTipoPagoDerechosMap"> 
+    	<id column="LLTIPOPAGODER" property="id"/>
+    	<result column="DSTIPOPAGODER" property="nombre" />
+    </resultMap>
+	
+	<resultMap type="ctTipoCertificado" id="ctTipoCertificadoMap"> 
+    	<id column="LLTIPOCERTIFICA" property="id"/>
+    	<result column="DSTIPOCERTIFICA" property="nombre" />
+    </resultMap>
+    
+    <resultMap type="cttipoconsulta" id="ctTipoConsultaMap"> 
+    	<id column="LLTIPOCONSULTA" property="id"/>
+    	<result column="DSTIPOCONSULTA" property="nombre" />
+    </resultMap>
+    
+    <resultMap type="ctacto" id="ctActoMap">
+    	<id column="LLACTO" property="id"/>
+    	<result column="DSACTO" property="nombre" />
+    	<result column="DSACTOCORTA" property="nombreCorto" />
+    </resultMap>
+    
+    <resultMap type="cfVariable" id="cfVariableMap">
+    	<id column="LLVARIABLE" property="id"/>
+    	<result column="DSNOMBREVARIABLE" property="nombre" />
+    	<result column="DSDESCRIPCION" property="descripcion" />
+    	<result column="BOVARIABLERANGO" property="variableRango" />  
+    	<result column="DSCODIGO" property="codigo" />  	
+    </resultMap>
+    
+     <resultMap type="ctCondicionCalif" id="ctCondicionesCalifMap">
+    	<id column="LLCONDICIONCALIF" property="id"/>
+    	<result column="DSCONDICIONCALIF" property="nombre" />
+     </resultMap>
+     
+     <resultMap type="ctCondicion" id="ctCondicionesMap">
+    	<id column="LLCONDICION" property="id"/>
+    	<result column="DSCONDICION" property="nombre" />
+    	<result column="FCMODIFICACION" property="fcModificacion" />
+     </resultMap>
+     
+     <resultMap type="ctImpuesto" id="ctImpuestoMap">
+     	<id column="LLIMPUESTO" property="id"/>
+    	<result column="DSNOMBREIMPUESTO" property="nombre" />
+    	<result column="NOPORCENTAJE" property="porcentaje" />
+    	<result column="FCMODIFICACION" property="fcModificacion" />
+    	<association property="cfTarifa" javaType="cfTarifa" column="LLTARIFA" resultMap="cfTarifasMap" />
+     </resultMap>
+     
+     <resultMap type="ctCondonacion" id="ctCondonacionMap">
+     	<id column="LLCONDONACION" property="id"/>
+    	<result column="DSNOMBRECOND" property="nombre" />
+    	<result column="NOPORCENTAJE" property="porcentaje" />
+    	<association property="ctImpuesto" javaType="ctImpuesto" column="LLIMPUESTO" resultMap="ctImpuestoMap" />
+		<association property="cfTarifa" javaType="cfTarifa" column="LLTARIFA" resultMap="cfTarifasMap" />
+	 </resultMap>
+	 
+	 
+	   <resultMap type="cfDescuento" id="cfDescuentoMap">
+     	<id column="LLDESCUENTO" property="id"/>
+    	<result column="NOMBRE" property="nombre" />
+    	<result column="DESCRIPCION" property="descripcion" />
+    	<result column="VALOR" property="valor" />
+    	<association property="ctCondicion" javaType="ctCondicion" column="LLCONDICION" resultMap="ctCondicionesMap" />
+	 </resultMap>
+	 
+	  <resultMap type="pagoDerechos" id="cfPagoDerechosMap">
+     	<id column="LLPAGODERECHO" property="id"/>
+       	<result column="FCINICIOVIGENCIA" property="fcInicioVigencia" />
+    	<association property="ctTipoPagoDerechos" javaType="cttipopagoder" column="LLTIPOPAGODER" resultMap="cttipopagoderMap" />
+    	<association property="ctOficina" javaType="oficinas" column="LLOFICINA" resultMap="ctOficinaMap" />
+	 </resultMap>
+	 
+	  <resultMap type="cttipopagoder" id="cttipopagoderMap">
+     	<id column="LLTIPOPAGODER" property="id"/>
+       	<result column="DSTIPOPAGODER" property="nombre" />
+    	<result column="FCMODIFICACION" property="fcModificacion" />
+	 </resultMap>    
+	 
+	 <resultMap type="oficinas" id="ctOficinaMap">
+     	<id column="LLTIPOPAGODER" property="id"/>
+       	<result column="DSOFICINA" property="nombre" />
+    	<association property="ctEstado" javaType="ctEstados" column="LLESTADO" resultMap="ctEstadosMap" />
+	 </resultMap>
+	 
+	 <resultMap type="ctEstados" id="ctEstadosMap">
+     	<id column="LLESTADO" property="id"/>
+       	<result column="DSESTADO" property="nombre" />    	
+	 </resultMap>
+	 
+	 <resultMap type="cfTarifa" id="cfTarifasMap">
+     	<id column="LLTARIFA" property="id"/>
+       	<result column="NORANGOI" property="rangoInicial" />
+       	<result column="NORANGOF" property="rangoFinal" /> 
+       	<result column="DSCONCEPTO" property="concepto" />  
+       	<result column="DSFORMULA" property="formula" /> 
+       	<association property="ctCondicion" javaType="ctCondicion" column="LLCONDICION" resultMap="ctCondicionesMap" />
+       	<association property="ctCondicionCalificacion" javaType="ctCondicionCalif" column="LLCONDICIONCALIF" resultMap="ctCondicionesCalifMap" />
+       	<association property="cfPagoDerechos" javaType="pagoDerechos" column="LLPAGODERECHO" resultMap="cfPagoDerechosMap" />
+     </resultMap>
+	 	    
+    
+    <select id="consultarFormasPrecodificadas" resultMap="ctFormaPrecodificadaMap">
+    	SELECT * FROM
+    	CTFRMPRE    
+    </select>
+    
+    <select id="consultarTipoPagoDerechos" resultMap="ctTipoPagoDerechosMap">
+    	SELECT * FROM
+    	CTTIPOPAGODER
+    </select>
+
+    <select id="consultarTipoCertificado" resultMap="ctTipoCertificadoMap">
+    	SELECT * FROM
+    	CTTIPOCERTIFICA
+    </select>
+    
+     <select id="consultarTipoConsulta" resultMap="ctTipoConsultaMap">
+    	SELECT * FROM
+    	CTTIPOCONSULTA
+    </select>    
+    
+    
+    <select id="consultarDescuentos" resultMap="cfDescuentoMap">
+    	SELECT * FROM CFDESCUENTOS
+    </select>
+    
+    <select id="consultaActosForma" resultMap="ctActoMap">
+    select 
+        ctac.*
+	from 
+        ctactos ctac
+    join 
+        ctfrmpre ctfrm on ctac.llctfrmpre = ctfrm.llctfrmpre
+		where 
+		     ctfrm.llctfrmpre = #{idForma}
+    </select>
+    
+    <select id="consultarVariables" resultMap="cfVariableMap">
+    SELECT * FROM CFVARIABLES
+    </select>
+    
+    <select id="consultarImpuestos" resultMap="ctImpuestoMap">
+    SELECT * FROM CTIMPUESTOS
+    </select>
+        
+    <select id="consultarCondicionesCalif" resultMap="ctCondicionesCalifMap">
+    SELECT * FROM CTCONDICIONCALIFIC
+    </select>
+    
+    <select id="consultarCondiciones" resultMap="ctCondicionesMap">
+    SELECT * FROM CTCONDICIONES
+    </select>
+    
+    <select id="consultarCondonacion" resultMap="ctCondonacionMap">
+    SELECT * FROM CTCONDONACIONES
+    </select>
+    
+    <select id="consultarPagoDerInsc" resultMap="cfPagoDerechosMap">
+   SELECT cfpagoder.*,oficina.*, estado.*,cttip.* FROM CFPAGODERECHOS cfpagoder
+		JOIN PAGODERECHO_FORMA forma ON cfpagoder.llpagoderecho = forma.llpagoderecho
+		JOIN PAGODERECHO_ACTO acto ON cfpagoder.llpagoderecho = acto.llpagoderecho
+		JOIN CTOFICINAS oficina ON cfpagoder.lloficina = oficina.lloficina
+		JOIN CTESTADOS estado ON oficina.llestado = estado.llestado
+		JOIN CTTIPOPAGODER cttip ON cfpagoder.lltipopagoder = cttip.lltipopagoder
+	WHERE 
+		cfpagoder.lloficina = #{idOficina} 
+		AND cfpagoder.lltipopagoder = #{idTipoPagoDer}
+		AND forma.llctfrmpre = #{idForma} 
+		AND acto.llacto = #{idActo}
+    </select>
+    
+    <select id="consultarVariablesPagoDer" parameterType="pagoDerechos" resultMap="cfVariableMap">
+    SELECT * FROM CFVARIABLES WHERE LLPAGODERECHO = #{id}
+    </select>
+    
+    <select id="consultarDescuentosPagoDer" parameterType="pagoDerechos" resultMap="cfDescuentoMap">
+    SELECT * FROM CFDESCUENTOS WHERE LLPAGODERECHO = #{id}
+    </select>
+    
+    <select id="consultarTarifasPagoDer" parameterType="pagoDerechos" resultMap="cfTarifasMap">
+    SELECT * FROM CFTARIFAS WHERE LLPAGODERECHO = #{id}
+    </select>
+    
+    <select id="consultarImpuestosTarifa"  parameterType="cfTarifa" resultMap="ctImpuestoMap">
+    SELECT * FROM CTIMPUESTOS WHERE LLTARIFA = #{id}
+    </select>
+    
+    <select id="consultarCondonacionesTarifa" parameterType="cfTarifa" resultMap="ctCondonacionMap">
+    SELECT * FROM CTCONDONACIONES WHERE LLTARIFA = #{id}
+    </select>    
+    
+    <delete id="eliminarVariable">
+    DELETE FROM CFVARIABLES WHERE LLVARIABLE=#{idVariable}
+    </delete>
+    
+    <delete id="eliminarImpuesto">
+    DELETE FROM CTIMPUESTOS WHERE LLIMPUESTO=#{idImpuesto}
+    </delete>
+    
+    <delete id="eliminarCondonacion">
+    DELETE FROM CTCONDONACIONES WHERE LLCONDONACION=#{idCondonacion}
+    </delete>
+    
+    <insert id="agregarVariable" parameterType="cfVariable">
+    
+    	INSERT INTO CFVARIABLES (
+    				LLVARIABLE,
+    				DSNOMBREVARIABLE,
+    				DSDESCRIPCION,
+    				BOVARIABLERANGO,
+    				DSCODIGO) 
+    	VALUES (
+    				cfvariables_SEQ.nextval,
+    				#{nombre},
+    				#{descripcion},
+    				#{variableRango},
+    				#{codigo})
+
+    </insert>
+        
+    <update id="actualizarVariable" parameterType="cfvariable"> 
+        UPDATE CFVARIABLES
+	    		SET
+        			DSNOMBREVARIABLE=#{nombre},
+    				DSDESCRIPCION=#{descripcion},
+    				BOVARIABLERANGO=#{variableRango},
+    				DSCODIGO=#{codigo}
+        		WHERE 		
+        			LLVARIABLE = #{id} 
+    </update>
+    
+    <insert id="agregarImpuesto" parameterType="ctImpuesto">
+    
+    	INSERT INTO CTIMPUESTOS (
+    				LLIMPUESTO,
+    				DSNOMBREIMPUESTO,
+    				NOPORCENTAJE,
+    				FCMODIFICACION,
+    				BOACTIVO) 
+    	VALUES (
+    				ctimpuestos_SEQ.nextval,
+    				#{nombre},
+    				#{porcentaje},
+    				#{fcModificacion},
+    				#{activo})
+
+    </insert>
+        
+    <update id="actualizarImpuesto" parameterType="ctImpuesto"> 
+        UPDATE CTIMPUESTOS
+	    		SET
+        			DSNOMBREIMPUESTO=#{nombre},
+    				NOPORCENTAJE=#{porcentaje},
+    				FCMODIFICACION=#{fcModificacion}
+        		WHERE 		
+        			LLIMPUESTO = #{id} 
+    </update>
+    
+    <insert id="agregarCondonacion" parameterType="ctCondonacion">
+    
+    	INSERT INTO CTCONDONACIONES (
+    				LLCONDONACION,
+    				LLIMPUESTO,
+    				DSNOMBRECOND,
+    				NOPORCENTAJE) 
+    	VALUES (
+    				ctcondonaciones_SEQ.nextval,
+    				#{ctImpuesto.id},
+    				#{nombre},
+    				#{porcentaje})
+
+    </insert>
+        
+    <update id="actualizarCondonacion" parameterType="ctCondonacion"> 
+        UPDATE CTCONDONACIONES
+	    		SET
+        			DSNOMBRECOND=#{nombre},
+    				NOPORCENTAJE=#{porcentaje},
+    				LLIMPUESTO=#{ctImpuesto.id}
+        		WHERE 		
+        			LLIMPUESTO = #{id} 
+    </update>
+        
+</mapper>
